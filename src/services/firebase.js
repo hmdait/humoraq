@@ -3,11 +3,11 @@ import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
-  authDomain: "humoraq-ffb97.firebaseapp.com",
-  projectId: "humoraq-ffb97",
-  storageBucket: "humoraq-ffb97.firebasestorage.app",
-  messagingSenderId: "84511525878",
-  appId: process.env.VUE_APP_MYAPPID,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VUE_APP_FIREBASE_APP_ID,
   measurementId: "G-1TTSQ15HXS"
 };
 
