@@ -5,8 +5,8 @@
         <div class="col-md-6">
           <label class="form-label fw-semibold">Language</label>
           <select 
-            :value="language"
-            @change="$emit('update:language', $event.target.value)"
+            :value="selectedLanguage"
+            @change="handleLanguageChange"
             class="form-select"
           >
             <option value="en">English</option>
@@ -36,16 +36,29 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
 defineProps({
-  language: {
-    type: String,
-    required: true
-  },
   category: {
     type: String,
     default: ''
   }
 });
 
-defineEmits(['update:language', 'update:category']);
+const emit = defineEmits(['update:category', 'language-changed']);
+
+const store = useStore();
+
+// CRITICAL: Always read from Vuex store
+const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
+
+// CRITICAL: Update Vuex store on change
+const handleLanguageChange = (event) => {
+  const newLanguage = event.target.value;
+  store.dispatch('preferences/setLanguage', newLanguage);
+  
+  // Emit event to notify parent component
+  emit('language-changed', newLanguage);
+};
 </script>

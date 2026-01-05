@@ -26,7 +26,7 @@
 
           <div v-if="currentJoke" class="text-center">
             <JokeButton 
-              @click="handleGetAnother"
+              @click="loadRandomJoke"
               text="Get Another Joke"
             />
           </div>
@@ -37,34 +37,43 @@
 </template>
 
 <script setup>
-import { watch, onMounted } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
 import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
-import { useJokes } from '../composables/useJokes';
 import { updateSEO } from '../utils/seo';
 
 const router = useRouter();
 const route = useRoute();
+const store = useStore();
 
-// Get the composable with all its refs and methods
-const { 
-  currentJoke, 
-  loading, 
-  loadJokeById, 
-  loadRandomJoke 
-} = useJokes();
+// CRITICAL: Get data from Vuex store
+const currentJoke = computed(() => store.getters['jokes/currentJoke']);
+const loading = computed(() => store.getters['jokes/loading']);
+const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
 
-// Handle "Get Another Joke" button
-const handleGetAnother = async () => {
-  await loadRandomJoke();
+// Load random joke
+const loadRandomJoke = async () => {  
+  // CRITICAL: Clear category before fetching random joke
+  await store.dispatch('jokes/setCategory', '');
+  
+  // CRITICAL: Fetch joke using Vuex (will use language from preferences)
+  await store.dispatch('jokes/fetchRandomJoke');
+  
+  // Navigate to the new joke if one was loaded
   if (currentJoke.value) {
     router.push(`/joke/${currentJoke.value.id}`);
   }
 };
 
-// Watch route changes to load the joke
+// Load joke by ID
+const loadJokeById = async (jokeId) => {
+  await store.dispatch('jokes/fetchJokeById', jokeId);
+};
+
+// Watch for route param changes
 watch(
   () => route.params.id,
   async (newId) => {

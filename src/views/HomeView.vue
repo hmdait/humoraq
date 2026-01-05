@@ -14,8 +14,8 @@
           </div>
 
           <CategoryFilter 
-            v-model:language="currentLanguage"
             v-model:category="currentCategory"
+            @language-changed="handleLanguageChange"
           />
 
           <JokeCard 
@@ -37,23 +37,46 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useStore } from 'vuex';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
 import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
 import CategoryFilter from '../components/CategoryFilter.vue';
-import { useJokes } from '../composables/useJokes';
 import { updateSEO } from '../utils/seo';
 
-const { 
-  currentJoke, 
-  loading, 
-  currentLanguage, 
-  currentCategory,
-  loadRandomJoke 
-} = useJokes();
+const store = useStore();
 
-watch([currentLanguage, currentCategory], () => {
+// Local state for category only
+const currentCategory = ref('');
+
+// CRITICAL: Get all data from Vuex store
+const currentJoke = computed(() => store.getters['jokes/currentJoke']);
+const loading = computed(() => store.getters['jokes/loading']);
+const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
+
+// Load random joke
+const loadRandomJoke = () => {
+  // Set category in store
+  store.dispatch('jokes/setCategory', currentCategory.value);
+  // Fetch joke (will automatically use language from preferences)
+  store.dispatch('jokes/fetchRandomJoke');
+};
+
+// Handle language change
+const handleLanguageChange = () => {
+  loadRandomJoke();
+};
+
+// CRITICAL: Watch for language changes from store
+watch(selectedLanguage, (newLanguage, oldLanguage) => {
+  if (newLanguage !== oldLanguage) {
+    loadRandomJoke();
+  }
+});
+
+// Watch for category changes
+watch(currentCategory, () => {
   loadRandomJoke();
 });
 

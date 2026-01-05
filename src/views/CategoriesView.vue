@@ -8,10 +8,10 @@
           <div class="mb-4">
             <label class="form-label fw-semibold">Select Language:</label>
             <select 
-              v-model="selectedLanguage" 
+              :value="selectedLanguage"
+              @change="handleLanguageChange"
               class="form-select"
               style="max-width: 200px;"
-              @change="loadCounts"
             >
               <option value="en">English</option>
               <option value="fr">Français</option>
@@ -46,35 +46,46 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
-import { useJokes } from '../composables/useJokes';
+import { getCategories, getCategoryCount } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
 
 const router = useRouter();
-const { categories, getCategoryCount, currentLanguage } = useJokes();
-const selectedLanguage = ref('en');
+const store = useStore();
+
+// CRITICAL: Get language from Vuex store
+const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
+const categories = ref(getCategories());
 const categoryCounts = reactive({});
 
+// CRITICAL: Update Vuex store on language change
+const handleLanguageChange = (event) => {
+  store.dispatch('preferences/setLanguage', event.target.value);
+};
+
 const loadCounts = async () => {
-  currentLanguage.value = selectedLanguage.value;
   for (const category of categories.value) {
-    categoryCounts[category.slug] = await getCategoryCount(category.slug);
+    categoryCounts[category.slug] = await getCategoryCount(category.slug, selectedLanguage.value);
   }
 };
 
 const navigateToCategory = (slug) => {
-  currentLanguage.value = selectedLanguage.value;
   router.push(`/category/${slug}`);
 };
+
+// CRITICAL: Watch for language changes from store
+watch(selectedLanguage, () => {
+  loadCounts();
+});
 
 onMounted(async () => {
   updateSEO({
     title: 'Browse Joke Categories - Humoraq',
     description: 'Explore jokes by category: tech, work, animals, food, and more!'
   });
-  selectedLanguage.value = currentLanguage.value;
   await loadCounts();
 });
 </script>

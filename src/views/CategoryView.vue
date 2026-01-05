@@ -12,7 +12,8 @@
               {{ categoryName }} Jokes
             </h1>
             <select 
-              v-model="currentLanguage" 
+              :value="selectedLanguage"
+              @change="handleLanguageChange"
               class="form-select"
               style="max-width: 150px;"
             >
@@ -22,16 +23,21 @@
             </select>
           </div>
 
-          <div v-if="jokes.length > 0" class="row g-4">
-            <div 
-              v-for="joke in jokes" 
-              :key="joke.id"
-              class="col-md-6 col-lg-4"
-            >
-              <JokeCard :joke="joke" />
+          <!-- Loading state -->
+          <div v-if="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
           </div>
 
+          <!-- Jokes grid -->
+          <JokeGrid 
+            v-else-if="jokes.length > 0"
+            :jokes="jokes"
+            :preview-length="120"
+          />
+
+          <!-- Empty state -->
           <div v-else class="alert alert-info">
             No jokes found in this category for the selected language.
           </div>
@@ -43,10 +49,11 @@
 
 <script setup>
 import { computed, onMounted, watch } from 'vue';
+import { useStore } from 'vuex';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
-import JokeCard from '../components/JokeCard.vue';
-import { useJokes } from '../composables/useJokes';
+import JokeGrid from '../components/JokeGrid.vue';
 import { updateSEO } from '../utils/seo';
+import { getCategories } from '../services/jokeService';
 
 const props = defineProps({
   slug: {
@@ -55,16 +62,44 @@ const props = defineProps({
   }
 });
 
-const { jokes, currentLanguage, loadJokesByCategory, getCategoryName } = useJokes();
+const store = useStore();
 
-const categoryName = computed(() => getCategoryName(props.slug));
+// CRITICAL: Get all data from Vuex store
+const jokes = computed(() => store.getters['jokes/jokes']);
+const loading = computed(() => store.getters['jokes/loading']);
+const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
 
-watch([() => props.slug, currentLanguage], () => {
-  loadJokesByCategory(props.slug);
+// Get category name
+const categoryName = computed(() => {
+  const categories = getCategories();
+  const category = categories.find(c => c.slug === props.slug);
+  return category ? category.name : props.slug;
+});
+
+// CRITICAL: Update Vuex store on language change
+const handleLanguageChange = (event) => {
+  store.dispatch('preferences/setLanguage', event.target.value);
+};
+
+// Load jokes
+const loadJokes = () => {
+  store.dispatch('jokes/fetchJokesByCategory', props.slug);
+};
+
+// CRITICAL: Watch for language changes from store
+watch(selectedLanguage, (newLanguage, oldLanguage) => {
+  if (newLanguage !== oldLanguage) {
+    loadJokes();
+  }
+});
+
+// Watch for route changes
+watch(() => props.slug, () => {
+  loadJokes();
 });
 
 onMounted(() => {
-  loadJokesByCategory(props.slug);
+  loadJokes();
   updateSEO({
     title: `${categoryName.value} Jokes - Humoraq`,
     description: `Browse all ${categoryName.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`

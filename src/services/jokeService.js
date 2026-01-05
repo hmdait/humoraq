@@ -261,10 +261,10 @@ export const createJoke = async (jokeData) => {
 
 export const getCategories = () => {
   return [
+    { slug: 'general', name: 'General', icon: '😄' },
     { slug: 'tech', name: 'Tech', icon: '💻' },
     { slug: 'work', name: 'Work', icon: '💼' },
     { slug: 'animals', name: 'Animals', icon: '🐶' },
-    { slug: 'food', name: 'Food', icon: '🍕' },
-    { slug: 'general', name: 'General', icon: '😄' }
+    { slug: 'food', name: 'Food', icon: '🍕' }
   ];
 };
