@@ -201,6 +201,8 @@ const formatDate = (timestamp) => {
   line-height: 1.6;
   color: var(--text-color);
   white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word; 
 }
 
 .badge-sm {

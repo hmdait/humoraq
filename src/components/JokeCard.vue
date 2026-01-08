@@ -8,7 +8,8 @@
         <span class="badge bg-secondary">{{ getLanguageName(joke.language) }}</span>
       </div>
       
-      <p class="joke-text">{{ joke.text }}</p>
+      <!-- UPDATED: Added preserve-whitespace class -->
+      <p class="joke-text preserve-whitespace">{{ joke.text }}</p>
       
       <div class="d-flex justify-content-between align-items-center mt-3">
         <div class="d-flex flex-column flex-sm-row gap-2 align-items-start align-items-sm-center">
@@ -44,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
 
@@ -63,14 +64,15 @@ const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
 
-// Check if user has already liked this joke (from localStorage)
 onMounted(() => {
   const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
   hasLiked.value = likedJokes.includes(props.joke.id);
 });
 
 const handleLike = async () => {
-  if (hasLiked.value || isLiking.value) return;
+  if (hasLiked.value || isLiking.value) {
+    return;
+  }
 
   isLiking.value = true;
 
@@ -84,7 +86,6 @@ const handleLike = async () => {
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
 
-    // ADD THIS: Track like event
     trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
@@ -135,17 +136,53 @@ const getAuthorName = (author) => {
 </script>
 
 <style scoped>
+.joke-card {
+  transition: box-shadow 0.3s ease;
+}
+
+.joke-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .joke-card:hover {
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+}
+
+.joke-text {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 0;
+}
+
+/* ADDED: Preserve whitespace and line breaks */
+.preserve-whitespace {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.category-badge {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .like-button {
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+  font-weight: 500;
 }
 
 .like-button:hover:not(.liked) {
   transform: scale(1.1);
+  color: #dc3545 !important;
 }
 
 .like-button.liked {
+  color: #dc3545 !important;
+  font-weight: 600;
   cursor: default;
 }
 
