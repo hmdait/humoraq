@@ -44,43 +44,50 @@ import DefaultLayout from '../layouts/DefaultLayout.vue';
 import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
 import { updateSEO } from '../utils/seo';
+import { trackJokeView } from '../services/analyticsService'; // ADD THIS
 
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
 
-// CRITICAL: Get data from Vuex store
 const currentJoke = computed(() => store.getters['jokes/currentJoke']);
 const loading = computed(() => store.getters['jokes/loading']);
 const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
 
-// Load random joke
-const loadRandomJoke = async () => {  
-  // CRITICAL: Clear category before fetching random joke
-  await store.dispatch('jokes/setCategory', '');
+const loadRandomJoke = async () => {
+  console.log('=== JokeView: loadRandomJoke called ===');
+  console.log('JokeView: Current language:', selectedLanguage.value);
   
-  // CRITICAL: Fetch joke using Vuex (will use language from preferences)
+  await store.dispatch('jokes/setCategory', '');
   await store.dispatch('jokes/fetchRandomJoke');
   
-  // Navigate to the new joke if one was loaded
   if (currentJoke.value) {
     router.push(`/joke/${currentJoke.value.id}`);
   }
 };
 
-// Load joke by ID
 const loadJokeById = async (jokeId) => {
+  console.log('=== JokeView: loadJokeById called ===');
+  console.log('JokeView: Loading joke ID:', jokeId);
+  
   await store.dispatch('jokes/fetchJokeById', jokeId);
+  
+  // ADD THIS: Track joke view
+  if (currentJoke.value) {
+    trackJokeView(
+      currentJoke.value.id, 
+      currentJoke.value.category, 
+      currentJoke.value.language
+    );
+  }
 };
 
-// Watch for route param changes
 watch(
   () => route.params.id,
   async (newId) => {
     if (newId) {
       await loadJokeById(String(newId));
       
-      // Update SEO after joke is loaded
       if (currentJoke.value && currentJoke.value.text) {
         updateSEO({
           title: `Joke - Humoraq`,

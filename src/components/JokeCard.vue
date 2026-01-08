@@ -46,6 +46,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { likeJoke } from '../services/jokeService';
+import { trackJokeLike } from '../services/analyticsService';
 
 const props = defineProps({
   joke: {
@@ -69,27 +70,24 @@ onMounted(() => {
 });
 
 const handleLike = async () => {
-  if (hasLiked.value || isLiking.value) {
-    return; // Prevent duplicate likes
-  }
+  if (hasLiked.value || isLiking.value) return;
 
   isLiking.value = true;
 
   try {
-    // Optimistically update UI
     localLikes.value += 1;
     hasLiked.value = true;
 
-    // Update Firestore
     await likeJoke(props.joke.id);
 
-    // Store in localStorage to prevent multiple likes
     const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
+
+    // ADD THIS: Track like event
+    trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
-    // Revert optimistic update on error
     localLikes.value -= 1;
     hasLiked.value = false;
   } finally {

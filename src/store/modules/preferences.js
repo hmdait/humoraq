@@ -1,3 +1,5 @@
+import { trackLanguageChange } from '../../services/analyticsService'; 
+
 const state = {
   language: localStorage.getItem('selectedLanguage') || 'en',
   theme: localStorage.getItem('theme') || 'light'
@@ -11,8 +13,14 @@ const getters = {
 
 const mutations = {
   SET_LANGUAGE(state, language) {
+    const oldLanguage = state.language; // ADD THIS
     state.language = language;
     localStorage.setItem('selectedLanguage', language);
+    
+    //Track language change
+    if (oldLanguage !== language) {
+      trackLanguageChange(oldLanguage, language);
+    }
   },
   
   SET_THEME(state, theme) {

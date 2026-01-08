@@ -119,6 +119,7 @@ import { ref, reactive, onMounted } from 'vue';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
 import { createJoke } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
+import { trackJokeSubmit } from '../services/analyticsService';
 
 const formData = reactive({
   authorName: '',
@@ -149,6 +150,9 @@ const handleSubmit = async () => {
       category: formData.category,
       language: formData.language
     });
+
+    //Track joke submission
+    trackJokeSubmit(formData.category, formData.language, 'user');
 
     submitted.value = true;
     

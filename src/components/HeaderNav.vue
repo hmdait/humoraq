@@ -28,10 +28,13 @@
             <router-link to="/" class="nav-link">Home</router-link>
           </li>
           <li class="nav-item">
+            <router-link to="/spotlight" class="nav-link">Spotlight</router-link>
+          </li>
+          <li class="nav-item">
             <router-link to="/categories" class="nav-link">Categories</router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/submit" class="nav-link">Submit Joke</router-link>
+            <router-link to="/submit" class="nav-link">Submit</router-link>
           </li>
         </ul>
       </div>

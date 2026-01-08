@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
+
 
 const firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
@@ -11,7 +13,32 @@ const firebaseConfig = {
   measurementId: "G-1TTSQ15HXS"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore
 const db = getFirestore(app);
 
-export { db };
+// Initialize Analytics
+let analytics = null;
+
+const initAnalytics = async () => {
+  try {
+    // Check if analytics is supported in this environment
+    const supported = await isAnalyticsSupported();
+    
+    if (supported) {
+      analytics = getAnalytics(app);
+      console.log('✅ Firebase Analytics initialized successfully');
+    } else {
+      console.warn('⚠️ Firebase Analytics not supported in this environment');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing Analytics:', error);
+  }
+};
+
+// Initialize analytics (async)
+initAnalytics();
+
+export { db, analytics };

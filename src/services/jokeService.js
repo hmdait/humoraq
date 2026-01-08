@@ -6,6 +6,9 @@ import {
   addDoc, 
   query, 
   where,
+  orderBy,
+  limit,
+  startAfter,
   serverTimestamp,
   increment,
   updateDoc
@@ -267,4 +270,97 @@ export const getCategories = () => {
     { slug: 'animals', name: 'Animals', icon: '🐶' },
     { slug: 'food', name: 'Food', icon: '🍕' }
   ];
+};
+
+// NEW: Fetch jokes feed with pagination
+export const getJokesFeed = async (pageSize = 10, lastDoc = null) => {
+  try {
+    let q = query(
+      jokesCollection,
+      where('status', '==', 'published'),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+
+    // If lastDoc is provided, start after it (pagination)
+    if (lastDoc) {
+      q = query(
+        jokesCollection,
+        where('status', '==', 'published'),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastDoc),
+        limit(pageSize)
+      );
+    }
+
+    const querySnapshot = await getDocs(q);
+    
+    // Get the last document for pagination
+    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    
+    const jokes = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      _doc: doc // Store the document reference for pagination
+    }));
+
+    return {
+      jokes,
+      lastDoc: lastVisible,
+      hasMore: jokes.length === pageSize
+    };
+  } catch (error) {
+    console.error('Error fetching jokes feed:', error);
+    return {
+      jokes: [],
+      lastDoc: null,
+      hasMore: false
+    };
+  }
+};
+
+// NEW: Fetch jokes feed filtered by language
+export const getJokesFeedByLanguage = async (language, pageSize = 10, lastDoc = null) => {
+  try {
+    let q = query(
+      jokesCollection,
+      where('status', '==', 'published'),
+      where('language', '==', language),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+
+    if (lastDoc) {
+      q = query(
+        jokesCollection,
+        where('status', '==', 'published'),
+        where('language', '==', language),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastDoc),
+        limit(pageSize)
+      );
+    }
+
+    const querySnapshot = await getDocs(q);
+    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    
+    const jokes = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      _doc: doc
+    }));
+
+    return {
+      jokes,
+      lastDoc: lastVisible,
+      hasMore: jokes.length === pageSize
+    };
+  } catch (error) {
+    console.error('Error fetching jokes feed by language:', error);
+    return {
+      jokes: [],
+      lastDoc: null,
+      hasMore: false
+    };
+  }
 };
