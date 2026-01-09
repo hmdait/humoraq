@@ -8,8 +8,15 @@
         <span class="badge bg-secondary">{{ getLanguageName(joke.language) }}</span>
       </div>
       
-      <!-- UPDATED: Added preserve-whitespace class -->
-      <p class="joke-text preserve-whitespace">{{ joke.text }}</p>
+      <!-- UPDATED: Added dynamic direction and lang attributes -->
+      <p 
+        class="joke-text preserve-whitespace"
+        :dir="textDirection"
+        :lang="joke.language"
+        :class="directionClass"
+      >
+        {{ joke.text }}
+      </p>
       
       <div class="d-flex justify-content-between align-items-center mt-3">
         <div class="d-flex flex-column flex-sm-row gap-2 align-items-start align-items-sm-center">
@@ -45,9 +52,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
+import { getTextDirection, getDirectionClass } from '../utils/rtl';
 
 const props = defineProps({
   joke: {
@@ -63,6 +71,10 @@ const props = defineProps({
 const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
+
+// Compute text direction based on content
+const textDirection = computed(() => getTextDirection(props.joke.text));
+const directionClass = computed(() => getDirectionClass(props.joke.text));
 
 onMounted(() => {
   const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
@@ -155,11 +167,24 @@ const getAuthorName = (author) => {
   margin-bottom: 0;
 }
 
-/* ADDED: Preserve whitespace and line breaks */
+/* Preserve whitespace and line breaks */
 .preserve-whitespace {
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+/* UPDATED: Force right alignment for RTL */
+.rtl-text.joke-text {
+  line-height: 1.8 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* UPDATED: Ensure LTR stays left */
+.ltr-text.joke-text {
+  text-align: left !important;
+  direction: ltr !important;
 }
 
 .category-badge {

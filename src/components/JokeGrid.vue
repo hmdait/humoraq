@@ -7,7 +7,6 @@
     >
       <div class="card joke-card-preview h-100">
         <div class="card-body d-flex flex-column">
-          <!-- Header with badges -->
           <div class="d-flex justify-content-between align-items-start mb-3">
             <span :class="`badge bg-${getCategoryColor(joke.category)} category-badge`">
               {{ getCategoryName(joke.category) }}
@@ -15,12 +14,16 @@
             <span class="badge bg-secondary">{{ getLanguageName(joke.language) }}</span>
           </div>
           
-          <!-- Joke preview text - fixed height with ellipsis -->
-          <p class="joke-preview-text flex-grow-1">
+          <!-- UPDATED: Added RTL support -->
+          <p 
+            class="joke-preview-text flex-grow-1 preserve-whitespace"
+            :dir="getTextDirection(joke.text)"
+            :lang="joke.language"
+            :class="getDirectionClass(joke.text)"
+          >
             {{ truncateText(joke.text, previewLength) }}
           </p>
           
-          <!-- Footer with stats and button -->
           <div class="mt-auto pt-3 border-top">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <small class="text-muted">
@@ -45,7 +48,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { getTextDirection, getDirectionClass } from '../utils/rtl';
 
 const props = defineProps({
   jokes: {
@@ -59,12 +62,10 @@ const props = defineProps({
   }
 });
 
-// Truncate text helper
 const truncateText = (text, maxLength) => {
   if (!text) return '';
   if (text.length <= maxLength) return text;
   
-  // Try to break at word boundary
   const truncated = text.substring(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
   
@@ -134,14 +135,30 @@ const getAuthorName = (author) => {
   font-size: 1rem;
   line-height: 1.5;
   color: var(--text-color);
-  
-  /* Fixed height with ellipsis */
-  height: 4.5em; /* 3 lines * 1.5 line-height */
+  height: 4.5em;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
+}
+
+/* UPDATED: Force right alignment for RTL */
+.rtl-text.joke-preview-text {
+  line-height: 1.7 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.ltr-text.joke-preview-text {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.preserve-whitespace {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .category-badge {

@@ -26,11 +26,25 @@
         </div>
       </div>
 
-      <!-- Title (if exists) -->
-      <h5 v-if="joke.title" class="feed-post-title mb-2">{{ joke.title }}</h5>
+      <!-- Title (if exists) - UPDATED: Added RTL support -->
+      <h5 
+        v-if="joke.title" 
+        class="feed-post-title mb-2"
+        :dir="titleDirection"
+        :class="titleDirectionClass"
+      >
+        {{ joke.title }}
+      </h5>
 
-      <!-- Joke Text -->
-      <p class="feed-post-text mb-3">{{ joke.text }}</p>
+      <!-- Joke Text - UPDATED: Added RTL support -->
+      <p 
+        class="feed-post-text mb-3 preserve-whitespace"
+        :dir="textDirection"
+        :lang="joke.language"
+        :class="directionClass"
+      >
+        {{ joke.text }}
+      </p>
 
       <!-- Footer with stats and actions -->
       <div class="feed-post-footer">
@@ -62,8 +76,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { likeJoke } from '../services/jokeService';
+import { trackJokeLike } from '../services/analyticsService';
+import { getTextDirection, getDirectionClass } from '../utils/rtl';
 
 const props = defineProps({
   joke: {
@@ -75,6 +91,17 @@ const props = defineProps({
 const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
+
+// Compute text direction based on content
+const textDirection = computed(() => getTextDirection(props.joke.text));
+const directionClass = computed(() => getDirectionClass(props.joke.text));
+
+const titleDirection = computed(() => 
+  props.joke.title ? getTextDirection(props.joke.title) : 'ltr'
+);
+const titleDirectionClass = computed(() => 
+  props.joke.title ? getDirectionClass(props.joke.title) : 'ltr-text'
+);
 
 onMounted(() => {
   const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
@@ -95,6 +122,8 @@ const handleLike = async () => {
     const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
+
+    trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
     localLikes.value -= 1;
@@ -148,7 +177,6 @@ const getLanguageName = (code) => {
 const formatDate = (timestamp) => {
   if (!timestamp) return 'Just now';
   
-  // Handle Firestore Timestamp
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   const now = new Date();
   const diffMs = now - date;
@@ -196,13 +224,39 @@ const formatDate = (timestamp) => {
   font-weight: 600;
 }
 
+/* UPDATED: Force right alignment for RTL title */
+.rtl-text.feed-post-title {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.ltr-text.feed-post-title {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
 .feed-post-text {
   font-size: 1rem;
   line-height: 1.6;
   color: var(--text-color);
+}
+
+/* UPDATED: Force right alignment for RTL text */
+.rtl-text.feed-post-text {
+  line-height: 1.8 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.ltr-text.feed-post-text {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.preserve-whitespace {
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow-wrap: break-word; 
+  overflow-wrap: break-word;
 }
 
 .badge-sm {

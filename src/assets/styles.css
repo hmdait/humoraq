@@ -241,6 +241,99 @@ body.light-mode {
   max-height: 4.5em;
 }
 
+
+/* ========================================
+   RTL (Right-to-Left) Support
+   ======================================== */
+
+/* RTL Text Direction - FULL RIGHT ALIGNMENT */
+.rtl-text {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: embed;
+}
+
+.ltr-text {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Auto-detect direction based on content */
+.auto-direction {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+/* Arabic-specific typography improvements */
+.rtl-text,
+[dir="rtl"] {
+  font-family: 'Segoe UI', 'Arial', 'Tahoma', 'Noto Sans Arabic', 'Geeza Pro', sans-serif;
+  line-height: 1.8 !important; /* Better spacing for Arabic */
+  letter-spacing: 0 !important; /* Remove letter spacing for Arabic */
+  text-align: right !important; /* Force right alignment */
+}
+
+/* Preserve whitespace for all directions */
+.preserve-whitespace {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* RTL paragraph alignment */
+.rtl-text p,
+.rtl-text .joke-text,
+.rtl-text .feed-post-text,
+.rtl-text .joke-preview-text {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* RTL title alignment */
+.rtl-text h1,
+.rtl-text h2,
+.rtl-text h3,
+.rtl-text h4,
+.rtl-text h5,
+.rtl-text h6,
+.rtl-text .feed-post-title {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* RTL-aware margin and padding utilities */
+.rtl-text .ms-2 {
+  margin-right: 0.5rem !important;
+  margin-left: 0 !important;
+}
+
+.rtl-text .me-2 {
+  margin-left: 0.5rem !important;
+  margin-right: 0 !important;
+}
+
+/* Badge positioning for RTL */
+.rtl-text .badge {
+  margin-left: 0.5rem;
+  margin-right: 0;
+}
+
+.ltr-text .badge {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+/* Fix Bootstrap flex direction for RTL */
+.rtl-text .d-flex {
+  direction: rtl;
+}
+
+/* RTL Card body alignment */
+[dir="rtl"] .card-body {
+  text-align: right;
+}
+
+
 /* Grid responsive adjustments */
 @media (max-width: 768px) {
   .joke-card-preview {

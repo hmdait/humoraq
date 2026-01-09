@@ -214,6 +214,7 @@ import { createJoke } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
 import { trackJokeSubmit } from '../services/analyticsService';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import { getTextDirection, getDirectionClass } from '../utils/rtl';
 
 // Validation constants
 const minLength = 20;
@@ -270,6 +271,8 @@ const clearText = () => {
     jokeTextarea.value.style.height = 'auto';
   }
 };
+
+
 
 // Handle form submission
 const handleSubmit = async () => {
