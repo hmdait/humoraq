@@ -25,7 +25,7 @@
       <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <router-link to="/" class="nav-link">Home</router-link>
+            <router-link to="/" class="nav-link">Feed</router-link>
           </li>
           <li class="nav-item">
             <router-link to="/spotlight" class="nav-link">Spotlight</router-link>
@@ -35,6 +35,9 @@
           </li>
           <li class="nav-item">
             <router-link to="/submit" class="nav-link">Submit</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/about" class="nav-link">About</router-link>
           </li>
         </ul>
       </div>
@@ -56,6 +59,69 @@ import ThemeToggle from './ThemeToggle.vue';
 .brand-name {
   font-weight: bold;
   font-size: 1.25rem;
+}
+
+/* Active link styling */
+.nav-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary-color) !important;
+}
+
+.nav-link.router-link-active {
+  color: var(--primary-color) !important;
+  font-weight: 500;
+}
+
+.nav-link.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+/* Dark mode navbar */
+.dark-mode .navbar {
+  background-color: var(--card-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+.dark-mode .navbar-brand,
+.dark-mode .nav-link {
+  color: var(--text-color) !important;
+}
+
+.dark-mode .nav-link:hover,
+.dark-mode .nav-link.router-link-active {
+  color: var(--primary-color) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 991px) {
+  .navbar-nav {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .dark-mode .navbar-nav {
+    border-top-color: var(--border-color);
+  }
+
+  .nav-link.router-link-active::after {
+    display: none;
+  }
+
+  .nav-item {
+    text-align: center;
+  }
 }
 
 @media (max-width: 576px) {

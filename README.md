@@ -1,72 +1,73 @@
 🎭 Humoraq
 
-Humoraq est une application web moderne de partage de blagues, développée avec Vue 3 et Firebase, mettant l’accent sur la qualité UX, la scalabilité et la gestion d’un contenu multilingue.
+Humoraq is a modern, multilingual joke-sharing web application built with Vue 3 and Firebase.
+This project was designed as a portfolio showcase, highlighting frontend architecture, UX quality, and scalable SPA development.
 
-Projet personnel démontrant des compétences en frontend moderne, architecture SPA, et intégration backend cloud.
+🚀 Project Purpose:
+Build a production-ready Single Page Application
+Manage dynamic, multilingual content
+Apply best practices in UX, SEO, and performance
+Demonstrate clean architecture and maintainable code
 
-🚀 Objectif du projet:
-Concevoir une Single Page Application performante et maintenable
-Gérer du contenu dynamique (blagues) par catégorie et langue
-Mettre en œuvre de bonnes pratiques UX, SEO et performance
-Structurer un projet Vue 3 prêt pour la production
+✨ Key Features:
+🌍 Multilingual support (English, French, Arabic)
+📚 Category-based content
+🔄 Dynamic joke feed (random & filtered)
+👀 Spotlight & detail views
+👍 Like & view counters with duplicate-prevention logic
+🌙 Dark / Light mode with persistence
+📝 User joke submission
+📱 Fully responsive design
 
-✨ Fonctionnalités clés
-🌍 Multilingue : anglais, français, arabe
-📚 Catégorisation des contenus
-🔄 Flux de blagues dynamique (aléatoire & filtré)
-👀 Pages détail & spotlight
-👍 Likes & vues avec prévention des doublons
-🌙 Dark / Light mode persistant
-📝 Soumission de contenu par les utilisateurs
-📱 Responsive design (mobile / desktop)
-
-
-🧠 Points techniques mis en avant
-
+🧠 Technical Highlights:
 Vue 3 – Composition API
-Architecture modulaire (components, composables, services, views)
-Vue Router (routes dynamiques, pages dédiées)
-Firebase Firestore pour les données temps réel
-SEO dynamique (meta tags par page)
-Optimistic UI et gestion des états de chargement
-LocalStorage pour améliorer l’expérience utilisateur
-Code réutilisable et maintenable
+Modular architecture (components, composables, services, views)
+Vue Router with dynamic routes
+Firebase Firestore for real-time data
+Dynamic SEO meta tags
+Optimistic UI updates
+LocalStorage for UX optimization
+Clean, reusable, and scalable codebase
 
-🗂️ Structure du projet (simplifiée)
+🗂️ Project Structure (Simplified):
 src/
-├── components/    # UI réutilisable
-├── composables/   # Logique métier (hooks Vue)
-├── views/         # Pages / routes
-├── services/      # Accès aux données (Firestore)
-├── router/        # Navigation
+├── components/    # Reusable UI components
+├── composables/   # Business logic (Vue hooks)
+├── views/         # Route-level pages
+├── services/      # Data access layer
+├── router/        # App navigation
 ├── utils/         # SEO & helpers
 ├── App.vue
 └── main.js
 
-🛠️ Stack technique
+🛠️ Tech Stack:
+Frontend: Vue 3, JavaScript, HTML, CSS
+UI Framework: Bootstrap 5
+Routing: Vue Router
+Backend: Firebase (Firestore)
+State Management: Vue Composables
+SEO & Performance: Dynamic metadata, lazy loading
 
-Frontend : Vue 3, JavaScript, HTML, CSS
-UI : Bootstrap 5
-Routing : Vue Router
-Backend : Firebase (Firestore)
-State management : Composables Vue
-SEO & Performance : Meta dynamiques, lazy loading
+📈 What This Project Demonstrates:
+End-to-end frontend application development
+Strong understanding of modern SPA concepts
+Focus on user experience and performance
+Scalable and maintainable code organization
+Ability to design and deliver a complete product independently
 
-
-📝 Future Enhancements
-[*] User authentication
-[] Joke moderation system
-[*] Comment system
-[] Share to social media
-[] Joke of the day
-[] Advanced search and filters
-[*] User profiles
-[] Favorite jokes collection
-[*] Video jokes support
-[*] Audio jokes / TTS
-[] Progressive Web App (PWA)
+💡 Future Enhancements:
+[] User authentication 
+[] Joke moderation system 
+[] Comment system 
+[*] Share to social media 
+[*] Joke of the day 
+[] Advanced search and filters 
+[] User profiles 
+[] Favorite jokes collection 
+[*] Video jokes support 
+[] Audio jokes / TTS 
+[] Progressive Web App (PWA) 
 [] Admin dashboard
 
-📄 Licence
-
-Projet open-source sous licence MIT.
+📄 License:
+This project is open-source under the MIT License.

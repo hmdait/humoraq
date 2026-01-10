@@ -5,8 +5,9 @@ import JokeView from '../views/JokeView.vue';
 import CategoriesView from '../views/CategoriesView.vue';
 import CategoryView from '../views/CategoryView.vue';
 import SubmitView from '../views/SubmitView.vue';
+import AboutView from '../views/AboutView.vue'; // NEW
 import NotFoundView from '../views/NotFoundView.vue';
-import { trackPageView } from '../services/analyticsService'; // ADD THIS
+import { trackPageView } from '../services/analyticsService';
 
 const routes = [
   {
@@ -51,6 +52,12 @@ const routes = [
     meta: { title: 'Submit a Joke - Humoraq' }
   },
   {
+    path: '/about', // NEW ROUTE
+    name: 'about',
+    component: AboutView,
+    meta: { title: 'About Us - Humoraq' }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: NotFoundView,
@@ -67,12 +74,10 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // Update page title
   document.title = to.meta.title || 'Humoraq';
   next();
 });
 
-// ADD THIS: Track page views after navigation
 router.afterEach((to, from) => {
   trackPageView(to.name, to.meta.title || 'Humoraq');
 });
