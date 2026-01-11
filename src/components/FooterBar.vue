@@ -89,7 +89,7 @@
               <i class="bi bi-instagram fs-4"></i>
             </a>
             <a 
-              href="https://tiktok.com/@humoraq" 
+              href="https://www.tiktok.com/@humoraq" 
               target="_blank" 
               rel="noopener noreferrer"
               class="social-icon"
@@ -98,11 +98,11 @@
               <i class="bi bi-tiktok fs-4"></i>
             </a>
             <a 
-              href="https://twitter.com/humoraq" 
+              href="https://x.com/Humoraq_jk" 
               target="_blank" 
               rel="noopener noreferrer"
               class="social-icon"
-              aria-label="Twitter"
+              aria-label="X"
             >
               <i class="bi bi-twitter fs-4"></i>
             </a>

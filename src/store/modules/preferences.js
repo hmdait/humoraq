@@ -1,26 +1,44 @@
-import { trackLanguageChange } from '../../services/analyticsService'; 
-
 const state = {
-  language: localStorage.getItem('selectedLanguage') || 'en',
+  languages: JSON.parse(localStorage.getItem('selectedLanguages') || '["en", "fr", "ar"]'), // Default: all languages
   theme: localStorage.getItem('theme') || 'light'
 };
 
 const getters = {
-  selectedLanguage: (state) => state.language,
+  selectedLanguages: (state) => state.languages,
   selectedTheme: (state) => state.theme,
-  isLanguageSelected: (state) => (lang) => state.language === lang
+  
+  // Helper to check if a language is selected
+  isLanguageSelected: (state) => (lang) => state.languages.includes(lang),
+  
+  // Check if all languages are selected
+  allLanguagesSelected: (state) => state.languages.length === 3,
+  
+  // For backward compatibility (returns first selected language)
+  selectedLanguage: (state) => state.languages[0] || 'en'
 };
 
 const mutations = {
-  SET_LANGUAGE(state, language) {
-    const oldLanguage = state.language; // ADD THIS
-    state.language = language;
-    localStorage.setItem('selectedLanguage', language);
-    
-    //Track language change
-    if (oldLanguage !== language) {
-      trackLanguageChange(oldLanguage, language);
+  SET_LANGUAGES(state, languages) {
+    // Ensure at least one language is always selected
+    if (languages.length === 0) {
+      languages = ['en'];
     }
+    state.languages = languages;
+    localStorage.setItem('selectedLanguages', JSON.stringify(languages));
+  },
+  
+  TOGGLE_LANGUAGE(state, language) {
+    const index = state.languages.indexOf(language);
+    if (index > -1) {
+      // Remove language if already selected (but keep at least one)
+      if (state.languages.length > 1) {
+        state.languages.splice(index, 1);
+      }
+    } else {
+      // Add language
+      state.languages.push(language);
+    }
+    localStorage.setItem('selectedLanguages', JSON.stringify(state.languages));
   },
   
   SET_THEME(state, theme) {
@@ -30,8 +48,12 @@ const mutations = {
 };
 
 const actions = {
-  setLanguage({ commit }, language) {
-    commit('SET_LANGUAGE', language);
+  setLanguages({ commit }, languages) {
+    commit('SET_LANGUAGES', languages);
+  },
+  
+  toggleLanguage({ commit }, language) {
+    commit('TOGGLE_LANGUAGE', language);
   },
   
   setTheme({ commit }, theme) {
@@ -39,11 +61,11 @@ const actions = {
   },
   
   initializePreferences({ commit }) {
-    const savedLanguage = localStorage.getItem('selectedLanguage');
+    const savedLanguages = localStorage.getItem('selectedLanguages');
     const savedTheme = localStorage.getItem('theme');
     
-    if (savedLanguage) {
-      commit('SET_LANGUAGE', savedLanguage);
+    if (savedLanguages) {
+      commit('SET_LANGUAGES', JSON.parse(savedLanguages));
     }
     if (savedTheme) {
       commit('SET_THEME', savedTheme);

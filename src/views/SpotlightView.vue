@@ -1,6 +1,6 @@
 <template>
   <DefaultLayout>
-      <div class="container">
+    <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-8">
         <!-- Page Header -->
@@ -9,11 +9,7 @@
           <p class="lead text-muted">Jokes that rotate automatically</p>
         </div>
 
-        <!-- Language & Category Filter -->
-        <CategoryFilter 
-          v-model:category="currentCategory"
-          @language-changed="handleLanguageChange"
-        />
+        <!-- NO CATEGORY FILTER - removed completely -->
 
         <!-- Joke Card with Fade Transition -->
         <div 
@@ -74,15 +70,13 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
-import CategoryFilter from '../components/CategoryFilter.vue';
 import { updateSEO } from '../utils/seo';
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import { trackSpotlightAction } from '../services/analyticsService';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 const store = useStore();
 
-// Local state
-const currentCategory = ref('');
+// Local state (NO category filter)
 const isAutoRotationActive = ref(true);
 const isPaused = ref(false);
 const rotationTimer = ref(null);
@@ -90,10 +84,10 @@ const progressTimer = ref(null);
 const currentDelay = ref(0);
 const elapsedTime = ref(0);
 
-// Computed properties from Vuex
+// Get data from GLOBAL Vuex state
 const currentJoke = computed(() => store.getters['jokes/currentJoke']);
 const loading = computed(() => store.getters['jokes/loading']);
-const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
+const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
 // Progress calculation
 const progressPercent = computed(() => {
@@ -115,11 +109,13 @@ const calculateDelay = (joke) => {
   return delay;
 };
 
-// Load random joke
+// Load random joke (NO category - uses GLOBAL languages)
 const loadRandomJoke = async () => {
   console.log('=== Loading random joke ===');
   stopAutoRotation();
-  store.dispatch('jokes/setCategory', currentCategory.value);
+  
+  // Clear category and fetch (will use GLOBAL languages from Vuex)
+  await store.dispatch('jokes/setCategory', '');
   await store.dispatch('jokes/fetchRandomJoke');
   
   if (currentJoke.value) {
@@ -131,7 +127,6 @@ const loadRandomJoke = async () => {
   }
 };
 
-// Start auto-rotation timer
 const startAutoRotation = () => {
   if (!currentJoke.value) return;
   
@@ -141,11 +136,8 @@ const startAutoRotation = () => {
   currentDelay.value = calculateDelay(currentJoke.value);
   elapsedTime.value = 0;
   
-  console.log(`Next rotation in ${currentDelay.value}ms`);
-  
   rotationTimer.value = setTimeout(() => {
     if (isAutoRotationActive.value && !isPaused.value) {
-      // ADD THIS
       trackSpotlightAction('auto_rotate', currentJoke.value?.id);
       loadRandomJoke();
     }
@@ -158,24 +150,18 @@ const startAutoRotation = () => {
   }, 100);
 };
 
-// Stop auto-rotation timer
 const stopAutoRotation = () => {
-  console.log('=== Stopping auto-rotation ===');
-  
   if (rotationTimer.value) {
     clearTimeout(rotationTimer.value);
     rotationTimer.value = null;
   }
-  
   if (progressTimer.value) {
     clearInterval(progressTimer.value);
     progressTimer.value = null;
   }
-  
   elapsedTime.value = 0;
 };
 
-// Toggle auto-rotation on/off
 const toggleAutoRotation = () => {
   isAutoRotationActive.value = !isAutoRotationActive.value;
   
@@ -188,45 +174,33 @@ const toggleAutoRotation = () => {
     trackSpotlightAction('pause');
   }
 };
-// Pause on hover
+
 const pauseAutoRotation = () => {
-  console.log('=== Paused (hover) ===');
   isPaused.value = true;
 };
 
-// Resume on mouse leave
 const resumeAutoRotation = () => {
-  console.log('=== Resumed (hover end) ===');
   if (isAutoRotationActive.value) {
     isPaused.value = false;
   }
 };
 
-// Handle visibility change (tab switching)
 const handleVisibilityChange = () => {
   if (document.hidden) {
-    console.log('=== Tab hidden - pausing ===');
     isPaused.value = true;
   } else {
-    console.log('=== Tab visible - resuming ===');
     if (isAutoRotationActive.value) {
       isPaused.value = false;
     }
   }
 };
 
-// Handle language change
-const handleLanguageChange = () => {
-  console.log('Language changed to:', selectedLanguage.value);
+// Watch for language changes from GLOBAL state
+watch(selectedLanguages, () => {
+  console.log('=== Languages changed, loading new joke ===');
   loadRandomJoke();
-};
+}, { deep: true });
 
-// Watch for language or category changes
-watch([selectedLanguage, currentCategory], () => {
-  loadRandomJoke();
-});
-
-// Watch for joke changes to restart timer
 watch(currentJoke, (newJoke) => {
   if (newJoke && isAutoRotationActive.value && !isPaused.value) {
     startAutoRotation();
@@ -246,14 +220,12 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  console.log('=== Spotlight unmounted ===');
   stopAutoRotation();
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 </script>
 
 <style scoped>
-/* Fade Transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s ease;
@@ -264,18 +236,11 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
-}
-
-/* Joke Spotlight Container */
 .joke-spotlight-container {
   min-height: 250px;
   position: relative;
 }
 
-/* Progress bar styling */
 .progress {
   border-radius: 4px;
   overflow: hidden;

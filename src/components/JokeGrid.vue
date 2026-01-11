@@ -7,6 +7,7 @@
     >
       <div class="card joke-card-preview h-100">
         <div class="card-body d-flex flex-column">
+          <!-- Header: Badges -->
           <div class="d-flex justify-content-between align-items-start mb-3">
             <span :class="`badge bg-${getCategoryColor(joke.category)} category-badge`">
               {{ getCategoryName(joke.category) }}
@@ -14,7 +15,18 @@
             <span class="badge bg-secondary">{{ getLanguageName(joke.language) }}</span>
           </div>
           
-          <!-- UPDATED: Added RTL support -->
+          <!-- NEW: Joke Title (if exists) -->
+          <h5 
+            v-if="joke.title" 
+            class="joke-title mb-2"
+            :dir="getTextDirection(joke.title)"
+            :lang="joke.language"
+            :class="getDirectionClass(joke.title)"
+          >
+            {{ joke.title }}
+          </h5>
+          
+          <!-- Joke Preview Text -->
           <p 
             class="joke-preview-text flex-grow-1 preserve-whitespace"
             :dir="getTextDirection(joke.text)"
@@ -24,6 +36,7 @@
             {{ truncateText(joke.text, previewLength) }}
           </p>
           
+          <!-- Footer: Author, Stats, and Action -->
           <div class="mt-auto pt-3 border-top">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <small class="text-muted">
@@ -131,6 +144,36 @@ const getAuthorName = (author) => {
   box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
 }
 
+/* NEW: Joke Title Styling */
+.joke-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  
+  /* Limit to 2 lines with ellipsis */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* RTL support for title */
+.rtl-text.joke-title {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.ltr-text.joke-title {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
 .joke-preview-text {
   font-size: 1rem;
   line-height: 1.5;
@@ -139,11 +182,12 @@ const getAuthorName = (author) => {
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
 }
 
-/* UPDATED: Force right alignment for RTL */
+/* RTL text gets better line height */
 .rtl-text.joke-preview-text {
   line-height: 1.7 !important;
   text-align: right !important;

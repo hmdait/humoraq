@@ -21,8 +21,8 @@ const getters = {
   jokesCount: (state) => state.jokes.length,
   
   jokesByLanguage: (state, getters, rootState) => {
-    const selectedLanguage = rootState.preferences.language;
-    return state.jokes.filter(joke => joke.language === selectedLanguage);
+    const selectedLanguages = rootState.preferences.languages;
+    return state.jokes.filter(joke => selectedLanguages.includes(joke.language));
   },
   
   getJokePreview: (state) => (joke, maxLength = 100) => {
@@ -69,26 +69,43 @@ const mutations = {
 };
 
 const actions = {
-  // FIXED: Properly access state.category
   async fetchRandomJoke({ commit, state, rootState }) {
     commit('SET_LOADING', true);
     commit('SET_ERROR', null);
     
     try {
-      // CRITICAL: Get language from Vuex preferences module
-      const language = rootState.preferences.language;
+      // Get selected languages from preferences
+      const languages = rootState.preferences.languages;
       
-      // CRITICAL: Get category from local state
-      const category = state.category;
+      console.log('Fetching random joke for languages:', languages);
       
-      const filters = {
-        language: language,
-        category: category || undefined
-      };
-
-      const joke = await getRandomJoke(filters);
+      // Fetch jokes for all selected languages
+      let allJokes = [];
       
-      commit('SET_CURRENT_JOKE', joke);
+      for (const language of languages) {
+        const filters = {
+          language: language,
+          category: state.category || undefined
+        };
+        
+        console.log('Fetching with filters:', filters);
+        
+        const joke = await getRandomJoke(filters);
+        if (joke) {
+          allJokes.push(joke);
+        }
+      }
+      
+      console.log('Total jokes fetched:', allJokes.length);
+      
+      // Pick a random joke from all fetched jokes
+      if (allJokes.length > 0) {
+        const randomJoke = allJokes[Math.floor(Math.random() * allJokes.length)];
+        commit('SET_CURRENT_JOKE', randomJoke);
+      } else {
+        commit('SET_CURRENT_JOKE', null);
+        console.warn('No jokes found for selected languages');
+      }
     } catch (error) {
       commit('SET_ERROR', error.message);
       console.error('Error fetching random joke:', error);
@@ -118,11 +135,33 @@ const actions = {
     commit('SET_CATEGORY', category);
     
     try {
-      // CRITICAL: Get language from Vuex preferences module
-      const language = rootState.preferences.language;
-          
-      const jokes = await getJokesByCategory(category, language);
-      commit('SET_JOKES', jokes);
+      // Get selected languages from preferences
+      const languages = rootState.preferences.languages;
+      
+      console.log('Fetching jokes for category:', category, 'languages:', languages);
+      
+      // Fetch jokes for all selected languages
+      let allJokes = [];
+      
+      for (const language of languages) {
+        const jokes = await getJokesByCategory(category, language);
+        allJokes = [...allJokes, ...jokes];
+      }
+      
+      console.log('Total jokes fetched for category:', allJokes.length);
+      
+      // Sort by creation date (newest first)
+      allJokes.sort((a, b) => {
+        const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function' 
+          ? a.createdAt.toMillis() 
+          : 0;
+        const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function' 
+          ? b.createdAt.toMillis() 
+          : 0;
+        return bTime - aTime;
+      });
+      
+      commit('SET_JOKES', allJokes);
     } catch (error) {
       commit('SET_ERROR', error.message);
       console.error('Error fetching jokes by category:', error);

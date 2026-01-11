@@ -3,29 +3,14 @@
     <div class="container py-4">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <!-- Header -->
+          <!-- Header - NO LANGUAGE SELECTOR -->
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="display-5 mb-0">Jokes Feed</h1>
-            <select 
-              v-model="selectedLanguage"
-              @change="handleLanguageChange"
-              class="form-select"
-              style="max-width: 150px;"
-            >
-              <option value="">All Languages</option>
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
           </div>
 
           <!-- Feed Posts -->
           <div v-if="jokes.length > 0">
-            <FeedPost 
-              v-for="joke in jokes" 
-              :key="joke.id"
-              :joke="joke"
-            />
+            <FeedPost v-for="joke in jokes" :key="joke.id" :joke="joke" />
           </div>
 
           <!-- Loading Indicator -->
@@ -36,12 +21,9 @@
             <p class="mt-2 text-muted">Loading more jokes...</p>
           </div>
 
-          <!-- Load More Button (fallback if infinite scroll doesn't work) -->
+          <!-- Load More Button -->
           <div v-if="hasMore && !loading" class="text-center py-4">
-            <button 
-              @click="loadMore"
-              class="btn btn-outline-primary"
-            >
+            <button @click="loadMore" class="btn btn-outline-primary">
               Load More Jokes
             </button>
           </div>
@@ -56,14 +38,14 @@
             <div class="display-1 mb-3">😢</div>
             <h3>No jokes found</h3>
             <p class="text-muted">
-              {{ selectedLanguage ? 'Try selecting a different language' : 'Be the first to submit a joke!' }}
+              Try selecting more languages from the header or be the first to submit a joke!
             </p>
             <router-link to="/submit" class="btn btn-primary mt-3">
               Submit a Joke
             </router-link>
           </div>
 
-          <!-- Scroll Sentinel (for infinite scroll detection) -->
+          <!-- Scroll Sentinel -->
           <div ref="scrollSentinel" class="scroll-sentinel"></div>
         </div>
       </div>
@@ -72,127 +54,159 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
-import DefaultLayout from '../layouts/DefaultLayout.vue';
-import FeedPost from '../components/FeedPost.vue';
-import { getJokesFeed, getJokesFeedByLanguage } from '../services/jokeService';
-import { updateSEO } from '../utils/seo';
-import { trackFeedScroll } from '../services/analyticsService';
+  import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import FeedPost from '../components/FeedPost.vue';
+  import { getJokesFeed, getJokesFeedByLanguage } from '../services/jokeService';
+  import { updateSEO } from '../utils/seo';
+  import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
-const jokes = ref([]);
-const loading = ref(false);
-const hasMore = ref(true);
-const lastDoc = ref(null);
-const selectedLanguage = ref('');
-const scrollSentinel = ref(null);
-const pageSize = 10;
+  const store = useStore();
 
-// Intersection Observer for infinite scroll
-let observer = null;
+  const jokes = ref([]);
+  const loading = ref(false);
+  const hasMore = ref(true);
+  const lastDocs = ref({});
+  const scrollSentinel = ref(null);
+  const pageSize = 10;
 
-const loadInitialJokes = async () => {
-  console.log('=== Loading initial jokes ===');
-  loading.value = true;
-  jokes.value = [];
-  lastDoc.value = null;
-  hasMore.value = true;
+  let observer = null;
 
-  try {
-    const result = selectedLanguage.value
-      ? await getJokesFeedByLanguage(selectedLanguage.value, pageSize)
-      : await getJokesFeed(pageSize);
+  // Get selected languages from Vuex (GLOBAL STATE)
+  const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-    jokes.value = result.jokes;
-    lastDoc.value = result.lastDoc;
-    hasMore.value = result.hasMore;
+  const loadInitialJokes = async () => {
+    console.log('=== Loading initial jokes for languages:', selectedLanguages.value);
+    loading.value = true;
+    jokes.value = [];
+    lastDocs.value = {};
+    hasMore.value = true;
 
-    console.log('Loaded jokes:', jokes.value.length);
-    console.log('Has more:', hasMore.value);
-  } catch (error) {
-    console.error('Error loading initial jokes:', error);
-  } finally {
-    loading.value = false;
-  }
-};
+    try {
+      let allJokes = [];
 
-const loadMore = async () => {
-  if (loading.value || !hasMore.value) return;
+      // Fetch for each selected language
+      for (const language of selectedLanguages.value) {
+        const result = await getJokesFeedByLanguage(language, pageSize);
+        allJokes = [...allJokes, ...result.jokes];
+        lastDocs.value[language] = result.lastDoc;
+      }
 
-  console.log('=== Loading more jokes ===');
-  loading.value = true;
+      // Sort by creation date
+      allJokes.sort((a, b) => {
+        const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function'
+          ? a.createdAt.toMillis()
+          : 0;
+        const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function'
+          ? b.createdAt.toMillis()
+          : 0;
+        return bTime - aTime;
+      });
 
-  try {
-    const result = selectedLanguage.value
-      ? await getJokesFeedByLanguage(selectedLanguage.value, pageSize, lastDoc.value)
-      : await getJokesFeed(pageSize, lastDoc.value);
+      jokes.value = allJokes.slice(0, pageSize);
+      hasMore.value = allJokes.length >= pageSize;
 
-    jokes.value = [...jokes.value, ...result.jokes];
-    lastDoc.value = result.lastDoc;
-    hasMore.value = result.hasMore;
-
-    console.log('Total jokes:', jokes.value.length);
-    console.log('Has more:', hasMore.value);
-
-    //Track feed scroll
-    trackFeedScroll(jokes.value.length, hasMore.value);
-  } catch (error) {
-    console.error('Error loading more jokes:', error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const handleLanguageChange = () => {
-  console.log('=== Language changed to:', selectedLanguage.value, '===');
-  loadInitialJokes();
-};
-
-const setupInfiniteScroll = () => {
-  if (!scrollSentinel.value) return;
-
-  const options = {
-    root: null,
-    rootMargin: '200px', // Load more when sentinel is 200px from viewport
-    threshold: 0
+      console.log('Loaded jokes:', jokes.value.length);
+    } catch (error) {
+      console.error('Error loading initial jokes:', error);
+    } finally {
+      loading.value = false;
+    }
   };
 
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && hasMore.value && !loading.value) {
-        console.log('=== Scroll sentinel visible, loading more ===');
-        loadMore();
+  const loadMore = async () => {
+    if (loading.value || !hasMore.value) return;
+
+    console.log('=== Loading more jokes ===');
+    loading.value = true;
+
+    try {
+      let allJokes = [];
+
+      for (const language of selectedLanguages.value) {
+        const result = await getJokesFeedByLanguage(
+          language,
+          pageSize,
+          lastDocs.value[language]
+        );
+        allJokes = [...allJokes, ...result.jokes];
+        lastDocs.value[language] = result.lastDoc;
       }
+
+      // Sort
+      allJokes.sort((a, b) => {
+        const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function'
+          ? a.createdAt.toMillis()
+          : 0;
+        const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function'
+          ? b.createdAt.toMillis()
+          : 0;
+        return bTime - aTime;
+      });
+
+      jokes.value = [...jokes.value, ...allJokes.slice(0, pageSize)];
+      hasMore.value = allJokes.length >= pageSize;
+
+      console.log('Total jokes:', jokes.value.length);
+    } catch (error) {
+      console.error('Error loading more jokes:', error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Watch for language changes from GLOBAL state
+  watch(selectedLanguages, () => {
+    console.log('=== Languages changed, reloading feed ===');
+    loadInitialJokes();
+  }, { deep: true });
+
+  const setupInfiniteScroll = () => {
+    if (!scrollSentinel.value) return;
+
+    const options = {
+      root: null,
+      rootMargin: '200px',
+      threshold: 0
+    };
+
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && hasMore.value && !loading.value) {
+          console.log('=== Scroll sentinel visible, loading more ===');
+          loadMore();
+        }
+      });
+    }, options);
+
+    observer.observe(scrollSentinel.value);
+  };
+
+  const cleanupInfiniteScroll = () => {
+    if (observer && scrollSentinel.value) {
+      observer.unobserve(scrollSentinel.value);
+      observer.disconnect();
+    }
+  };
+
+  onMounted(async () => {
+    updateSEO({
+      title: 'Jokes Feed - Humoraq',
+      description: 'Browse the latest jokes from the Humoraq community in a social feed format.'
     });
-  }, options);
 
-  observer.observe(scrollSentinel.value);
-};
-
-const cleanupInfiniteScroll = () => {
-  if (observer && scrollSentinel.value) {
-    observer.unobserve(scrollSentinel.value);
-    observer.disconnect();
-  }
-};
-
-onMounted(async () => {
-  updateSEO({
-    title: 'Jokes Feed - Humoraq',
-    description: 'Browse the latest jokes from the Humoraq community in a social feed format.'
+    await loadInitialJokes();
+    setupInfiniteScroll();
   });
 
-  await loadInitialJokes();
-  setupInfiniteScroll();
-});
-
-onUnmounted(() => {
-  cleanupInfiniteScroll();
-});
+  onUnmounted(() => {
+    cleanupInfiniteScroll();
+  });
 </script>
 
 <style scoped>
-.scroll-sentinel {
-  height: 1px;
-  width: 100%;
-}
+  .scroll-sentinel {
+    height: 1px;
+    width: 100%;
+  }
 </style>

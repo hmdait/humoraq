@@ -4,7 +4,7 @@
       <div class="row justify-content-center">
         <div class="col-lg-8">
           <router-link to="/" class="btn btn-outline-secondary mb-4">
-            ← Back to Home
+            ← Back to Feed
           </router-link>
 
           <JokeCard 
@@ -24,12 +24,34 @@
             </div>
           </div>
 
-          <div v-if="currentJoke" class="text-center">
+          <!-- Actions Section -->
+          <div v-if="currentJoke" class="text-center mb-4">
             <JokeButton 
               @click="loadRandomJoke"
               text="Get Another Joke"
             />
           </div>
+
+          <!-- Call-to-Action Section -->
+          <div v-if="currentJoke" class="cta-section">
+            <div class="card border-primary shadow-sm">
+              <div class="card-body text-center p-4">
+                <h5 class="card-title mb-3">
+                  Got a joke to share? 😄
+                </h5>
+                <p class="card-text text-muted mb-3">
+                  Make someone laugh today! Share your favorite joke with our community.
+                </p>
+                <router-link 
+                  to="/submit" 
+                  class="btn btn-primary btn-lg"
+                >
+                  ✍️ Share Your Favorite Joke
+                </router-link>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -44,7 +66,7 @@ import DefaultLayout from '../layouts/DefaultLayout.vue';
 import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
 import { updateSEO } from '../utils/seo';
-import { trackJokeView } from '../services/analyticsService'; // ADD THIS
+import { trackJokeView } from '../services/analyticsService';
 
 const router = useRouter();
 const route = useRoute();
@@ -72,7 +94,6 @@ const loadJokeById = async (jokeId) => {
   
   await store.dispatch('jokes/fetchJokeById', jokeId);
   
-  // ADD THIS: Track joke view
   if (currentJoke.value) {
     trackJokeView(
       currentJoke.value.id, 
@@ -106,3 +127,71 @@ onMounted(() => {
   });
 });
 </script>
+
+<style scoped>
+/* CTA Section Styling */
+.cta-section {
+  margin-top: 2rem;
+  animation: fadeInUp 0.5s ease;
+}
+
+.cta-section .card {
+  border-width: 2px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.cta-section .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(13, 110, 253, 0.2) !important;
+}
+
+.cta-section .card-title {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.cta-section .btn {
+  min-width: 200px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cta-section .btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Dark mode support */
+.dark-mode .cta-section .card {
+  background-color: var(--card-bg);
+  border-color: var(--primary-color);
+}
+
+.dark-mode .cta-section .card:hover {
+  box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3) !important;
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .cta-section .btn {
+    min-width: 100%;
+    font-size: 0.95rem;
+  }
+
+  .cta-section .card-body {
+    padding: 1.5rem !important;
+  }
+}
+</style>

@@ -7,39 +7,24 @@
             ← Back to Categories
           </router-link>
 
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="display-5">
-              {{ categoryName }} Jokes
-            </h1>
-            <select 
-              :value="selectedLanguage"
-              @change="handleLanguageChange"
-              class="form-select"
-              style="max-width: 150px;"
-            >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
-          </div>
+          <!-- Header - NO LANGUAGE SELECTOR -->
+          <h1 class="display-5 mb-4">
+            {{ categoryName }} Jokes
+          </h1>
 
-          <!-- Loading state -->
+          <!-- Loading State -->
           <div v-if="loading" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
 
-          <!-- Jokes grid -->
-          <JokeGrid 
-            v-else-if="jokes.length > 0"
-            :jokes="jokes"
-            :preview-length="120"
-          />
+          <!-- Jokes Grid -->
+          <JokeGrid v-else-if="jokes.length > 0" :jokes="jokes" :preview-length="120" />
 
-          <!-- Empty state -->
+          <!-- Empty State -->
           <div v-else class="alert alert-info">
-            No jokes found in this category for the selected language.
+            No jokes found in this category. Try selecting more languages from the header!
           </div>
         </div>
       </div>
@@ -48,61 +33,56 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import DefaultLayout from '../layouts/DefaultLayout.vue';
-import JokeGrid from '../components/JokeGrid.vue';
-import { updateSEO } from '../utils/seo';
-import { getCategories } from '../services/jokeService';
+  import { computed, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import JokeGrid from '../components/JokeGrid.vue';
+  import { updateSEO } from '../utils/seo';
+  import { getCategories } from '../services/jokeService';
+  import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
-const props = defineProps({
-  slug: {
-    type: String,
-    required: true
-  }
-});
-
-const store = useStore();
-
-// CRITICAL: Get all data from Vuex store
-const jokes = computed(() => store.getters['jokes/jokes']);
-const loading = computed(() => store.getters['jokes/loading']);
-const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
-
-// Get category name
-const categoryName = computed(() => {
-  const categories = getCategories();
-  const category = categories.find(c => c.slug === props.slug);
-  return category ? category.name : props.slug;
-});
-
-// CRITICAL: Update Vuex store on language change
-const handleLanguageChange = (event) => {
-  store.dispatch('preferences/setLanguage', event.target.value);
-};
-
-// Load jokes
-const loadJokes = () => {
-  store.dispatch('jokes/fetchJokesByCategory', props.slug);
-};
-
-// CRITICAL: Watch for language changes from store
-watch(selectedLanguage, (newLanguage, oldLanguage) => {
-  if (newLanguage !== oldLanguage) {
-    loadJokes();
-  }
-});
-
-// Watch for route changes
-watch(() => props.slug, () => {
-  loadJokes();
-});
-
-onMounted(() => {
-  loadJokes();
-  updateSEO({
-    title: `${categoryName.value} Jokes - Humoraq`,
-    description: `Browse all ${categoryName.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
+  const props = defineProps({
+    slug: {
+      type: String,
+      required: true
+    }
   });
-});
+
+  const store = useStore();
+
+  // Get data from GLOBAL Vuex state
+  const jokes = computed(() => store.getters['jokes/jokes']);
+  const loading = computed(() => store.getters['jokes/loading']);
+  const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
+
+  // Get category name
+  const categoryName = computed(() => {
+    const categories = getCategories();
+    const category = categories.find(c => c.slug === props.slug);
+    return category ? category.name : props.slug;
+  });
+
+  // Load jokes using GLOBAL state
+  const loadJokes = () => {
+    console.log('=== Loading jokes for category:', props.slug, 'languages:', selectedLanguages.value);
+    store.dispatch('jokes/fetchJokesByCategory', props.slug);
+  };
+
+  // Watch for language changes from GLOBAL state
+  watch(selectedLanguages, () => {
+    console.log('=== Languages changed, reloading category ===');
+    loadJokes();
+  }, { deep: true });
+
+  // Watch for route changes
+  watch(() => props.slug, () => {
+    loadJokes();
+  });
+
+  onMounted(() => {
+    loadJokes();
+    updateSEO({
+      title: `${categoryName.value} Jokes - Humoraq`,
+      description: `Browse all ${categoryName.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
+    });
+  });
 </script>

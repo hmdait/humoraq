@@ -3,32 +3,12 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
+          <!-- Header - NO LANGUAGE SELECTOR -->
           <h1 class="display-5 mb-4">Browse by Category</h1>
-          
-          <div class="mb-4">
-            <label class="form-label fw-semibold">Select Language:</label>
-            <select 
-              :value="selectedLanguage"
-              @change="handleLanguageChange"
-              class="form-select"
-              style="max-width: 200px;"
-            >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
-          </div>
 
           <div class="row g-4">
-            <div 
-              v-for="category in categories" 
-              :key="category.slug"
-              class="col-md-6 col-lg-4"
-            >
-              <div 
-                class="card category-card h-100"
-                @click="navigateToCategory(category.slug)"
-              >
+            <div v-for="category in categories" :key="category.slug" class="col-md-6 col-lg-4">
+              <div class="card category-card h-100" @click="navigateToCategory(category.slug)">
                 <div class="card-body text-center">
                   <div class="display-4 mb-3">{{ category.icon }}</div>
                   <h5 class="card-title">{{ category.name }}</h5>
@@ -46,46 +26,70 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-import DefaultLayout from '../layouts/DefaultLayout.vue';
-import { getCategories, getCategoryCount } from '../services/jokeService';
-import { updateSEO } from '../utils/seo';
+  import { ref, reactive, computed, onMounted, watch } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { useStore } from 'vuex';
+  import { getCategories, getCategoryCount } from '../services/jokeService';
+  import { updateSEO } from '../utils/seo';
+  import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
-const router = useRouter();
-const store = useStore();
+  const router = useRouter();
+  const store = useStore();
 
-// CRITICAL: Get language from Vuex store
-const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
-const categories = ref(getCategories());
-const categoryCounts = reactive({});
+  // Get selected languages from GLOBAL state
+  const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-// CRITICAL: Update Vuex store on language change
-const handleLanguageChange = (event) => {
-  store.dispatch('preferences/setLanguage', event.target.value);
-};
+  const categories = ref(getCategories());
+  const categoryCounts = reactive({});
 
-const loadCounts = async () => {
-  for (const category of categories.value) {
-    categoryCounts[category.slug] = await getCategoryCount(category.slug, selectedLanguage.value);
-  }
-};
+  const loadCounts = async () => {
+    console.log('=== Loading counts for languages:', selectedLanguages.value);
 
-const navigateToCategory = (slug) => {
-  router.push(`/category/${slug}`);
-};
+    for (const category of categories.value) {
+      let totalCount = 0;
 
-// CRITICAL: Watch for language changes from store
-watch(selectedLanguage, () => {
-  loadCounts();
-});
+      // Count for each selected language
+      for (const language of selectedLanguages.value) {
+        const count = await getCategoryCount(category.slug, language);
+        totalCount += count;
+      }
 
-onMounted(async () => {
-  updateSEO({
-    title: 'Browse Joke Categories - Humoraq',
-    description: 'Explore jokes by category: tech, work, animals, food, and more!'
+      categoryCounts[category.slug] = totalCount;
+    }
+  };
+
+  const navigateToCategory = (slug) => {
+    console.log('=== Navigating to category:', slug);
+    router.push(`/category/${slug}`);
+  };
+
+  // Watch for language changes from GLOBAL state
+  watch(selectedLanguages, () => {
+    console.log('=== Languages changed, reloading counts ===');
+    loadCounts();
+  }, { deep: true });
+
+  onMounted(async () => {
+    updateSEO({
+      title: 'Browse Joke Categories - Humoraq',
+      description: 'Explore jokes by category: tech, work, animals, food, and more!'
+    });
+    await loadCounts();
   });
-  await loadCounts();
-});
 </script>
+
+<style scoped>
+  .category-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark-mode .category-card:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  }
+</style>

@@ -18,6 +18,29 @@
   --border-color: #495057;
 }
 
+/* ========================================
+   Fixed Header Spacing
+   ======================================== */
+
+/* Add padding to body to prevent content from hiding under fixed header */
+body {
+  padding-top: 72px; /* Height of fixed navbar + some buffer */
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 991px) {
+  body {
+    padding-top: 68px;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    padding-top: 64px;
+  }
+}
+
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   min-height: 100vh;
