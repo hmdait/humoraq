@@ -66,45 +66,76 @@
           </ul>
         </div>
 
-        <!-- Social Networks -->
+        <!-- Social Networks - UPDATED -->
         <div class="col-lg-3 col-md-6">
           <h5 class="fw-bold mb-3">Follow Us</h5>
-          <div class="d-flex gap-3 mb-3">
+          <div class="d-flex gap-2 flex-wrap mb-3">
+            <!-- Facebook -->
             <a 
               href="https://facebook.com/humoraq" 
               target="_blank" 
               rel="noopener noreferrer"
               class="social-icon"
               aria-label="Facebook"
+              title="Facebook"
             >
               <i class="bi bi-facebook fs-4"></i>
             </a>
+            
+            <!-- Instagram -->
             <a 
-              href="https://www.instagram.com/humoraq_ar/" 
+              href="https://instagram.com/humoraq" 
               target="_blank" 
               rel="noopener noreferrer"
               class="social-icon"
               aria-label="Instagram"
+              title="Instagram"
             >
               <i class="bi bi-instagram fs-4"></i>
             </a>
+            
+            <!-- TikTok -->
             <a 
-              href="https://www.tiktok.com/@humoraq" 
+              href="https://tiktok.com/@humoraq" 
               target="_blank" 
               rel="noopener noreferrer"
               class="social-icon"
               aria-label="TikTok"
+              title="TikTok"
             >
               <i class="bi bi-tiktok fs-4"></i>
             </a>
+            
+            <!-- X (Twitter) - UPDATED WITH CUSTOM X LOGO -->
             <a 
               href="https://x.com/Humoraq_jk" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="social-icon"
-              aria-label="X"
+              class="social-icon social-icon-x"
+              aria-label="X (Twitter)"
+              title="X (formerly Twitter)"
             >
-              <i class="bi bi-twitter fs-4"></i>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="20" 
+                height="20" 
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            
+            <!-- Pinterest - NEW -->
+            <a 
+              href="https://fr.pinterest.com/humoraq_jk/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="social-icon"
+              aria-label="Pinterest"
+              title="Pinterest"
+            >
+              <i class="bi bi-pinterest fs-4"></i>
             </a>
           </div>
           <p class="text-muted small mb-0">
@@ -158,31 +189,64 @@ const currentYear = computed(() => new Date().getFullYear());
   color: var(--primary-color) !important;
 }
 
+/* Social Icons Styling */
 .social-icon {
   color: #6c757d;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.05);
+  text-decoration: none;
 }
 
 .social-icon:hover {
-  color: var(--primary-color);
-  background-color: rgba(13, 110, 253, 0.1);
-  transform: translateY(-2px);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Individual Social Icon Hover Colors */
+.social-icon:hover:has(.bi-facebook) {
+  background-color: #1877f2;
+}
+
+.social-icon:hover:has(.bi-instagram) {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-icon:hover:has(.bi-tiktok) {
+  background-color: #000000;
+}
+
+.social-icon:hover:has(.bi-pinterest) {
+  background-color: #e60023;
+}
+
+/* X (Twitter) Custom Styling */
+.social-icon-x:hover {
+  background-color: #000000;
+}
+
+.social-icon-x svg {
+  transition: transform 0.3s ease;
+}
+
+.social-icon-x:hover svg {
+  transform: scale(1.1);
+}
+
+/* Dark Mode Social Icons */
 .dark-mode .social-icon {
   color: #adb5bd;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .dark-mode .social-icon:hover {
-  color: var(--primary-color);
-  background-color: rgba(13, 110, 253, 0.2);
+  color: #fff;
 }
 
 h5 {
@@ -197,8 +261,8 @@ h5 {
   }
 
   .social-icon {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
 }
 </style>
