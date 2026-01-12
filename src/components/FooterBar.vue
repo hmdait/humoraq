@@ -84,7 +84,7 @@
             
             <!-- Instagram -->
             <a 
-              href="https://instagram.com/humoraq" 
+              href="https://instagram.com/humoraq_ar" 
               target="_blank" 
               rel="noopener noreferrer"
               class="social-icon"

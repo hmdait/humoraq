@@ -1,11 +1,35 @@
+// src/store/modules/preferences.js
+
+import { initializeLanguages } from '@/utils/languageDetection';
+
+// Initialize languages with browser detection (only if localStorage is empty)
+const { languages: detectedLanguages, wasAutoDetected } = initializeLanguages();
+
+// Get initial languages: use detected if no localStorage, otherwise parse stored value
+const getInitialLanguages = () => {
+  const stored = localStorage.getItem('selectedLanguages');
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) && parsed.length > 0 ? parsed : ['en', 'fr', 'ar'];
+    } catch {
+      return ['en', 'fr', 'ar'];
+    }
+  }
+  // Use detected languages if no stored value
+  return detectedLanguages;
+};
+
 const state = {
-  languages: JSON.parse(localStorage.getItem('selectedLanguages') || '["en", "fr", "ar"]'), // Default: all languages
-  theme: localStorage.getItem('theme') || 'light'
+  languages: getInitialLanguages(),
+  theme: localStorage.getItem('theme') || 'light',
+  wasAutoDetected: wasAutoDetected
 };
 
 const getters = {
   selectedLanguages: (state) => state.languages,
   selectedTheme: (state) => state.theme,
+  wasAutoDetected: (state) => state.wasAutoDetected,
   
   // Helper to check if a language is selected
   isLanguageSelected: (state) => (lang) => state.languages.includes(lang),
@@ -24,6 +48,7 @@ const mutations = {
       languages = ['en'];
     }
     state.languages = languages;
+    state.wasAutoDetected = false; // User made explicit choice
     localStorage.setItem('selectedLanguages', JSON.stringify(languages));
   },
   
@@ -38,6 +63,7 @@ const mutations = {
       // Add language
       state.languages.push(language);
     }
+    state.wasAutoDetected = false; // User made explicit choice
     localStorage.setItem('selectedLanguages', JSON.stringify(state.languages));
   },
   
