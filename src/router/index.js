@@ -5,7 +5,8 @@ import JokeView from '../views/JokeView.vue';
 import CategoriesView from '../views/CategoriesView.vue';
 import CategoryView from '../views/CategoryView.vue';
 import SubmitView from '../views/SubmitView.vue';
-import AboutView from '../views/AboutView.vue'; // NEW
+import AboutView from '../views/AboutView.vue';
+import VideosView from '../views/VideosView.vue'; // NEW: Add videos import
 import NotFoundView from '../views/NotFoundView.vue';
 import { trackPageView } from '../services/analyticsService';
 
@@ -52,10 +53,17 @@ const routes = [
     meta: { title: 'Submit a Joke - Humoraq' }
   },
   {
-    path: '/about', // NEW ROUTE
+    path: '/about',
     name: 'about',
     component: AboutView,
     meta: { title: 'About Us - Humoraq' }
+  },
+  // NEW: Videos route
+  {
+    path: '/videos',
+    name: 'videos',
+    component: VideosView,
+    meta: { title: 'Funny Videos - Humoraq' }
   },
   {
     path: '/:pathMatch(.*)*',
