@@ -63,6 +63,7 @@
               <small>👁️ {{ joke.views || 0 }} views</small>
             </span>
           </div>
+          
           <router-link 
             :to="`/joke/${joke.id}`" 
             class="btn btn-sm btn-outline-primary"
@@ -80,6 +81,7 @@ import { ref, computed, onMounted } from 'vue';
 import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
+import SocialShare from './SocialShare.vue';
 
 const props = defineProps({
   joke: {

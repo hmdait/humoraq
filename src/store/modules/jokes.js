@@ -1,7 +1,8 @@
 import { 
   getJokeById, 
   getRandomJoke, 
-  getJokesByCategory 
+  getJokesByCategory,
+  trackJokeInteraction 
 } from '@/services/jokeService';
 
 const state = {
@@ -65,6 +66,51 @@ const mutations = {
   CLEAR_JOKES(state) {
     state.jokes = [];
     state.currentJoke = null;
+  },
+
+  /**
+   * Update joke's updatedAt timestamp in local state
+   * Prevents unnecessary refetch when tracking interactions
+   */
+  UPDATE_JOKE_TIMESTAMP(state, jokeId) {
+    // Update in jokes array
+    const jokeIndex = state.jokes.findIndex(j => j.id === jokeId);
+    if (jokeIndex !== -1) {
+      state.jokes[jokeIndex].updatedAt = new Date();
+    }
+    
+    // Update current joke if viewing single joke
+    if (state.currentJoke && state.currentJoke.id === jokeId) {
+      state.currentJoke.updatedAt = new Date();
+    }
+  },
+
+  /**
+   * Increment like count in local state (optimistic update)
+   */
+  INCREMENT_LIKES(state, jokeId) {
+    const jokeIndex = state.jokes.findIndex(j => j.id === jokeId);
+    if (jokeIndex !== -1) {
+      state.jokes[jokeIndex].likes = (state.jokes[jokeIndex].likes || 0) + 1;
+    }
+    
+    if (state.currentJoke && state.currentJoke.id === jokeId) {
+      state.currentJoke.likes = (state.currentJoke.likes || 0) + 1;
+    }
+  },
+
+  /**
+   * Increment share count in local state (optimistic update)
+   */
+  INCREMENT_SHARES(state, jokeId) {
+    const jokeIndex = state.jokes.findIndex(j => j.id === jokeId);
+    if (jokeIndex !== -1) {
+      state.jokes[jokeIndex].shares = (state.jokes[jokeIndex].shares || 0) + 1;
+    }
+    
+    if (state.currentJoke && state.currentJoke.id === jokeId) {
+      state.currentJoke.shares = (state.currentJoke.shares || 0) + 1;
+    }
   }
 };
 
@@ -176,6 +222,37 @@ const actions = {
   
   clearJokes({ commit }) {
     commit('CLEAR_JOKES');
+  },
+
+  /**
+   * Track joke interaction (like, share, view)
+   * Updates updatedAt timestamp in Firestore
+   * @param {Object} payload - { jokeId, interactionType }
+   */
+  async trackInteraction({ commit }, { jokeId, interactionType }) {
+    try {
+      // Optimistic UI update
+      if (interactionType === 'like') {
+        commit('INCREMENT_LIKES', jokeId);
+      } else if (interactionType === 'share') {
+        commit('INCREMENT_SHARES', jokeId);
+      }
+      
+      commit('UPDATE_JOKE_TIMESTAMP', jokeId);
+      
+      // Track in Firestore
+      await trackJokeInteraction(jokeId, interactionType);
+      
+      console.log(`✅ Tracked ${interactionType} for joke ${jokeId}`);
+      return true;
+    } catch (error) {
+      console.error('Error tracking interaction:', error);
+      
+      // Rollback optimistic update on error (optional)
+      // You could implement a ROLLBACK mutation here if needed
+      
+      return false;
+    }
   }
 };
 
