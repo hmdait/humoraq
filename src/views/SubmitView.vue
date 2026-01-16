@@ -27,6 +27,48 @@
                 </small>
               </div>
 
+              <!-- Email (NEW) -->
+              <div class="mb-3">
+                <label for="email" class="form-label">
+                  Email <span class="text-muted">(optional)</span>
+                </label>
+                <input 
+                  id="email"
+                  v-model="formData.email"
+                  type="email"
+                  class="form-control"
+                  :class="{ 'is-invalid': emailError }"
+                  placeholder="your@email.com"
+                  @input="validateEmail"
+                />
+                
+                <!-- Monetization Message -->
+                <div class="email-info-box mt-2">
+                  <div class="d-flex align-items-start">
+                    <i class="bi bi-cash-coin text-success me-2" style="font-size: 1.2rem;"></i>
+                    <div>
+                      <small class="text-muted">
+                        <strong>Earn money from your jokes!</strong> 
+                        If your joke performs well, you can receive:
+                      </small>
+                      <ul class="reward-list mb-1">
+                        <li><strong>$5</strong> when your joke reaches <strong>5,000 views</strong></li>
+                        <li><strong>$5</strong> when your joke reaches <strong>1,000 likes</strong></li>
+                      </ul>
+                      <small class="text-muted">
+                        We'll contact you via email to send your reward. 
+                        <span class="text-primary">Your email stays private</span> and won't be used for spam.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email Validation Error -->
+                <div v-if="emailError" class="invalid-feedback d-block">
+                  {{ emailError }}
+                </div>
+              </div>
+
               <!-- Joke Title (Optional) -->
               <div class="mb-3">
                 <label for="title" class="form-label">
@@ -209,20 +251,20 @@ He replies: 'They had eggs.'"
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { createJoke } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
 import { trackJokeSubmit } from '../services/analyticsService';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import { getTextDirection, getDirectionClass } from '../utils/rtl';
 
 // Validation constants
 const minLength = 20;
-const maxLength = 2000; // Increased to 2000 characters
+const maxLength = 2000;
 
 // Form data
 const formData = reactive({
   authorName: '',
+  email: '', // NEW: Email field
   title: '',
   text: '',
   category: '',
@@ -233,6 +275,7 @@ const formData = reactive({
 const submitting = ref(false);
 const submitted = ref(false);
 const errorMessage = ref('');
+const emailError = ref(''); // NEW: Email validation error
 const jokeTextarea = ref(null);
 const showValidationError = ref(false);
 
@@ -247,9 +290,23 @@ const isFormValid = computed(() => {
   return (
     isTextValid.value &&
     formData.category !== '' &&
-    formData.language !== ''
+    formData.language !== '' &&
+    !emailError.value // Email must be valid if provided
   );
 });
+
+// Email validation (only if filled)
+const validateEmail = () => {
+  emailError.value = '';
+  
+  // Only validate if email is not empty
+  if (formData.email.trim()) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      emailError.value = 'Please enter a valid email address';
+    }
+  }
+};
 
 // Auto-grow textarea
 const handleTextInput = () => {
@@ -272,8 +329,6 @@ const clearText = () => {
   }
 };
 
-
-
 // Handle form submission
 const handleSubmit = async () => {
   // Validate text length
@@ -292,6 +347,14 @@ const handleSubmit = async () => {
     return;
   }
 
+  // Validate email if provided
+  if (formData.email.trim()) {
+    validateEmail();
+    if (emailError.value) {
+      return;
+    }
+  }
+
   submitting.value = true;
   errorMessage.value = '';
   showValidationError.value = false;
@@ -299,6 +362,7 @@ const handleSubmit = async () => {
   try {
     await createJoke({
       authorName: formData.authorName.trim() || 'Anonymous',
+      email: formData.email.trim() || null, // NEW: Include email (null if empty)
       title: formData.title.trim(),
       text: formData.text.trim(),
       category: formData.category,
@@ -314,11 +378,13 @@ const handleSubmit = async () => {
     setTimeout(() => {
       submitted.value = false;
       formData.authorName = '';
+      formData.email = ''; // NEW: Reset email
       formData.title = '';
       formData.text = '';
       formData.category = '';
       formData.language = 'en';
       showValidationError.value = false;
+      emailError.value = ''; // NEW: Reset email error
       
       if (jokeTextarea.value) {
         jokeTextarea.value.style.height = 'auto';
@@ -365,6 +431,31 @@ onMounted(() => {
   box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
 }
 
+/* NEW: Email info box styling */
+.email-info-box {
+  background-color: rgba(25, 135, 84, 0.05);
+  border-left: 3px solid #198754;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+}
+
+.reward-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.reward-list li {
+  padding: 0.25rem 0;
+  color: #198754;
+}
+
+.reward-list li:before {
+  content: "💰 ";
+  margin-right: 0.25rem;
+}
+
 /* Dark mode adjustments */
 .dark-mode .joke-textarea {
   background-color: var(--card-bg);
@@ -375,6 +466,15 @@ onMounted(() => {
 .dark-mode .joke-textarea:focus {
   background-color: var(--card-bg);
   color: var(--text-color);
+}
+
+.dark-mode .email-info-box {
+  background-color: rgba(25, 135, 84, 0.15);
+  border-left-color: #198754;
+}
+
+.dark-mode .reward-list li {
+  color: #75b798;
 }
 
 /* Character counter animation */

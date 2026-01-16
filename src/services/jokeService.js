@@ -286,14 +286,15 @@ export const createJoke = async (jokeData) => {
       author: {
         type: 'user',
         name: jokeData.authorName || 'Anonymous',
+        email: jokeData.email || null, // Store email (null if not provided)
         uid: null
       },
       likes: 0,
       views: 0,
-      shares: 0, // Initialize shares counter
+      shares: 0,
       status: 'published',
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp() // Initialize updatedAt
+      updatedAt: serverTimestamp()
     };
 
     const docRef = await addDoc(jokesCollection, newJoke);

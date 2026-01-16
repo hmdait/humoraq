@@ -18,34 +18,50 @@
         {{ joke.text }}
       </p>
       
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <div class="d-flex flex-column flex-sm-row gap-2 align-items-start align-items-sm-center">
-          <small class="text-muted">
-            👤 By: <strong>{{ getAuthorName(joke.author) }}</strong>
-          </small>
-          <div class="d-flex gap-3">
-            <small 
-              class="text-muted like-button" 
-              @click="handleLike"
-              :class="{ 'liked': hasLiked, 'liking': isLiking }"
-              role="button"
-              tabindex="0"
-            >
-              <span class="heart-icon">{{ hasLiked ? '❤️' : '🤍' }}</span>
-              {{ localLikes }}
-            </small>
+      <div class="joke-card-footer">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <!-- Author and Stats -->
+          <div class="d-flex flex-column flex-sm-row gap-2 align-items-start align-items-sm-center">
             <small class="text-muted">
-              👁️ {{ joke.views || 0 }}
+              👤 By: <strong>{{ getAuthorName(joke.author) }}</strong>
             </small>
+            <div class="d-flex gap-3 align-items-center">
+              <!-- Like Button -->
+              <small 
+                class="text-muted like-button" 
+                @click.stop="handleLike"
+                :class="{ 'liked': hasLiked, 'liking': isLiking }"
+                role="button"
+                tabindex="0"
+              >
+                <span class="heart-icon">{{ hasLiked ? '❤️' : '🤍' }}</span>
+                {{ localLikes }}
+              </small>
+
+              <!-- NEW: Social Share Component -->
+              <SocialShare :joke="joke" />
+
+              <!-- Views -->
+              <small class="text-muted d-none d-sm-inline">
+                👁️ {{ joke.views || 0 }}
+              </small>
+
+              <!-- Shares (optional) -->
+              <small class="text-muted d-none d-sm-inline" v-if="joke.shares">
+                🔗 {{ joke.shares }}
+              </small>
+            </div>
           </div>
+
+          <!-- View Details Button -->
+          <router-link 
+            v-if="showLink"
+            :to="`/joke/${joke.id}`" 
+            class="btn btn-sm btn-outline-primary"
+          >
+            View Details
+          </router-link>
         </div>
-        <router-link 
-          v-if="showLink"
-          :to="`/joke/${joke.id}`" 
-          class="btn btn-sm btn-outline-primary"
-        >
-          View Details
-        </router-link>
       </div>
     </div>
   </div>
@@ -53,9 +69,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
 import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
+import SocialShare from './SocialShare.vue';
 
 const props = defineProps({
   joke: {
@@ -68,6 +86,7 @@ const props = defineProps({
   }
 });
 
+const store = useStore();
 const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
@@ -89,18 +108,26 @@ const handleLike = async () => {
   isLiking.value = true;
 
   try {
+    // Optimistic UI update
     localLikes.value += 1;
     hasLiked.value = true;
 
-    await likeJoke(props.joke.id);
+    // Track interaction in Firestore (updates updatedAt)
+    await store.dispatch('jokes/trackInteraction', {
+      jokeId: props.joke.id,
+      interactionType: 'like'
+    });
 
+    // Mark as liked in localStorage
     const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
 
+    // Track analytics
     trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
+    // Rollback on error
     localLikes.value -= 1;
     hasLiked.value = false;
   } finally {
@@ -193,6 +220,16 @@ const getAuthorName = (author) => {
   letter-spacing: 0.5px;
 }
 
+.joke-card-footer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .joke-card-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
 .like-button {
   cursor: pointer;
   transition: all 0.2s ease;
@@ -227,5 +264,18 @@ const getAuthorName = (author) => {
 
 .like-button:active:not(.liked) .heart-icon {
   transform: scale(0.9);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .joke-card-footer .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .joke-card-footer .btn-outline-primary {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
 }
 </style>

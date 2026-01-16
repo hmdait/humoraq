@@ -48,22 +48,34 @@
 
       <!-- Footer with stats and actions -->
       <div class="feed-post-footer">
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex gap-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="d-flex gap-3 align-items-center">
+            <!-- Like Button -->
             <button 
               class="btn btn-sm btn-link text-decoration-none p-0 like-btn"
               :class="{ 'liked': hasLiked }"
-              @click="handleLike"
+              @click.stop="handleLike"
               :disabled="isLiking"
             >
               <span class="heart-icon">{{ hasLiked ? '❤️' : '🤍' }}</span>
               <span class="ms-1">{{ localLikes }}</span>
             </button>
-            <span class="text-muted">
-              <small>👁️ {{ joke.views || 0 }} views</small>
+
+            <!-- NEW: Social Share Component -->
+            <SocialShare :joke="joke" />
+
+            <!-- Views Count -->
+            <span class="text-muted d-none d-sm-inline">
+              <small>👁️ {{ joke.views || 0 }}</small>
+            </span>
+
+            <!-- Shares Count (optional) -->
+            <span class="text-muted d-none d-sm-inline" v-if="joke.shares">
+              <small>🔗 {{ joke.shares }}</small>
             </span>
           </div>
           
+          <!-- View Details Button -->
           <router-link 
             :to="`/joke/${joke.id}`" 
             class="btn btn-sm btn-outline-primary"
@@ -78,6 +90,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
 import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
@@ -90,6 +103,7 @@ const props = defineProps({
   }
 });
 
+const store = useStore();
 const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
@@ -116,18 +130,26 @@ const handleLike = async () => {
   isLiking.value = true;
 
   try {
+    // Optimistic UI update
     localLikes.value += 1;
     hasLiked.value = true;
 
-    await likeJoke(props.joke.id);
+    // Track interaction in Firestore (updates updatedAt)
+    await store.dispatch('jokes/trackInteraction', {
+      jokeId: props.joke.id,
+      interactionType: 'like'
+    });
 
+    // Mark as liked in localStorage
     const likedJokes = JSON.parse(localStorage.getItem('likedJokes') || '[]');
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
 
+    // Track analytics
     trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
+    // Rollback on error
     localLikes.value -= 1;
     hasLiked.value = false;
   } finally {
@@ -266,6 +288,16 @@ const formatDate = (timestamp) => {
   padding: 0.25em 0.5em;
 }
 
+.feed-post-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dark-mode .feed-post-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
 .like-btn {
   color: #6c757d;
   transition: all 0.2s ease;
@@ -288,5 +320,22 @@ const formatDate = (timestamp) => {
 
 .heart-icon {
   font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .feed-post-footer .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  .feed-post-footer .d-flex > div:first-child {
+    width: 100%;
+  }
+
+  .feed-post-footer .btn-outline-primary {
+    width: 100%;
+  }
 }
 </style>
