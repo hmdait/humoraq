@@ -1,4 +1,5 @@
 // src/store/modules/videos.js
+// UPDATED: Uses category values (not slugs) to match unified config
 
 import { fetchVideos } from '@/services/videoService';
 
@@ -6,7 +7,7 @@ const state = {
   videos: [],
   loading: false,
   error: null,
-  selectedCategories: [] // Multi-select: empty array = show all
+  selectedCategories: [] // Multi-select: empty array = show all (uses VALUES not slugs)
 };
 
 const getters = {
@@ -17,12 +18,12 @@ const getters = {
   videosCount: (state) => state.videos.length,
   selectedCategories: (state) => state.selectedCategories,
   
-  // Check if a category is selected
-  isCategorySelected: (state) => (categorySlug) => {
-    return state.selectedCategories.includes(categorySlug);
+  // Check if a category is selected (uses VALUE)
+  isCategorySelected: (state) => (categoryValue) => {
+    return state.selectedCategories.includes(categoryValue);
   },
   
-  // Computed filtered videos (client-side filtering)
+  // UPDATED: Filtered videos (client-side filtering)
   filteredVideos: (state, getters, rootState) => {
     let filtered = state.videos;
     
@@ -33,11 +34,22 @@ const getters = {
     }
     
     // Filter by selected categories (multi-select)
-    // If no categories selected, show all videos
+    // UPDATED: Uses category VALUES from video.categories array
     if (state.selectedCategories.length > 0) {
-      filtered = filtered.filter(video => 
-        state.selectedCategories.includes(video.category)
-      );
+      filtered = filtered.filter(video => {
+        // Video can have multiple categories (array)
+        if (Array.isArray(video.categories)) {
+          // Check if any selected category is in video's categories
+          return state.selectedCategories.some(cat => 
+            video.categories.includes(cat)
+          );
+        }
+        // Fallback: single category field (old format)
+        if (video.category) {
+          return state.selectedCategories.includes(video.category);
+        }
+        return false;
+      });
     }
     
     return filtered;
@@ -65,14 +77,15 @@ const mutations = {
     state.selectedCategories = categories;
   },
   
-  TOGGLE_CATEGORY(state, categorySlug) {
-    const index = state.selectedCategories.indexOf(categorySlug);
+  // UPDATED: Toggle category by VALUE
+  TOGGLE_CATEGORY(state, categoryValue) {
+    const index = state.selectedCategories.indexOf(categoryValue);
     if (index > -1) {
       // Remove category
       state.selectedCategories.splice(index, 1);
     } else {
       // Add category
-      state.selectedCategories.push(categorySlug);
+      state.selectedCategories.push(categoryValue);
     }
   },
   
@@ -110,11 +123,10 @@ const actions = {
   },
   
   /**
-   * Toggle a category on/off
-   * No need to refetch - filtering happens via computed property
+   * UPDATED: Toggle category (uses VALUE not slug)
    */
-  toggleCategory({ commit }, categorySlug) {
-    commit('TOGGLE_CATEGORY', categorySlug);
+  toggleCategory({ commit }, categoryValue) {
+    commit('TOGGLE_CATEGORY', categoryValue);
   },
   
   /**

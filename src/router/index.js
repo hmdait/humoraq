@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { isValidCategorySlug, slugToValue, getCategoryBySlug } from '@/config/categories'; // UPDATED
 import JokesFeedView from '../views/JokesFeedView.vue';
 import SpotlightView from '../views/SpotlightView.vue';
 import JokeView from '../views/JokeView.vue';
@@ -6,7 +7,7 @@ import CategoriesView from '../views/CategoriesView.vue';
 import CategoryView from '../views/CategoryView.vue';
 import SubmitView from '../views/SubmitView.vue';
 import AboutView from '../views/AboutView.vue';
-import VideosView from '../views/VideosView.vue'; // NEW: Add videos import
+import VideosView from '../views/VideosView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { trackPageView } from '../services/analyticsService';
 
@@ -43,7 +44,25 @@ const routes = [
     path: '/category/:slug',
     name: 'category',
     component: CategoryView,
-    props: true,
+    props: route => ({
+      slug: slugToValue(route.params.slug) // UPDATED: Convert slug to value
+    }),
+    // UPDATED: Validate category slug before navigation
+    beforeEnter: (to, from, next) => {
+      const slug = to.params.slug;
+      
+      if (isValidCategorySlug(slug)) {
+        const category = getCategoryBySlug(slug);
+        // Update meta with category info
+        to.meta.title = `${category.label} Jokes - Humoraq`;
+        to.meta.description = category.description;
+        next();
+      } else {
+        // Invalid category - redirect to categories list
+        console.warn(`Invalid category slug: ${slug}`);
+        next({ name: 'categories' });
+      }
+    },
     meta: { title: 'Category - Humoraq' }
   },
   {
@@ -58,7 +77,6 @@ const routes = [
     component: AboutView,
     meta: { title: 'About Us - Humoraq' }
   },
-  // NEW: Videos route
   {
     path: '/videos',
     name: 'videos',
@@ -81,6 +99,7 @@ const router = createRouter({
   }
 });
 
+// Update document title and track page views
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || 'Humoraq';
   next();

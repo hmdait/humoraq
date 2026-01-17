@@ -4,7 +4,7 @@
     @mouseenter="open"
     @mouseleave="close"
   >
-    <!-- HEADER (toujours visible) -->
+    <!-- HEADER -->
     <div class="filter-header d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0 d-flex align-items-center gap-2">
         <i class="bi bi-funnel"></i>
@@ -30,24 +30,23 @@
         <div class="categories-grid">
           <div
             v-for="category in categories"
-            :key="category.slug"
+            :key="category.value"
             class="category-checkbox"
           >
             <input
               :id="`category-${category.slug}`"
               type="checkbox"
-              :checked="isSelected(category.slug)"
-              @change="toggleCategory(category.slug)"
+              :checked="isSelected(category.value)"
+              @change="toggleCategory(category.value)"
               class="form-check-input"
             />
             <label
               :for="`category-${category.slug}`"
               class="category-label"
-              :class="{ active: isSelected(category.slug) }"
+              :class="{ active: isSelected(category.value) }"
             >
-              <span class="category-icon">{{ category.icon }}</span>
-              <span class="category-name">{{ category.name }}</span>
-              <span v-if="isSelected(category.slug)" class="check-icon">
+              <span class="category-name">{{ category.label }}</span>
+              <span v-if="isSelected(category.value)" class="check-icon">
                 <i class="bi bi-check-circle-fill"></i>
               </span>
             </label>
@@ -72,7 +71,7 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { getVideoCategories } from '@/services/videoService';
+import { getAllCategories } from '@/config/categories'; // UPDATED: Use unified config
 
 const store = useStore();
 const isOpen = ref(false);
@@ -87,20 +86,20 @@ onMounted(() => {
 const open = () => (isOpen.value = true);
 const close = () => (isOpen.value = false);
 
-const categories = getVideoCategories().filter(cat => cat.slug !== 'all');
+// UPDATED: Get categories from unified config
+const categories = getAllCategories();
+
 const selectedCategories = computed(() => store.getters['videos/selectedCategories']);
 
-const isSelected = slug =>
-  store.getters['videos/isCategorySelected'](slug);
+const isSelected = (value) => 
+  store.getters['videos/isCategorySelected'](value);
 
-const toggleCategory = slug =>
-  store.dispatch('videos/toggleCategory', slug);
+const toggleCategory = (value) => 
+  store.dispatch('videos/toggleCategory', value);
 
-const clearAll = () =>
+const clearAll = () => 
   store.dispatch('videos/clearCategories');
 </script>
-
-
 
 <style scoped>
 .category-filter {
@@ -221,7 +220,7 @@ const clearAll = () =>
   color: #6ea8fe;
 }
 
-/* Hover animation */
+/* Animation */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.2s ease;
@@ -237,33 +236,14 @@ const clearAll = () =>
   margin-top: 0.5rem;
 }
 
-
 /* Responsive */
 @media (max-width: 768px) {
   .categories-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 0.75rem;
-  }
-  
-  .category-label {
-    padding: 0.75rem;
-    min-height: 90px;
-  }
-  
-  .category-icon {
-    font-size: 1.75rem;
-  }
-  
-  .category-name {
-    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 576px) {
-  .category-filter {
-    padding: 1rem;
-  }
-  
   .categories-grid {
     grid-template-columns: repeat(2, 1fr);
   }

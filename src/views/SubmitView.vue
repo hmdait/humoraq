@@ -63,7 +63,6 @@
                     </div>
                   </div>
 
-                  <!-- Email Validation Error -->
                   <div v-if="emailError" class="invalid-feedback d-block">
                     {{ emailError }}
                   </div>
@@ -99,23 +98,11 @@
                       'is-valid': isTextValid && formData.text.length > 0
                     }" 
                     rows="6" 
-                    placeholder="Write your joke here… longer jokes are welcome 😄
-
-You can write multiple lines, add emojis 🎭, and tell longer stories.
-
-Example:
-A programmer's wife tells him: 'Go to the store and buy a loaf of bread. If they have eggs, buy a dozen.'
-
-He comes back with 12 loaves of bread.
-
-'Why did you buy 12 loaves of bread?' she asks.
-
-He replies: 'They had eggs.'" 
+                    placeholder="Write your joke here…"
                     @input="handleTextInput" 
                     required
                   ></textarea>
 
-                  <!-- Character Counter -->
                   <div class="d-flex justify-content-between align-items-center mt-2">
                     <small 
                       class="form-text" 
@@ -130,9 +117,6 @@ He replies: 'They had eggs.'"
                       <span v-if="characterCount < minLength">
                         (minimum {{ minLength }})
                       </span>
-                      <span v-if="characterCount >= maxLength - 100 && characterCount <= maxLength">
-                        ({{ maxLength - characterCount }} remaining)
-                      </span>
                     </small>
 
                     <button 
@@ -145,24 +129,12 @@ He replies: 'They had eggs.'"
                     </button>
                   </div>
 
-                  <!-- Validation Messages -->
                   <div v-if="showValidationError" class="invalid-feedback d-block">
-                    <span v-if="characterCount < minLength">
-                      ⚠️ Your joke must be at least {{ minLength }} characters long.
-                      ({{ minLength - characterCount }} more needed)
-                    </span>
-                    <span v-else-if="characterCount > maxLength">
-                      ⚠️ Your joke is too long! Maximum {{ maxLength }} characters allowed.
-                      ({{ characterCount - maxLength }} over limit)
-                    </span>
-                  </div>
-
-                  <div v-if="isTextValid && formData.text.length > 0" class="valid-feedback d-block">
-                    ✓ Perfect length!
+                    ⚠️ Your joke must be between {{ minLength }} and {{ maxLength }} characters.
                   </div>
                 </div>
 
-                <!-- Categories (Tag-style Multi-select) -->
+                <!-- Categories (UPDATED: Using unified config) -->
                 <div class="mb-3">
                   <label class="form-label">
                     Categories <span class="text-danger">*</span>
@@ -171,7 +143,6 @@ He replies: 'They had eggs.'"
                     Select one or more categories that best describe your joke
                   </p>
 
-                  <!-- Category Tags Grid -->
                   <div class="categories-grid">
                     <div 
                       v-for="category in availableCategories" 
@@ -195,12 +166,10 @@ He replies: 'They had eggs.'"
                     </div>
                   </div>
 
-                  <!-- Categories Validation Error -->
                   <div v-if="showCategoriesError" class="invalid-feedback d-block mt-2">
                     ⚠️ Please select at least one category
                   </div>
 
-                  <!-- Selected Categories Display -->
                   <div v-if="formData.categories.length > 0" class="selected-categories mt-3">
                     <small class="text-muted">
                       <strong>Selected ({{ formData.categories.length }}):</strong>
@@ -234,7 +203,7 @@ He replies: 'They had eggs.'"
                     :disabled="submitting || submitted || !isFormValid"
                   >
                     <span v-if="submitting">
-                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                      <span class="spinner-border spinner-border-sm me-2"></span>
                       Submitting...
                     </span>
                     <span v-else-if="submitted">
@@ -245,28 +214,12 @@ He replies: 'They had eggs.'"
                     </span>
                   </button>
                 </div>
-
-                <!-- Submission Guidelines -->
-                <div class="mt-3">
-                  <small class="text-muted">
-                    <strong>Guidelines:</strong>
-                    <ul class="mb-0 mt-2">
-                      <li>Keep it funny and appropriate for all audiences</li>
-                      <li>Original jokes are preferred</li>
-                      <li>Multi-line jokes and stories are welcome</li>
-                      <li>Use emojis to enhance your joke 😄</li>
-                      <li>Select categories that accurately describe your joke</li>
-                    </ul>
-                  </small>
-                </div>
               </form>
 
-              <!-- Success Message -->
               <div v-if="submitted" class="alert alert-success mt-4">
                 <strong>🎉 Thank you!</strong> Your joke has been published successfully.
               </div>
 
-              <!-- Error Message -->
               <div v-if="errorMessage" class="alert alert-danger mt-4">
                 <strong>❌ Error:</strong> {{ errorMessage }}
               </div>
@@ -283,41 +236,21 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { createJoke } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
 import { trackJokeSubmit } from '../services/analyticsService';
+import { getCategoriesForSelect } from '../config/categories'; // UPDATED: Import from unified config
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
-// ========================================
-// Constants
-// ========================================
 const minLength = 20;
 const maxLength = 2000;
 
-// Available categories - matches Firestore schema
-const availableCategories = [
-  { value: 'General', label: 'General' },
-  { value: 'Relationships', label: 'Relationships' },
-  { value: 'Family', label: 'Family' },
-  { value: 'Work', label: 'Work' },
-  { value: 'School', label: 'School' },
-  { value: 'Friends', label: 'Friends' },
-  { value: 'Adult', label: 'Adult' },
-  { value: 'Animals', label: 'Animals' },
-  { value: 'Food', label: 'Food' },
-  { value: 'Tech', label: 'Tech' },
-  { value: 'Sports', label: 'Sports' },
-  { value: 'Old People', label: 'Old People' },
-  { value: 'Women', label: 'Women' },
-  { value: 'Men', label: 'Men' }
-];
+// UPDATED: Get categories from unified config
+const availableCategories = getCategoriesForSelect();
 
-// ========================================
-// Reactive State
-// ========================================
 const formData = reactive({
   authorName: '',
   email: '',
   title: '',
   text: '',
-  categories: [], // Array of category strings
+  categories: [],
   language: 'en'
 });
 
@@ -329,38 +262,20 @@ const jokeTextarea = ref(null);
 const showValidationError = ref(false);
 const showCategoriesError = ref(false);
 
-// ========================================
-// Computed Properties
-// ========================================
 const characterCount = computed(() => formData.text.length);
+const isTextValid = computed(() => 
+  characterCount.value >= minLength && characterCount.value <= maxLength
+);
+const isFormValid = computed(() => 
+  isTextValid.value && 
+  formData.categories.length > 0 && 
+  formData.language !== '' && 
+  !emailError.value
+);
+const selectedCategoriesText = computed(() => formData.categories.join(', '));
 
-const isTextValid = computed(() => {
-  return characterCount.value >= minLength && characterCount.value <= maxLength;
-});
-
-const isFormValid = computed(() => {
-  return (
-    isTextValid.value &&
-    formData.categories.length > 0 &&
-    formData.language !== '' &&
-    !emailError.value
-  );
-});
-
-const selectedCategoriesText = computed(() => {
-  return formData.categories.join(', ');
-});
-
-// ========================================
-// Methods
-// ========================================
-
-/**
- * Validate email format
- */
 const validateEmail = () => {
   emailError.value = '';
-
   if (formData.email.trim()) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email.trim())) {
@@ -369,33 +284,22 @@ const validateEmail = () => {
   }
 };
 
-/**
- * Handle text input and auto-resize textarea
- */
 const handleTextInput = () => {
   showValidationError.value = false;
-
   if (jokeTextarea.value) {
     jokeTextarea.value.style.height = 'auto';
     jokeTextarea.value.style.height = jokeTextarea.value.scrollHeight + 'px';
   }
 };
 
-/**
- * Clear joke text
- */
 const clearText = () => {
   formData.text = '';
   showValidationError.value = false;
-
   if (jokeTextarea.value) {
     jokeTextarea.value.style.height = 'auto';
   }
 };
 
-/**
- * Reset form to initial state
- */
 const resetForm = () => {
   formData.authorName = '';
   formData.email = '';
@@ -406,29 +310,22 @@ const resetForm = () => {
   showValidationError.value = false;
   showCategoriesError.value = false;
   emailError.value = '';
-
   if (jokeTextarea.value) {
     jokeTextarea.value.style.height = 'auto';
   }
 };
 
-/**
- * Handle form submission
- */
 const handleSubmit = async () => {
-  // Reset errors
   errorMessage.value = '';
   showValidationError.value = false;
   showCategoriesError.value = false;
 
-  // Validate text length
   if (!isTextValid.value) {
     showValidationError.value = true;
     jokeTextarea.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
-  // Validate categories
   if (formData.categories.length === 0) {
     showCategoriesError.value = true;
     errorMessage.value = 'Please select at least one category';
@@ -436,39 +333,26 @@ const handleSubmit = async () => {
     return;
   }
 
-  // Validate language
-  if (!formData.language) {
-    errorMessage.value = 'Please select a language';
-    return;
-  }
-
-  // Validate email if provided
   if (formData.email.trim()) {
     validateEmail();
-    if (emailError.value) {
-      return;
-    }
+    if (emailError.value) return;
   }
 
   submitting.value = true;
 
   try {
-    // Create joke with categories array
     await createJoke({
       authorName: formData.authorName.trim() || 'Anonymous',
       email: formData.email.trim() || null,
       title: formData.title.trim(),
       text: formData.text.trim(),
-      categories: formData.categories, // Send categories array
+      categories: formData.categories,
       language: formData.language
     });
 
-    // Track submission (use first category for analytics)
     trackJokeSubmit(formData.categories[0], formData.language, 'user');
-
     submitted.value = true;
 
-    // Reset form after 3 seconds
     setTimeout(() => {
       submitted.value = false;
       resetForm();
@@ -481,48 +365,22 @@ const handleSubmit = async () => {
   }
 };
 
-// ========================================
-// Lifecycle
-// ========================================
 onMounted(() => {
   updateSEO({
     title: 'Submit a Joke - Humoraq',
-    description: 'Share your best jokes with the Humoraq community. Submit jokes in multiple languages and categories.'
+    description: 'Share your best jokes with the Humoraq community.'
   });
 });
 </script>
 
 <style scoped>
-/* ========================================
-   Textarea Styling
-   ======================================== */
+/* Keep your existing styles */
 .joke-textarea {
   resize: vertical;
   min-height: 150px;
   max-height: 500px;
-  font-size: 1rem;
-  line-height: 1.6;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.joke-textarea:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.joke-textarea.is-valid:focus {
-  border-color: #198754;
-  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
-}
-
-.joke-textarea.is-invalid:focus {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-}
-
-/* ========================================
-   Email Info Box
-   ======================================== */
 .email-info-box {
   background-color: rgba(25, 135, 84, 0.05);
   border-left: 3px solid #198754;
@@ -534,12 +392,6 @@ onMounted(() => {
   list-style: none;
   padding-left: 0;
   margin: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.reward-list li {
-  padding: 0.25rem 0;
-  color: #198754;
 }
 
 .reward-list li:before {
@@ -547,25 +399,16 @@ onMounted(() => {
   margin-right: 0.25rem;
 }
 
-/* ========================================
-   Categories - Tag Style
-   ======================================== */
 .categories-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
 }
 
-.category-checkbox-wrapper {
-  position: relative;
-}
-
-/* Hide checkbox */
 .category-checkbox-input {
   display: none;
 }
 
-/* Tag-style labels */
 .category-tag {
   display: inline-flex;
   align-items: center;
@@ -594,14 +437,10 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
 }
 
-.category-name {
-  font-weight: 500;
-  white-space: nowrap;
+.category-icon {
+  font-size: 1.1rem;
 }
 
-/* ========================================
-   Selected Categories Display
-   ======================================== */
 .selected-categories {
   padding: 0.75rem;
   background-color: rgba(13, 110, 253, 0.05);
@@ -609,77 +448,13 @@ onMounted(() => {
   border-radius: 0.375rem;
 }
 
-/* ========================================
-   Dark Mode
-   ======================================== */
-.dark-mode .joke-textarea {
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border-color: var(--border-color);
-}
-
-.dark-mode .email-info-box {
-  background-color: rgba(25, 135, 84, 0.15);
-  border-left-color: #198754;
-}
-
-.dark-mode .reward-list li {
-  color: #75b798;
-}
-
 .dark-mode .category-tag {
   border-color: #495057;
-  color: var(--text-color);
-}
-
-.dark-mode .category-tag:hover {
-  border-color: #0d6efd;
-  background: rgba(13, 110, 253, 0.15);
 }
 
 .dark-mode .category-tag.selected {
   background: #0d6efd;
   border-color: #0d6efd;
   color: #fff;
-}
-
-.dark-mode .selected-categories {
-  background-color: rgba(13, 110, 253, 0.1);
-  border-left-color: #0d6efd;
-}
-
-/* ========================================
-   Misc Styles
-   ======================================== */
-.form-text {
-  transition: color 0.3s ease;
-  font-weight: 500;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-ul {
-  padding-left: 1.5rem;
-}
-
-ul li {
-  margin-bottom: 0.25rem;
-}
-
-/* ========================================
-   Responsive
-   ======================================== */
-@media (max-width: 576px) {
-  .categories-grid {
-    gap: 0.5rem;
-  }
-
-  .category-tag {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.7rem;
-  }
 }
 </style>

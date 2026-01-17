@@ -9,15 +9,8 @@
             Explore jokes from different categories
           </p>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading counts...</span>
-            </div>
-          </div>
-
           <!-- Categories Grid -->
-          <div v-else class="row g-4">
+          <div class="row g-4">
             <div 
               v-for="category in categories" 
               :key="category.value" 
@@ -26,11 +19,20 @@
               <div 
                 class="card category-card h-100" 
                 @click="navigateToCategory(category.value)"
+                :class="{ 'loading-shimmer': isLoadingCount(category.value) }"
               >
                 <div class="card-body text-center">
                   <div class="display-4 mb-3">{{ category.icon }}</div>
                   <h5 class="card-title">{{ category.label }}</h5>
-                  <p class="card-text text-muted">
+                  
+                  <!-- Loading State (per category) -->
+                  <p v-if="isLoadingCount(category.value)" class="card-text text-muted">
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    Loading...
+                  </p>
+                  
+                  <!-- Count Display -->
+                  <p v-else class="card-text text-muted">
                     {{ categoryCounts[category.value] || 0 }} jokes
                   </p>
                 </div>
@@ -44,11 +46,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../services/firebase';
 import { updateSEO } from '../utils/seo';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
@@ -58,12 +58,13 @@ const store = useStore();
 // Get selected languages from GLOBAL state
 const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-const loading = ref(false);
+// Track loading state per category
+const loadingCategories = ref(new Set());
 
 /**
- * Categories list
+ * Categories list (static - no need to be reactive)
  */
-const categories = ref([
+const categories = [
   { value: 'General', label: 'General', icon: '😄' },
   { value: 'Relationships', label: 'Relationships', icon: '💑' },
   { value: 'Family', label: 'Family', icon: '👨‍👩‍👧‍👦' },
@@ -78,61 +79,49 @@ const categories = ref([
   { value: 'Old People', label: 'Old People', icon: '👴' },
   { value: 'Women', label: 'Women', icon: '👩' },
   { value: 'Men', label: 'Men', icon: '👨' }
-]);
+];
 
-const categoryCounts = reactive({});
+// OPTIMIZATION 1: Use Vuex store for caching counts
+const categoryCounts = computed(() => store.getters['categories/counts']);
+const cacheKey = computed(() => selectedLanguages.value.join(','));
+
+const isLoadingCount = (categoryValue) => {
+  return loadingCategories.value.has(categoryValue);
+};
 
 /**
- * FIXED: Count jokes using array-contains query
- * Firestore supports array-contains for querying arrays
+ * OPTIMIZATION 2: Load counts from Vuex cache or fetch if needed
  */
 const loadCounts = async () => {
-  loading.value = true;
-  console.log('=== Loading counts for languages:', selectedLanguages.value);
-
-  try {
-    for (const category of categories.value) {
-      let totalCount = 0;
-
-      // Count for each selected language
-      for (const language of selectedLanguages.value) {
-        try {
-          // FIXED: Use array-contains to query categories array
-          const q = query(
-            collection(db, 'jokes'),
-            where('status', '==', 'published'),
-            where('language', '==', language),
-            where('categories', 'array-contains', category.value)
-          );
-
-          const snapshot = await getDocs(q);
-          totalCount += snapshot.size;
-
-          console.log(`Category ${category.value} (${language}): ${snapshot.size} jokes`);
-        } catch (error) {
-          console.error(`Error counting ${category.value} (${language}):`, error);
-        }
-      }
-
-      categoryCounts[category.value] = totalCount;
-      console.log(`Total for ${category.value}: ${totalCount}`);
-    }
-  } catch (error) {
-    console.error('Error loading counts:', error);
-  } finally {
-    loading.value = false;
+  // Check if we already have cached counts for these languages
+  const cached = store.getters['categories/hasCachedCounts'](cacheKey.value);
+  
+  if (cached) {
+    console.log('✅ Using cached category counts');
+    return;
   }
+
+  console.log('📊 Fetching category counts for:', selectedLanguages.value);
+
+  // OPTIMIZATION 3: Dispatch Vuex action (handles parallel fetching)
+  await store.dispatch('categories/fetchCounts', {
+    languages: selectedLanguages.value,
+    categories: categories
+  });
 };
 
 const navigateToCategory = (categoryValue) => {
-  console.log('=== Navigating to category:', categoryValue);
   router.push(`/category/${categoryValue}`);
 };
 
-// Watch for language changes from GLOBAL state
-watch(selectedLanguages, () => {
-  console.log('=== Languages changed, reloading counts ===');
-  loadCounts();
+// OPTIMIZATION 4: Only reload if languages actually changed
+const languagesKey = ref(cacheKey.value);
+watch(selectedLanguages, (newLangs) => {
+  const newKey = newLangs.join(',');
+  if (newKey !== languagesKey.value) {
+    languagesKey.value = newKey;
+    loadCounts();
+  }
 }, { deep: true });
 
 onMounted(async () => {
@@ -140,6 +129,7 @@ onMounted(async () => {
     title: 'Browse Joke Categories - Humoraq',
     description: 'Explore jokes by category: tech, work, animals, relationships, and more!'
   });
+  
   await loadCounts();
 });
 </script>
@@ -150,12 +140,12 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.category-card:hover {
+.category-card:hover:not(.loading-shimmer) {
   transform: translateY(-5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.dark-mode .category-card:hover {
+.dark-mode .category-card:hover:not(.loading-shimmer) {
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
@@ -166,5 +156,17 @@ onMounted(async () => {
 
 .card-text {
   font-size: 1.1rem;
+}
+
+/* Loading shimmer effect */
+.loading-shimmer {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
 }
 </style>

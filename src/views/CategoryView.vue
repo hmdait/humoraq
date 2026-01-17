@@ -8,14 +8,30 @@
           </router-link>
 
           <!-- Header -->
-          <h1 class="display-5 mb-4">
-            {{ categoryLabel }} Jokes
-          </h1>
+          <div class="category-header mb-4">
+            <h1 class="display-5 mb-2">
+              <span class="category-icon me-2">{{ categoryIcon }}</span>
+              {{ categoryLabel }} Jokes
+            </h1>
+            <p class="text-muted">{{ categoryDescription }}</p>
+          </div>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
+          <!-- Loading State with Skeleton -->
+          <div v-if="loading" class="row g-4">
+            <div 
+              v-for="n in 6" 
+              :key="n"
+              class="col-md-6 col-lg-4"
+            >
+              <div class="card skeleton-card">
+                <div class="card-body">
+                  <div class="skeleton-badge mb-3"></div>
+                  <div class="skeleton-title mb-2"></div>
+                  <div class="skeleton-text mb-2"></div>
+                  <div class="skeleton-text mb-3"></div>
+                  <div class="skeleton-button"></div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -41,12 +57,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
+import { onBeforeRouteUpdate } from 'vue-router';
 import JokeGrid from '../components/JokeGrid.vue';
 import { updateSEO } from '../utils/seo';
+import { getCategoryByValue, getCategoryLabel, getCategoryIcon, getCategoryDescription } from '@/config/categories'; // UPDATED
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 const props = defineProps({
@@ -58,127 +74,155 @@ const props = defineProps({
 
 const store = useStore();
 
-// Local state
-const jokes = ref([]);
-const loading = ref(false);
-
-// Get selected languages from GLOBAL state
+// OPTIMIZATION: Use Vuex for state management and caching
+const jokes = computed(() => store.getters['categories/currentCategoryJokes']);
+const loading = computed(() => store.getters['categories/loading']);
 const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-/**
- * Map category slug to label
- */
-const categoryLabel = computed(() => {
-  const categoryMap = {
-    'General': 'General',
-    'Relationships': 'Relationships',
-    'Family': 'Family',
-    'Work': 'Work',
-    'School': 'School',
-    'Friends': 'Friends',
-    'Adult': 'Adult',
-    'Animals': 'Animals',
-    'Food': 'Food',
-    'Tech': 'Tech',
-    'Sports': 'Sports',
-    'Old People': 'Old People',
-    'Women': 'Women',
-    'Men': 'Men'
-  };
-  return categoryMap[props.slug] || props.slug;
-});
+// UPDATED: Get category info from unified config
+const category = computed(() => getCategoryByValue(props.slug));
+const categoryLabel = computed(() => getCategoryLabel(props.slug));
+const categoryIcon = computed(() => getCategoryIcon(props.slug));
+const categoryDescription = computed(() => getCategoryDescription(props.slug));
 
 /**
- * FIXED: Load jokes using array-contains query
- * Firestore can query arrays with 'array-contains'
+ * OPTIMIZATION: Load jokes with caching
  */
 const loadJokes = async () => {
-  loading.value = true;
-  console.log('=== Loading jokes for category:', props.slug, 'languages:', selectedLanguages.value);
+  const cacheKey = `${props.slug}-${selectedLanguages.value.join(',')}`;
   
-  try {
-    let allJokes = [];
-
-    // Fetch jokes for each selected language
-    for (const language of selectedLanguages.value) {
-      try {
-        // FIXED: Use array-contains to query categories array
-        const q = query(
-          collection(db, 'jokes'),
-          where('status', '==', 'published'),
-          where('language', '==', language),
-          where('categories', 'array-contains', props.slug)
-        );
-
-        const snapshot = await getDocs(q);
-        
-        const languageJokes = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
-        allJokes = [...allJokes, ...languageJokes];
-
-        console.log(`Found ${languageJokes.length} jokes for ${props.slug} (${language})`);
-      } catch (error) {
-        console.error(`Error loading jokes for ${language}:`, error);
-      }
-    }
-
-    // Sort by createdAt (newest first)
-    allJokes.sort((a, b) => {
-      const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function' 
-        ? a.createdAt.toMillis() 
-        : 0;
-      const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function' 
-        ? b.createdAt.toMillis() 
-        : 0;
-      return bTime - aTime;
-    });
-
-    jokes.value = allJokes;
-    
-    console.log('=== Total jokes loaded:', jokes.value.length);
-  } catch (error) {
-    console.error('Error loading jokes:', error);
-    jokes.value = [];
-  } finally {
-    loading.value = false;
+  // Check cache
+  const cached = store.getters['categories/hasCachedJokes'](cacheKey);
+  
+  if (cached) {
+    console.log('✅ Using cached jokes for:', props.slug);
+    store.commit('categories/SET_CURRENT_CATEGORY', props.slug);
+    return;
   }
+
+  console.log('📊 Fetching jokes for category:', props.slug);
+
+  // Fetch from Firestore
+  await store.dispatch('categories/fetchCategoryJokes', {
+    category: props.slug,
+    languages: selectedLanguages.value
+  });
 };
 
-// Watch for language changes
+// Handle route changes efficiently
+onBeforeRouteUpdate(async (to, from) => {
+  if (to.params.slug !== from.params.slug) {
+    await loadJokes();
+    updateSEO({
+      title: `${categoryLabel.value} Jokes - Humoraq`,
+      description: `Browse all ${categoryLabel.value.toLowerCase()} jokes. ${categoryDescription.value}`
+    });
+  }
+});
+
+// Debounced language change watcher
+let languageChangeTimeout = null;
 watch(selectedLanguages, () => {
-  console.log('=== Languages changed, reloading category ===');
-  loadJokes();
+  if (languageChangeTimeout) {
+    clearTimeout(languageChangeTimeout);
+  }
+  
+  languageChangeTimeout = setTimeout(() => {
+    console.log('Languages changed, reloading category');
+    loadJokes();
+  }, 300);
 }, { deep: true });
 
-// Watch for route changes (different category)
-watch(() => props.slug, () => {
-  loadJokes();
+onMounted(async () => {
+  await loadJokes();
+  
   updateSEO({
     title: `${categoryLabel.value} Jokes - Humoraq`,
-    description: `Browse all ${categoryLabel.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
+    description: `Browse all ${categoryLabel.value.toLowerCase()} jokes. ${categoryDescription.value}`
   });
 });
 
-onMounted(() => {
-  loadJokes();
-  
-  updateSEO({
-    title: `${categoryLabel.value} Jokes - Humoraq`,
-    description: `Browse all ${categoryLabel.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
-  });
+onBeforeUnmount(() => {
+  if (languageChangeTimeout) {
+    clearTimeout(languageChangeTimeout);
+  }
 });
 </script>
 
 <style scoped>
-.alert {
-  border-radius: 8px;
+.category-header {
+  border-bottom: 2px solid var(--border-color, #dee2e6);
+  padding-bottom: 1rem;
 }
 
-.alert a {
-  font-weight: 600;
-  text-decoration: underline;
+.category-icon {
+  font-size: 3rem;
+  vertical-align: middle;
+}
+
+/* Skeleton loading styles */
+.skeleton-card {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-badge,
+.skeleton-title,
+.skeleton-text,
+.skeleton-button {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-badge {
+  height: 24px;
+  width: 80px;
+  border-radius: 12px;
+}
+
+.skeleton-title {
+  height: 20px;
+  width: 60%;
+}
+
+.skeleton-text {
+  height: 16px;
+  width: 100%;
+}
+
+.skeleton-text:last-of-type {
+  width: 80%;
+}
+
+.skeleton-button {
+  height: 32px;
+  width: 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.dark-mode .skeleton-badge,
+.dark-mode .skeleton-title,
+.dark-mode .skeleton-text,
+.dark-mode .skeleton-button {
+  background: linear-gradient(90deg, #2c2c2c 25%, #3c3c3c 50%, #2c2c2c 75%);
+  background-size: 200% 100%;
 }
 </style>
