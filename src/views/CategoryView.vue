@@ -7,9 +7,9 @@
             ← Back to Categories
           </router-link>
 
-          <!-- Header - NO LANGUAGE SELECTOR -->
+          <!-- Header -->
           <h1 class="display-5 mb-4">
-            {{ categoryName }} Jokes
+            {{ categoryLabel }} Jokes
           </h1>
 
           <!-- Loading State -->
@@ -20,11 +20,19 @@
           </div>
 
           <!-- Jokes Grid -->
-          <JokeGrid v-else-if="jokes.length > 0" :jokes="jokes" :preview-length="120" />
+          <JokeGrid 
+            v-else-if="jokes.length > 0" 
+            :jokes="jokes" 
+            :preview-length="120" 
+          />
 
           <!-- Empty State -->
           <div v-else class="alert alert-info">
-            No jokes found in this category. Try selecting more languages from the header!
+            <strong>No jokes found in this category.</strong>
+            <p class="mb-0 mt-2">
+              Try selecting more languages from the header, or 
+              <router-link to="/submit">submit a joke</router-link> in this category!
+            </p>
           </div>
         </div>
       </div>
@@ -33,11 +41,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { useStore } from 'vuex';
 import JokeGrid from '../components/JokeGrid.vue';
 import { updateSEO } from '../utils/seo';
-import { getCategories } from '../services/jokeService';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 const props = defineProps({
@@ -49,61 +58,127 @@ const props = defineProps({
 
 const store = useStore();
 
-// Get data from GLOBAL Vuex state
-const jokes = computed(() => store.getters['jokes/jokes']);
-const loading = computed(() => store.getters['jokes/loading']);
+// Local state
+const jokes = ref([]);
+const loading = ref(false);
+
+// Get selected languages from GLOBAL state
 const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-// Get category name with fallback
-const categoryName = computed(() => {
-  const categories = getCategories();
-  const category = categories.find(c => c.slug === props.slug);
-  return category ? category.name : props.slug;
+/**
+ * Map category slug to label
+ */
+const categoryLabel = computed(() => {
+  const categoryMap = {
+    'General': 'General',
+    'Relationships': 'Relationships',
+    'Family': 'Family',
+    'Work': 'Work',
+    'School': 'School',
+    'Friends': 'Friends',
+    'Adult': 'Adult',
+    'Animals': 'Animals',
+    'Food': 'Food',
+    'Tech': 'Tech',
+    'Sports': 'Sports',
+    'Old People': 'Old People',
+    'Women': 'Women',
+    'Men': 'Men'
+  };
+  return categoryMap[props.slug] || props.slug;
 });
 
-// Load jokes using GLOBAL state
+/**
+ * FIXED: Load jokes using array-contains query
+ * Firestore can query arrays with 'array-contains'
+ */
 const loadJokes = async () => {
+  loading.value = true;
   console.log('=== Loading jokes for category:', props.slug, 'languages:', selectedLanguages.value);
-  await store.dispatch('jokes/fetchJokesByCategory', props.slug);
   
-  // Debug after loading
-  console.log('=== After loading ===');
-  console.log('Jokes in state:', store.state.jokes.jokes);
-  console.log('Jokes count:', store.state.jokes.jokes.length);
-  console.log('Loading:', store.state.jokes.loading);
-  console.log('Error:', store.state.jokes.error);
+  try {
+    let allJokes = [];
+
+    // Fetch jokes for each selected language
+    for (const language of selectedLanguages.value) {
+      try {
+        // FIXED: Use array-contains to query categories array
+        const q = query(
+          collection(db, 'jokes'),
+          where('status', '==', 'published'),
+          where('language', '==', language),
+          where('categories', 'array-contains', props.slug)
+        );
+
+        const snapshot = await getDocs(q);
+        
+        const languageJokes = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        allJokes = [...allJokes, ...languageJokes];
+
+        console.log(`Found ${languageJokes.length} jokes for ${props.slug} (${language})`);
+      } catch (error) {
+        console.error(`Error loading jokes for ${language}:`, error);
+      }
+    }
+
+    // Sort by createdAt (newest first)
+    allJokes.sort((a, b) => {
+      const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function' 
+        ? a.createdAt.toMillis() 
+        : 0;
+      const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function' 
+        ? b.createdAt.toMillis() 
+        : 0;
+      return bTime - aTime;
+    });
+
+    jokes.value = allJokes;
+    
+    console.log('=== Total jokes loaded:', jokes.value.length);
+  } catch (error) {
+    console.error('Error loading jokes:', error);
+    jokes.value = [];
+  } finally {
+    loading.value = false;
+  }
 };
 
-// Watch for language changes from GLOBAL state
+// Watch for language changes
 watch(selectedLanguages, () => {
   console.log('=== Languages changed, reloading category ===');
   loadJokes();
 }, { deep: true });
 
-// Watch for route changes
+// Watch for route changes (different category)
 watch(() => props.slug, () => {
   loadJokes();
-  // Update SEO when slug changes
   updateSEO({
-    title: `${categoryName.value} Jokes - Humoraq`,
-    description: `Browse all ${(categoryName.value || props.slug).toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
+    title: `${categoryLabel.value} Jokes - Humoraq`,
+    description: `Browse all ${categoryLabel.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
   });
 });
 
 onMounted(() => {
   loadJokes();
   
-  // Debug: Log current state
-  console.log('🔍 Debug Info:');
-  console.log('- Category slug:', props.slug);
-  console.log('- Selected languages:', selectedLanguages.value);
-  console.log('- All jokes in store:', store.state.jokes.allJokes || 'No allJokes property');
-  console.log('- Filtered jokes:', jokes.value);
-  
-  // Fix: Use optional chaining and fallback to prevent undefined error
   updateSEO({
-    title: `${categoryName.value || 'Category'} Jokes - Humoraq`,
-    description: `Browse all ${(categoryName.value || props.slug || 'category').toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
+    title: `${categoryLabel.value} Jokes - Humoraq`,
+    description: `Browse all ${categoryLabel.value.toLowerCase()} jokes. Funny and entertaining content in multiple languages.`
   });
 });
 </script>
+
+<style scoped>
+.alert {
+  border-radius: 8px;
+}
+
+.alert a {
+  font-weight: 600;
+  text-decoration: underline;
+}
+</style>

@@ -1,14 +1,26 @@
 <template>
   <div class="card joke-card shadow-sm">
     <div class="card-body">
-      <div class="d-flex justify-content-between align-items-start mb-3">
-        <span :class="`badge bg-${getCategoryColor(joke.category)} category-badge`">
-          {{ getCategoryName(joke.category) }}
-        </span>
-        <span class="badge bg-secondary">{{ getLanguageName(joke.language) }}</span>
+      <!-- UPDATED: Display multiple categories as tags -->
+      <div class="categories-header mb-3">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <!-- Categories Tags -->
+          <span 
+            v-for="category in jokeCategories" 
+            :key="category"
+            :class="`badge bg-${getCategoryColor(category)} category-badge`"
+          >
+            {{ category }}
+          </span>
+          
+          <!-- Language Badge -->
+          <span class="badge bg-secondary ms-auto">
+            {{ getLanguageName(joke.language) }}
+          </span>
+        </div>
       </div>
       
-      <!-- UPDATED: Added dynamic direction and lang attributes -->
+      <!-- Joke Text -->
       <p 
         class="joke-text preserve-whitespace"
         :dir="textDirection"
@@ -38,7 +50,7 @@
                 {{ localLikes }}
               </small>
 
-              <!-- NEW: Social Share Component -->
+              <!-- Social Share Component -->
               <SocialShare :joke="joke" />
 
               <!-- Views -->
@@ -91,6 +103,20 @@ const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
 
+// UPDATED: Support both old (category) and new (categories) formats
+const jokeCategories = computed(() => {
+  // If joke has categories array, use it
+  if (props.joke.categories && Array.isArray(props.joke.categories)) {
+    return props.joke.categories;
+  }
+  // Fallback to old single category format
+  if (props.joke.category) {
+    return [props.joke.category];
+  }
+  // Default fallback
+  return ['General'];
+});
+
 // Compute text direction based on content
 const textDirection = computed(() => getTextDirection(props.joke.text));
 const directionClass = computed(() => getDirectionClass(props.joke.text));
@@ -123,8 +149,8 @@ const handleLike = async () => {
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
 
-    // Track analytics
-    trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
+    // Track analytics - use first category
+    trackJokeLike(props.joke.id, jokeCategories.value[0], props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
     // Rollback on error
@@ -135,26 +161,28 @@ const handleLike = async () => {
   }
 };
 
-const getCategoryName = (slug) => {
-  const categories = {
-    tech: 'Tech',
-    work: 'Work',
-    animals: 'Animals',
-    food: 'Food',
-    general: 'General'
+/**
+ * UPDATED: Get color for category
+ * Returns consistent colors for known categories
+ */
+const getCategoryColor = (category) => {
+  const colorMap = {
+    'General': 'info',
+    'Relationships': 'danger',
+    'Family': 'success',
+    'Work': 'primary',
+    'School': 'warning',
+    'Friends': 'info',
+    'Adult': 'dark',
+    'Animals': 'warning',
+    'Food': 'danger',
+    'Tech': 'primary',
+    'Sports': 'success',
+    'Old People': 'secondary',
+    'Women': 'danger',
+    'Men': 'primary'
   };
-  return categories[slug] || slug;
-};
-
-const getCategoryColor = (slug) => {
-  const colors = {
-    tech: 'primary',
-    work: 'success',
-    animals: 'warning',
-    food: 'danger',
-    general: 'info'
-  };
-  return colors[slug] || 'secondary';
+  return colorMap[category] || 'secondary';
 };
 
 const getLanguageName = (code) => {
@@ -187,6 +215,19 @@ const getAuthorName = (author) => {
   box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
 }
 
+/* UPDATED: Categories header with flex wrap */
+.categories-header {
+  min-height: 32px;
+}
+
+.category-badge {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  padding: 0.35em 0.65em;
+  font-weight: 500;
+}
+
 .joke-text {
   font-size: 1.25rem;
   line-height: 1.6;
@@ -201,23 +242,16 @@ const getAuthorName = (author) => {
   overflow-wrap: break-word;
 }
 
-/* UPDATED: Force right alignment for RTL */
+/* RTL support */
 .rtl-text.joke-text {
   line-height: 1.8 !important;
   text-align: right !important;
   direction: rtl !important;
 }
 
-/* UPDATED: Ensure LTR stays left */
 .ltr-text.joke-text {
   text-align: left !important;
   direction: ltr !important;
-}
-
-.category-badge {
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .joke-card-footer {
@@ -276,6 +310,10 @@ const getAuthorName = (author) => {
   .joke-card-footer .btn-outline-primary {
     margin-top: 0.5rem;
     width: 100%;
+  }
+
+  .categories-header .badge {
+    font-size: 0.7rem;
   }
 }
 </style>

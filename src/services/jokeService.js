@@ -17,6 +17,8 @@ import { db } from './firebase';
 
 const jokesCollection = collection(db, 'jokes');
 
+// ... (keep existing getAllJokes, getJokeById, getRandomJoke functions) ...
+
 export const getAllJokes = async () => {
   try {
     const q = query(jokesCollection, where('status', '==', 'published'));
@@ -42,25 +44,20 @@ export const getJokeById = async (id) => {
         ...jokeSnapshot.data()
       };
       
-      // Check if user has already viewed this joke
       const viewedJokes = JSON.parse(localStorage.getItem('viewedJokes') || '[]');
       const hasViewed = viewedJokes.includes(id);
       
-      // Only increment if not viewed before
       if (!hasViewed) {
-        // Increment views and update updatedAt timestamp in background
         updateDoc(jokeDoc, {
           views: increment(1),
-          updatedAt: serverTimestamp() // Track interaction
+          updatedAt: serverTimestamp()
         }).catch(error => {
           console.error('Error incrementing views:', error);
         });
         
-        // Mark as viewed
         viewedJokes.push(id);
         localStorage.setItem('viewedJokes', JSON.stringify(viewedJokes));
         
-        // Return with incremented view count
         return {
           ...jokeData,
           views: (jokeData.views || 0) + 1
@@ -78,14 +75,18 @@ export const getJokeById = async (id) => {
 
 export const getRandomJoke = async (filters = {}) => {
   try {
-    let q = query(jokesCollection, where('status', '==', 'published'));
+    let q = query(
+      collection(db, 'jokes'),
+      where('status', '==', 'published')
+    );
 
     if (filters.language) {
       q = query(q, where('language', '==', filters.language));
     }
 
+    // UPDATED: Use array-contains if category filter provided
     if (filters.category) {
-      q = query(q, where('category', '==', filters.category));
+      q = query(q, where('categories', 'array-contains', filters.category));
     }
 
     const querySnapshot = await getDocs(q);
@@ -101,27 +102,23 @@ export const getRandomJoke = async (filters = {}) => {
     const randomIndex = Math.floor(Math.random() * jokes.length);
     const selectedJoke = jokes[randomIndex];
     
-    // Check if user has already viewed this joke
+    // View tracking logic (keep your existing code here)
     const viewedJokes = JSON.parse(localStorage.getItem('viewedJokes') || '[]');
     const hasViewed = viewedJokes.includes(selectedJoke.id);
     
-    // Only increment if not viewed before
     if (!hasViewed) {
       const jokeDoc = doc(db, 'jokes', selectedJoke.id);
       
-      // Increment views and update updatedAt in background
       updateDoc(jokeDoc, {
         views: increment(1),
-        updatedAt: serverTimestamp() // Track interaction
+        updatedAt: serverTimestamp()
       }).catch(error => {
         console.error('Error incrementing views:', error);
       });
       
-      // Mark as viewed
       viewedJokes.push(selectedJoke.id);
       localStorage.setItem('viewedJokes', JSON.stringify(viewedJokes));
       
-      // Return with incremented view count
       return {
         ...selectedJoke,
         views: (selectedJoke.views || 0) + 1
@@ -135,16 +132,29 @@ export const getRandomJoke = async (filters = {}) => {
   }
 };
 
+/**
+ * UPDATED: Get jokes by category (supports categories array)
+ * Fetches all jokes and filters client-side where category is in categories array
+ */
 export const getJokesByCategory = async (category, language = null) => {
   try {
-    let q = query(
-      jokesCollection,
-      where('status', '==', 'published'),
-      where('category', '==', category)
-    );
-
+    let q;
+    
     if (language) {
-      q = query(q, where('language', '==', language));
+      // Query with both language and category
+      q = query(
+        collection(db, 'jokes'),
+        where('status', '==', 'published'),
+        where('language', '==', language),
+        where('categories', 'array-contains', category)
+      );
+    } else {
+      // Query with just category
+      q = query(
+        collection(db, 'jokes'),
+        where('status', '==', 'published'),
+        where('categories', 'array-contains', category)
+      );
     }
 
     const querySnapshot = await getDocs(q);
@@ -154,22 +164,43 @@ export const getJokesByCategory = async (category, language = null) => {
       ...doc.data()
     }));
 
-    // Sort by createdAt locally with proper null/undefined handling
+    // Sort by createdAt locally
     jokes.sort((a, b) => {
-      // Handle missing or invalid createdAt
       const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function' 
         ? a.createdAt.toMillis() 
         : 0;
       const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function' 
         ? b.createdAt.toMillis() 
         : 0;
-      return bTime - aTime; // Descending order (newest first)
+      return bTime - aTime;
     });
 
+    console.log(`Found ${jokes.length} jokes for category: ${category}, language: ${language || 'all'}`);
     return jokes;
   } catch (error) {
     console.error('Error fetching jokes by category:', error);
     return [];
+  }
+};
+
+/**
+ * NEW: Get count of jokes in a category
+ * Counts jokes where the category appears in the categories array
+ */
+export const getCategoryJokesCount = async (category, language) => {
+  try {
+    const q = query(
+      collection(db, 'jokes'),
+      where('status', '==', 'published'),
+      where('language', '==', language),
+      where('categories', 'array-contains', category)
+    );
+
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size;
+  } catch (error) {
+    console.error('Error counting jokes:', error);
+    return 0;
   }
 };
 
@@ -187,7 +218,6 @@ export const getJokesByLanguage = async (language) => {
       ...doc.data()
     }));
 
-    // Sort by createdAt locally with proper null/undefined handling
     jokes.sort((a, b) => {
       const aTime = a.createdAt && typeof a.createdAt.toMillis === 'function' 
         ? a.createdAt.toMillis() 
@@ -195,7 +225,7 @@ export const getJokesByLanguage = async (language) => {
       const bTime = b.createdAt && typeof b.createdAt.toMillis === 'function' 
         ? b.createdAt.toMillis() 
         : 0;
-      return bTime - aTime; // Descending order
+      return bTime - aTime;
     });
 
     return jokes;
@@ -205,34 +235,75 @@ export const getJokesByLanguage = async (language) => {
   }
 };
 
+/**
+ * DEPRECATED: Old function - kept for backward compatibility
+ * Use getCategoryJokesCount instead
+ */
 export const getCategoryCount = async (categorySlug, language) => {
-  try {
-    const q = query(
-      jokesCollection,
-      where('status', '==', 'published'),
-      where('category', '==', categorySlug),
-      where('language', '==', language)
-    );
-
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size;
-  } catch (error) {
-    console.error('Error counting jokes:', error);
-    return 0;
-  }
+  console.warn('getCategoryCount is deprecated. Use getCategoryJokesCount instead.');
+  return getCategoryJokesCount(categorySlug, language);
 };
 
 /**
- * Like a joke and update updatedAt timestamp
- * @param {string} jokeId - The joke ID
- * @returns {Promise<boolean>}
+ * UPDATED: Create a new joke with categories array
  */
+export const createJoke = async (jokeData) => {
+  try {
+    // Validate categories array
+    if (!Array.isArray(jokeData.categories) || jokeData.categories.length === 0) {
+      throw new Error('At least one category is required');
+    }
+
+    // Validate required fields
+    if (!jokeData.text || jokeData.text.trim().length === 0) {
+      throw new Error('Joke text is required');
+    }
+
+    if (!jokeData.language) {
+      throw new Error('Language is required');
+    }
+
+    const newJoke = {
+      title: jokeData.title || '',
+      text: jokeData.text.trim(),
+      language: jokeData.language,
+      categories: jokeData.categories, // CHANGED: Array of categories
+      author: {
+        type: 'user',
+        name: jokeData.authorName || 'Anonymous',
+        email: jokeData.email || null,
+        uid: null
+      },
+      likes: 0,
+      views: 0,
+      shares: 0,
+      status: 'published',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    // IMPORTANT: Do NOT include 'category' field
+
+    const docRef = await addDoc(jokesCollection, newJoke);
+    
+    console.log('✅ Joke created successfully with categories:', jokeData.categories);
+    
+    return {
+      id: docRef.id,
+      ...newJoke
+    };
+  } catch (error) {
+    console.error('Error creating joke:', error);
+    throw error;
+  }
+};
+
 export const likeJoke = async (jokeId) => {
   try {
     const jokeDoc = doc(db, 'jokes', jokeId);
     await updateDoc(jokeDoc, {
       likes: increment(1),
-      updatedAt: serverTimestamp() // Track interaction
+      updatedAt: serverTimestamp()
     });
     return true;
   } catch (error) {
@@ -241,21 +312,14 @@ export const likeJoke = async (jokeId) => {
   }
 };
 
-/**
- * Track joke interaction and update updatedAt timestamp
- * @param {string} jokeId - The joke ID
- * @param {string} interactionType - Type of interaction (like, share, view)
- * @returns {Promise<void>}
- */
 export const trackJokeInteraction = async (jokeId, interactionType = 'view') => {
   try {
     const jokeRef = doc(db, 'jokes', jokeId);
     
     const updates = {
-      updatedAt: serverTimestamp() // Always update the interaction timestamp
+      updatedAt: serverTimestamp()
     };
     
-    // Increment counters based on interaction type
     switch (interactionType) {
       case 'like':
         updates.likes = increment(1);
@@ -276,49 +340,29 @@ export const trackJokeInteraction = async (jokeId, interactionType = 'view') => 
   }
 };
 
-export const createJoke = async (jokeData) => {
-  try {
-    const newJoke = {
-      title: jokeData.title || '',
-      text: jokeData.text,
-      language: jokeData.language,
-      category: jokeData.category,
-      author: {
-        type: 'user',
-        name: jokeData.authorName || 'Anonymous',
-        email: jokeData.email || null, // Store email (null if not provided)
-        uid: null
-      },
-      likes: 0,
-      views: 0,
-      shares: 0,
-      status: 'published',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
-
-    const docRef = await addDoc(jokesCollection, newJoke);
-    return {
-      id: docRef.id,
-      ...newJoke
-    };
-  } catch (error) {
-    console.error('Error creating joke:', error);
-    throw error;
-  }
-};
-
+/**
+ * UPDATED: Get categories list
+ */
 export const getCategories = () => {
   return [
-    { slug: 'general', name: 'General', icon: '😄' },
-    { slug: 'tech', name: 'Tech', icon: '💻' },
-    { slug: 'work', name: 'Work', icon: '💼' },
-    { slug: 'animals', name: 'Animals', icon: '🐶' },
-    { slug: 'food', name: 'Food', icon: '🍕' }
+    { slug: 'General', name: 'General', icon: '😄' },
+    { slug: 'Relationships', name: 'Relationships', icon: '💑' },
+    { slug: 'Family', name: 'Family', icon: '👨‍👩‍👧‍👦' },
+    { slug: 'Work', name: 'Work', icon: '💼' },
+    { slug: 'School', name: 'School', icon: '🎓' },
+    { slug: 'Friends', name: 'Friends', icon: '👥' },
+    { slug: 'Adult', name: 'Adult', icon: '🔞' },
+    { slug: 'Animals', name: 'Animals', icon: '🐶' },
+    { slug: 'Food', name: 'Food', icon: '🍕' },
+    { slug: 'Tech', name: 'Tech', icon: '💻' },
+    { slug: 'Sports', name: 'Sports', icon: '⚽' },
+    { slug: 'Old People', name: 'Old People', icon: '👴' },
+    { slug: 'Women', name: 'Women', icon: '👩' },
+    { slug: 'Men', name: 'Men', icon: '👨' }
   ];
 };
 
-// Fetch jokes feed with pagination (sorted by createdAt)
+// Feed functions (keep existing implementations)
 export const getJokesFeed = async (pageSize = 10, lastDoc = null) => {
   try {
     let q = query(
@@ -328,7 +372,6 @@ export const getJokesFeed = async (pageSize = 10, lastDoc = null) => {
       limit(pageSize)
     );
 
-    // If lastDoc is provided, start after it (pagination)
     if (lastDoc) {
       q = query(
         jokesCollection,
@@ -340,14 +383,12 @@ export const getJokesFeed = async (pageSize = 10, lastDoc = null) => {
     }
 
     const querySnapshot = await getDocs(q);
-    
-    // Get the last document for pagination
     const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
     
     const jokes = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      _doc: doc // Store the document reference for pagination
+      _doc: doc
     }));
 
     return {
@@ -365,7 +406,6 @@ export const getJokesFeed = async (pageSize = 10, lastDoc = null) => {
   }
 };
 
-// Fetch jokes feed filtered by language (sorted by createdAt)
 export const getJokesFeedByLanguage = async (language, pageSize = 10, lastDoc = null) => {
   try {
     let q = query(
@@ -411,20 +451,13 @@ export const getJokesFeedByLanguage = async (language, pageSize = 10, lastDoc = 
   }
 };
 
-/**
- * NEW: Fetch jokes feed ordered by updatedAt (most recently interacted)
- * Falls back to createdAt if updatedAt doesn't exist
- * @param {number} pageSize - Number of jokes per page
- * @param {object} lastDoc - Last document for pagination
- * @returns {Promise<{jokes: Array, lastDoc: object, hasMore: boolean}>}
- */
 export const getJokesFeedByInteraction = async (pageSize = 10, lastDoc = null) => {
   try {
     let q = query(
       jokesCollection,
       where('status', '==', 'published'),
-      orderBy('updatedAt', 'desc'), // Order by most recently interacted
-      orderBy('createdAt', 'desc'), // Secondary sort by creation
+      orderBy('updatedAt', 'desc'),
+      orderBy('createdAt', 'desc'),
       limit(pageSize)
     );
 
@@ -448,7 +481,6 @@ export const getJokesFeedByInteraction = async (pageSize = 10, lastDoc = null) =
         id: doc.id,
         ...data,
         _doc: doc,
-        // Fallback to createdAt if updatedAt doesn't exist
         sortDate: data.updatedAt || data.createdAt
       };
     });
@@ -468,13 +500,6 @@ export const getJokesFeedByInteraction = async (pageSize = 10, lastDoc = null) =
   }
 };
 
-/**
- * NEW: Fetch jokes feed by language ordered by updatedAt
- * @param {string} language - Language code (en, fr, ar)
- * @param {number} pageSize - Number of jokes per page
- * @param {object} lastDoc - Last document for pagination
- * @returns {Promise<{jokes: Array, lastDoc: object, hasMore: boolean}>}
- */
 export const getJokesFeedByLanguageInteraction = async (language, pageSize = 10, lastDoc = null) => {
   try {
     let q = query(
