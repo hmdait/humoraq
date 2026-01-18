@@ -10,6 +10,7 @@ import AboutView from '../views/AboutView.vue';
 import VideosView from '../views/VideosView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { trackPageView } from '../services/analyticsService';
+import LegalView from '../views/LegalView.vue';
 
 const routes = [
   {
@@ -50,7 +51,7 @@ const routes = [
     // UPDATED: Validate category slug before navigation
     beforeEnter: (to, from, next) => {
       const slug = to.params.slug;
-      
+
       if (isValidCategorySlug(slug)) {
         const category = getCategoryBySlug(slug);
         // Update meta with category info
@@ -88,6 +89,12 @@ const routes = [
     name: 'not-found',
     component: NotFoundView,
     meta: { title: '404 - Humoraq' }
+  },
+  {
+    path: '/legal',
+    name: 'legal',
+    component: LegalView,
+    meta: { title: 'Privacy & Terms - Humoraq' }
   }
 ];
 
