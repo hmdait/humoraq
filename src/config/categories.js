@@ -106,7 +106,7 @@ export const CATEGORIES = [
     value: 'Women', 
     label: 'Women', 
     slug: 'women',
-    icon: '👩',
+    icon: '♀️',
     color: 'danger',
     description: 'Women-related humor'
   },
@@ -114,7 +114,7 @@ export const CATEGORIES = [
     value: 'Men', 
     label: 'Men', 
     slug: 'men',
-    icon: '👨',
+    icon: '♂️',
     color: 'primary',
     description: 'Men-related humor'
   }

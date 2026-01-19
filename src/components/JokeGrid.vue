@@ -7,19 +7,18 @@
     >
       <div class="card joke-card-preview h-100">
         <div class="card-body d-flex flex-column">
-          <!-- Header: Badges -->
-          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+          <!-- Header: Badges - Show ALL categories -->
+          <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="d-flex flex-wrap gap-1">
-              <!-- UPDATED: Display all categories as badges -->
               <span 
-                v-for="category in getJokeCategories(joke)" 
-                :key="category"
-                :class="`badge bg-${getCategoryColor(category)} category-badge`"
+                v-for="cat in getJokeCategories(joke)" 
+                :key="cat"
+                :class="`badge bg-${getCategoryColor(cat)} category-badge`"
               >
-                {{ category }}
+                {{ getCategoryLabel(cat) }}
               </span>
             </div>
-            <span class="badge bg-secondary">{{ getLanguageName(joke.language) }}</span>
+            <span class="badge bg-secondary ms-2">{{ getLanguageName(joke.language) }}</span>
           </div>
           
           <!-- Joke Title (if exists) -->
@@ -68,6 +67,7 @@
 </template>
 
 <script setup>
+import { getCategoryLabel, getCategoryColor } from '@/config/categories';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
 
 const props = defineProps({
@@ -83,20 +83,20 @@ const props = defineProps({
 });
 
 /**
- * UPDATED: Get categories array from joke
- * Supports both old (category) and new (categories) formats
+ * Get joke categories - handles both old (single category) and new (array) format
  */
 const getJokeCategories = (joke) => {
-  // If joke has categories array, use it
-  if (joke.categories && Array.isArray(joke.categories)) {
+  // New format: categories array
+  if (Array.isArray(joke.categories)) {
     return joke.categories;
   }
-  // Fallback to old single category format
+  
+  // Old format: single category field (fallback)
   if (joke.category) {
     return [joke.category];
   }
-  // Default fallback
-  return ['General'];
+  
+  return ['General']; // Default fallback
 };
 
 const truncateText = (text, maxLength) => {
@@ -111,29 +111,6 @@ const truncateText = (text, maxLength) => {
   }
   
   return truncated + '...';
-};
-
-/**
- * UPDATED: Get color for category
- */
-const getCategoryColor = (category) => {
-  const colorMap = {
-    'General': 'info',
-    'Relationships': 'danger',
-    'Family': 'success',
-    'Work': 'primary',
-    'School': 'warning',
-    'Friends': 'info',
-    'Adult': 'dark',
-    'Animals': 'warning',
-    'Food': 'danger',
-    'Tech': 'primary',
-    'Sports': 'success',
-    'Old People': 'secondary',
-    'Women': 'danger',
-    'Men': 'primary'
-  };
-  return colorMap[category] || 'secondary';
 };
 
 const getLanguageName = (code) => {
@@ -230,12 +207,15 @@ const getAuthorName = (author) => {
   overflow-wrap: break-word;
 }
 
-/* UPDATED: Category badge styling for multiple categories */
 .category-badge {
   font-size: 0.7rem;
-  text-transform: capitalize;
-  letter-spacing: 0.3px;
-  padding: 0.3em 0.5em;
-  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Handle multiple badges wrapping */
+.d-flex.flex-wrap.gap-1 {
+  max-width: 70%;
 }
 </style>

@@ -4,37 +4,20 @@
       <div class="row">
         <div class="col-12">
           <!-- Header -->
-          <h1 class="display-5 mb-2">Browse by Category</h1>
-          <p class="text-muted mb-4">
-            Explore jokes from different categories
-          </p>
+          <h1 class="display-5 mb-4">Browse by Category</h1>
 
-          <!-- Categories Grid -->
           <div class="row g-4">
-            <div 
-              v-for="category in categories" 
-              :key="category.value" 
-              class="col-md-6 col-lg-4"
-            >
-              <div 
-                class="card category-card h-100" 
-                @click="navigateToCategory(category.value)"
-                :class="{ 'loading-shimmer': isLoadingCount(category.value) }"
-              >
+            <div v-for="category in categories" :key="category.slug" class="col-md-6 col-lg-4">
+              <div class="card category-card h-100" @click="navigateToCategory(category.slug)">
                 <div class="card-body text-center">
                   <div class="display-4 mb-3">{{ category.icon }}</div>
                   <h5 class="card-title">{{ category.label }}</h5>
-                  
-                  <!-- Loading State (per category) -->
-                  <p v-if="isLoadingCount(category.value)" class="card-text text-muted">
-                    <span class="spinner-border spinner-border-sm me-1"></span>
-                    Loading...
-                  </p>
-                  
-                  <!-- Count Display -->
-                  <p v-else class="card-text text-muted">
+                  <p class="card-text text-muted mb-2">
                     {{ categoryCounts[category.value] || 0 }} jokes
                   </p>
+                  <small class="text-muted" v-if="category.description">
+                    {{ category.description }}
+                  </small>
                 </div>
               </div>
             </div>
@@ -46,9 +29,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import { getAllCategories, getAllCategoryValues } from '@/config/categories';
+import { getBatchCategoryCounts } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
@@ -58,76 +43,53 @@ const store = useStore();
 // Get selected languages from GLOBAL state
 const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-// Track loading state per category
-const loadingCategories = ref(new Set());
+// Get categories from centralized config
+const categories = ref(getAllCategories());
+const categoryCounts = reactive({});
 
 /**
- * Categories list (static - no need to be reactive)
- */
-const categories = [
-  { value: 'General', label: 'General', icon: '😄' },
-  { value: 'Relationships', label: 'Relationships', icon: '💑' },
-  { value: 'Family', label: 'Family', icon: '👨‍👩‍👧‍👦' },
-  { value: 'Work', label: 'Work', icon: '💼' },
-  { value: 'School', label: 'School', icon: '🎓' },
-  { value: 'Friends', label: 'Friends', icon: '👥' },
-  { value: 'Adult', label: 'Adult', icon: '🔞' },
-  { value: 'Animals', label: 'Animals', icon: '🐶' },
-  { value: 'Food', label: 'Food', icon: '🍕' },
-  { value: 'Tech', label: 'Tech', icon: '💻' },
-  { value: 'Sports', label: 'Sports', icon: '⚽' },
-  { value: 'Old People', label: 'Old People', icon: '👴' },
-  { value: 'Women', label: 'Women', icon: '👩' },
-  { value: 'Men', label: 'Men', icon: '👨' }
-];
-
-// OPTIMIZATION 1: Use Vuex store for caching counts
-const categoryCounts = computed(() => store.getters['categories/counts']);
-const cacheKey = computed(() => selectedLanguages.value.join(','));
-
-const isLoadingCount = (categoryValue) => {
-  return loadingCategories.value.has(categoryValue);
-};
-
-/**
- * OPTIMIZATION 2: Load counts from Vuex cache or fetch if needed
+ * OPTIMIZED: Batch load all category counts at once
+ * Uses array-contains queries for categories array field
  */
 const loadCounts = async () => {
-  // Check if we already have cached counts for these languages
-  const cached = store.getters['categories/hasCachedCounts'](cacheKey.value);
-  
-  if (cached) {
-    console.log('✅ Using cached category counts');
-    return;
+  console.log('=== Loading counts for languages:', selectedLanguages.value);
+  console.time('⏱️ Category counts load time');
+
+  try {
+    // Get all category values from config
+    const categoryValues = getAllCategoryValues();
+    
+    console.log('Querying for categories:', categoryValues);
+    
+    // Batch fetch all counts (optimized: 3 queries instead of 42)
+    const counts = await getBatchCategoryCounts(categoryValues, selectedLanguages.value);
+    
+    // Update reactive object with all results
+    Object.assign(categoryCounts, counts);
+
+    console.log('✅ Category counts loaded:', counts);
+  } catch (error) {
+    console.error('❌ Error loading category counts:', error);
+  } finally {
+    console.timeEnd('⏱️ Category counts load time');
   }
-
-  console.log('📊 Fetching category counts for:', selectedLanguages.value);
-
-  // OPTIMIZATION 3: Dispatch Vuex action (handles parallel fetching)
-  await store.dispatch('categories/fetchCounts', {
-    languages: selectedLanguages.value,
-    categories: categories
-  });
 };
 
-const navigateToCategory = (categoryValue) => {
-  router.push(`/category/${categoryValue}`);
+const navigateToCategory = (slug) => {
+  console.log('=== Navigating to category slug:', slug);
+  router.push(`/category/${slug}`);
 };
 
-// OPTIMIZATION 4: Only reload if languages actually changed
-const languagesKey = ref(cacheKey.value);
-watch(selectedLanguages, (newLangs) => {
-  const newKey = newLangs.join(',');
-  if (newKey !== languagesKey.value) {
-    languagesKey.value = newKey;
-    loadCounts();
-  }
+// Watch for language changes from GLOBAL state
+watch(selectedLanguages, () => {
+  console.log('=== Languages changed, reloading counts ===');
+  loadCounts();
 }, { deep: true });
 
 onMounted(async () => {
   updateSEO({
     title: 'Browse Joke Categories - Humoraq',
-    description: 'Explore jokes by category: tech, work, animals, relationships, and more!'
+    description: 'Explore jokes by category: tech, work, animals, food, and more!'
   });
   
   await loadCounts();
@@ -140,33 +102,21 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.category-card:hover:not(.loading-shimmer) {
+.category-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.dark-mode .category-card:hover:not(.loading-shimmer) {
+.dark-mode .category-card:hover {
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
-.card-title {
-  font-weight: 600;
-  color: var(--text-color);
+.card-text.text-muted {
+  font-weight: 500;
 }
 
-.card-text {
-  font-size: 1.1rem;
-}
-
-/* Loading shimmer effect */
-.loading-shimmer {
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.spinner-border-sm {
-  width: 1rem;
-  height: 1rem;
-  border-width: 0.15em;
+small.text-muted {
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 </style>

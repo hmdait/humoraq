@@ -4,7 +4,7 @@
       <!-- Header with Navigation -->
       <div class="legal-header">
         <div class="container">
-          <h1 class="display-5 mb-4">Legal Information</h1>
+          <h1 class="display-5 mb-2">Legal Information</h1>
           <div class="btn-group" role="group">
             <button
               @click="activeSection = 'privacy'"
@@ -430,10 +430,9 @@ onMounted(() => {
 .legal-header {
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  padding: 2rem 0;
+  padding: 0 2rem 2rem 2rem;
   margin-bottom: 2rem;
   position: sticky;
-  top: 72px;
   z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }

@@ -13,13 +13,8 @@
               <small class="text-muted">
                 {{ formatDate(joke.createdAt) }}
                 <span class="mx-1">•</span>
-                <!-- UPDATED: Display all categories as badges -->
-                <span 
-                  v-for="(category, index) in jokeCategories" 
-                  :key="category"
-                  :class="`badge bg-${getCategoryColor(category)} badge-sm me-1`"
-                >
-                  {{ category }}
+                <span :class="`badge bg-${getCategoryColor(joke.category)} badge-sm`">
+                  {{ getCategoryLabel(joke.category) }}
                 </span>
                 <span class="mx-1">•</span>
                 <span class="badge bg-secondary badge-sm">
@@ -31,7 +26,7 @@
         </div>
       </div>
 
-      <!-- Title (if exists) -->
+      <!-- Title (if exists) - With RTL support -->
       <h5 
         v-if="joke.title" 
         class="feed-post-title mb-2"
@@ -41,7 +36,7 @@
         {{ joke.title }}
       </h5>
 
-      <!-- Joke Text -->
+      <!-- Joke Text - With RTL support -->
       <p 
         class="feed-post-text mb-3 preserve-whitespace"
         :dir="textDirection"
@@ -96,6 +91,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { getCategoryLabel, getCategoryColor } from '@/config/categories'; // SINGLE SOURCE OF TRUTH
 import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
@@ -112,20 +108,6 @@ const store = useStore();
 const localLikes = ref(props.joke.likes || 0);
 const hasLiked = ref(false);
 const isLiking = ref(false);
-
-// UPDATED: Support both old (category) and new (categories) formats
-const jokeCategories = computed(() => {
-  // If joke has categories array, use it
-  if (props.joke.categories && Array.isArray(props.joke.categories)) {
-    return props.joke.categories;
-  }
-  // Fallback to old single category format
-  if (props.joke.category) {
-    return [props.joke.category];
-  }
-  // Default fallback
-  return ['General'];
-});
 
 // Compute text direction based on content
 const textDirection = computed(() => getTextDirection(props.joke.text));
@@ -164,8 +146,8 @@ const handleLike = async () => {
     likedJokes.push(props.joke.id);
     localStorage.setItem('likedJokes', JSON.stringify(likedJokes));
 
-    // Track analytics - use first category
-    trackJokeLike(props.joke.id, jokeCategories.value[0], props.joke.language);
+    // Track analytics
+    trackJokeLike(props.joke.id, props.joke.category, props.joke.language);
   } catch (error) {
     console.error('Failed to like joke:', error);
     // Rollback on error
@@ -184,29 +166,6 @@ const getAuthorName = (author) => {
 const getAuthorInitial = (author) => {
   const name = getAuthorName(author);
   return name.charAt(0).toUpperCase();
-};
-
-/**
- * UPDATED: Get color for category
- */
-const getCategoryColor = (category) => {
-  const colorMap = {
-    'General': 'info',
-    'Relationships': 'danger',
-    'Family': 'success',
-    'Work': 'primary',
-    'School': 'warning',
-    'Friends': 'info',
-    'Adult': 'dark',
-    'Animals': 'warning',
-    'Food': 'danger',
-    'Tech': 'primary',
-    'Sports': 'success',
-    'Old People': 'secondary',
-    'Women': 'danger',
-    'Men': 'primary'
-  };
-  return colorMap[category] || 'secondary';
 };
 
 const getLanguageName = (code) => {
@@ -268,6 +227,7 @@ const formatDate = (timestamp) => {
   font-weight: 600;
 }
 
+/* Force right alignment for RTL title */
 .rtl-text.feed-post-title {
   text-align: right !important;
   direction: rtl !important;
@@ -284,6 +244,7 @@ const formatDate = (timestamp) => {
   color: var(--text-color);
 }
 
+/* Force right alignment for RTL text */
 .rtl-text.feed-post-text {
   line-height: 1.8 !important;
   text-align: right !important;
@@ -301,11 +262,9 @@ const formatDate = (timestamp) => {
   overflow-wrap: break-word;
 }
 
-/* UPDATED: Badge styling for multiple categories */
 .badge-sm {
   font-size: 0.7rem;
   padding: 0.25em 0.5em;
-  text-transform: capitalize;
 }
 
 .feed-post-footer {
@@ -356,10 +315,6 @@ const formatDate = (timestamp) => {
 
   .feed-post-footer .btn-outline-primary {
     width: 100%;
-  }
-
-  .badge-sm {
-    font-size: 0.65rem;
   }
 }
 </style>

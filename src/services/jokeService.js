@@ -17,7 +17,9 @@ import { db } from './firebase';
 
 const jokesCollection = collection(db, 'jokes');
 
-// ... (keep existing getAllJokes, getJokeById, getRandomJoke functions) ...
+// ============================================================================
+// BASIC JOKE RETRIEVAL
+// ============================================================================
 
 export const getAllJokes = async () => {
   try {
@@ -84,7 +86,7 @@ export const getRandomJoke = async (filters = {}) => {
       q = query(q, where('language', '==', filters.language));
     }
 
-    // UPDATED: Use array-contains if category filter provided
+    // FIXED: Use array-contains for categories array
     if (filters.category) {
       q = query(q, where('categories', 'array-contains', filters.category));
     }
@@ -102,7 +104,6 @@ export const getRandomJoke = async (filters = {}) => {
     const randomIndex = Math.floor(Math.random() * jokes.length);
     const selectedJoke = jokes[randomIndex];
     
-    // View tracking logic (keep your existing code here)
     const viewedJokes = JSON.parse(localStorage.getItem('viewedJokes') || '[]');
     const hasViewed = viewedJokes.includes(selectedJoke.id);
     
@@ -132,28 +133,38 @@ export const getRandomJoke = async (filters = {}) => {
   }
 };
 
+// ============================================================================
+// CATEGORY-BASED RETRIEVAL (FIXED FOR CATEGORIES ARRAY)
+// ============================================================================
+
 /**
- * UPDATED: Get jokes by category (supports categories array)
- * Fetches all jokes and filters client-side where category is in categories array
+ * FIXED: Get jokes by category using array-contains
+ * Supports categories array field: { categories: ['General', 'Work'] }
+ * 
+ * @param {string} categoryValue - Category value (e.g., "General", "Tech")
+ * @param {string} language - Language code (optional)
+ * @returns {Promise<Array>} Array of jokes
  */
-export const getJokesByCategory = async (category, language = null) => {
+export const getJokesByCategory = async (categoryValue, language = null) => {
   try {
+    console.log(`📚 Fetching jokes for category: ${categoryValue}, language: ${language || 'all'}`);
+    
     let q;
     
     if (language) {
-      // Query with both language and category
+      // Query with both language and category (array-contains)
       q = query(
         collection(db, 'jokes'),
         where('status', '==', 'published'),
         where('language', '==', language),
-        where('categories', 'array-contains', category)
+        where('categories', 'array-contains', categoryValue)
       );
     } else {
-      // Query with just category
+      // Query with just category (array-contains)
       q = query(
         collection(db, 'jokes'),
         where('status', '==', 'published'),
-        where('categories', 'array-contains', category)
+        where('categories', 'array-contains', categoryValue)
       );
     }
 
@@ -175,7 +186,7 @@ export const getJokesByCategory = async (category, language = null) => {
       return bTime - aTime;
     });
 
-    console.log(`Found ${jokes.length} jokes for category: ${category}, language: ${language || 'all'}`);
+    console.log(`✅ Found ${jokes.length} jokes for category: ${categoryValue}`);
     return jokes;
   } catch (error) {
     console.error('Error fetching jokes by category:', error);
@@ -184,25 +195,130 @@ export const getJokesByCategory = async (category, language = null) => {
 };
 
 /**
- * NEW: Get count of jokes in a category
- * Counts jokes where the category appears in the categories array
+ * FIXED: Get count of jokes in a category using array-contains
+ * 
+ * @param {string} categoryValue - Category value (e.g., "General", "Tech")
+ * @param {string} language - Language code
+ * @returns {Promise<number>} Count of jokes
  */
-export const getCategoryJokesCount = async (category, language) => {
+export const getCategoryCount = async (categoryValue, language) => {
   try {
+    console.log(`📊 Counting: categories array-contains "${categoryValue}", language="${language}"`);
+    
     const q = query(
       collection(db, 'jokes'),
       where('status', '==', 'published'),
       where('language', '==', language),
-      where('categories', 'array-contains', category)
+      where('categories', 'array-contains', categoryValue)
     );
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.size;
+    const count = querySnapshot.size;
+    
+    console.log(`✅ Found ${count} jokes for ${categoryValue} (${language})`);
+    return count;
   } catch (error) {
-    console.error('Error counting jokes:', error);
+    console.error(`❌ Error counting jokes for ${categoryValue}:`, error);
+    
+    // Fallback: if composite index is missing, try without language filter
+    if (error.code === 'failed-precondition' || error.message.includes('index')) {
+      console.warn('⚠️ Missing composite index, trying without language filter');
+      
+      try {
+        const q = query(
+          collection(db, 'jokes'),
+          where('status', '==', 'published'),
+          where('categories', 'array-contains', categoryValue)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        
+        // Filter by language in memory
+        let count = 0;
+        querySnapshot.forEach((doc) => {
+          if (doc.data().language === language) {
+            count++;
+          }
+        });
+        
+        console.log(`✅ Found ${count} jokes (filtered in memory)`);
+        return count;
+      } catch (innerError) {
+        console.error('❌ Fallback query also failed:', innerError);
+        return 0;
+      }
+    }
+    
     return 0;
   }
 };
+
+/**
+ * OPTIMIZED: Batch get all category counts
+ * Fetches all jokes per language once, counts categories in memory
+ * Much faster than individual queries per category
+ * 
+ * @param {Array<string>} categoryValues - Array of category values
+ * @param {Array<string>} languages - Array of language codes
+ * @returns {Promise<Object>} Object with category counts { 'Tech': 10, 'Work': 5, ... }
+ */
+export const getBatchCategoryCounts = async (categoryValues, languages) => {
+  try {
+    console.log('📊 Fetching batch category counts (array-based)');
+    console.time('⏱️ Batch category counts');
+    
+    // Fetch all jokes per language in parallel
+    const languagePromises = languages.map(async (language) => {
+      const q = query(
+        jokesCollection,
+        where('status', '==', 'published'),
+        where('language', '==', language)
+      );
+      
+      const snapshot = await getDocs(q);
+      
+      // Count jokes by category in memory
+      const counts = {};
+      
+      snapshot.forEach((doc) => {
+        const jokeCategories = doc.data().categories || [];
+        
+        // A joke can be in multiple categories
+        jokeCategories.forEach(cat => {
+          counts[cat] = (counts[cat] || 0) + 1;
+        });
+      });
+      
+      return counts;
+    });
+    
+    // Execute all language queries in parallel
+    const languageResults = await Promise.all(languagePromises);
+    
+    // Aggregate counts across all languages
+    const totalCounts = {};
+    
+    for (const categoryValue of categoryValues) {
+      totalCounts[categoryValue] = 0;
+      
+      for (const langCounts of languageResults) {
+        totalCounts[categoryValue] += langCounts[categoryValue] || 0;
+      }
+    }
+    
+    console.timeEnd('⏱️ Batch category counts');
+    console.log('✅ Batch counts loaded:', totalCounts);
+    
+    return totalCounts;
+  } catch (error) {
+    console.error('❌ Error fetching batch category counts:', error);
+    return {};
+  }
+};
+
+// ============================================================================
+// LANGUAGE-BASED RETRIEVAL
+// ============================================================================
 
 export const getJokesByLanguage = async (language) => {
   try {
@@ -235,17 +351,16 @@ export const getJokesByLanguage = async (language) => {
   }
 };
 
-/**
- * DEPRECATED: Old function - kept for backward compatibility
- * Use getCategoryJokesCount instead
- */
-export const getCategoryCount = async (categorySlug, language) => {
-  console.warn('getCategoryCount is deprecated. Use getCategoryJokesCount instead.');
-  return getCategoryJokesCount(categorySlug, language);
-};
+// ============================================================================
+// JOKE CREATION
+// ============================================================================
 
 /**
- * UPDATED: Create a new joke with categories array
+ * FIXED: Create a new joke with categories array
+ * Expects jokeData.categories to be an array
+ * 
+ * @param {Object} jokeData - Joke data with categories array
+ * @returns {Promise<Object>} Created joke
  */
 export const createJoke = async (jokeData) => {
   try {
@@ -267,7 +382,7 @@ export const createJoke = async (jokeData) => {
       title: jokeData.title || '',
       text: jokeData.text.trim(),
       language: jokeData.language,
-      categories: jokeData.categories, // CHANGED: Array of categories
+      categories: jokeData.categories, // Array of categories
       author: {
         type: 'user',
         name: jokeData.authorName || 'Anonymous',
@@ -282,8 +397,6 @@ export const createJoke = async (jokeData) => {
       updatedAt: serverTimestamp()
     };
 
-    // IMPORTANT: Do NOT include 'category' field
-
     const docRef = await addDoc(jokesCollection, newJoke);
     
     console.log('✅ Joke created successfully with categories:', jokeData.categories);
@@ -297,6 +410,10 @@ export const createJoke = async (jokeData) => {
     throw error;
   }
 };
+
+// ============================================================================
+// INTERACTIONS (LIKES, SHARES, VIEWS)
+// ============================================================================
 
 export const likeJoke = async (jokeId) => {
   try {
@@ -340,29 +457,10 @@ export const trackJokeInteraction = async (jokeId, interactionType = 'view') => 
   }
 };
 
-/**
- * UPDATED: Get categories list
- */
-export const getCategories = () => {
-  return [
-    { slug: 'General', name: 'General', icon: '😄' },
-    { slug: 'Relationships', name: 'Relationships', icon: '💑' },
-    { slug: 'Family', name: 'Family', icon: '👨‍👩‍👧‍👦' },
-    { slug: 'Work', name: 'Work', icon: '💼' },
-    { slug: 'School', name: 'School', icon: '🎓' },
-    { slug: 'Friends', name: 'Friends', icon: '👥' },
-    { slug: 'Adult', name: 'Adult', icon: '🔞' },
-    { slug: 'Animals', name: 'Animals', icon: '🐶' },
-    { slug: 'Food', name: 'Food', icon: '🍕' },
-    { slug: 'Tech', name: 'Tech', icon: '💻' },
-    { slug: 'Sports', name: 'Sports', icon: '⚽' },
-    { slug: 'Old People', name: 'Old People', icon: '👴' },
-    { slug: 'Women', name: 'Women', icon: '👩' },
-    { slug: 'Men', name: 'Men', icon: '👨' }
-  ];
-};
+// ============================================================================
+// FEED FUNCTIONS (PAGINATION)
+// ============================================================================
 
-// Feed functions (keep existing implementations)
 export const getJokesFeed = async (pageSize = 10, lastDoc = null) => {
   try {
     let q = query(
@@ -549,4 +647,80 @@ export const getJokesFeedByLanguageInteraction = async (language, pageSize = 10,
       hasMore: false
     };
   }
+};
+
+// ============================================================================
+// DEPRECATED / LEGACY SUPPORT
+// ============================================================================
+
+/**
+ * DEPRECATED: Use getCategoryCount instead
+ * Kept for backward compatibility with existing code
+ */
+export const getCategoryJokesCount = async (category, language) => {
+  console.warn('getCategoryJokesCount is deprecated. Use getCategoryCount instead.');
+  return getCategoryCount(category, language);
+};
+
+/**
+ * DEPRECATED: Old categories list
+ * Use src/config/categories.js instead
+ */
+export const getCategories = () => {
+  console.warn('getCategories from jokeService is deprecated. Use src/config/categories.js instead.');
+  return [
+    { slug: 'General', name: 'General', icon: '😄' },
+    { slug: 'Relationships', name: 'Relationships', icon: '💑' },
+    { slug: 'Family', name: 'Family', icon: '👨‍👩‍👧‍👦' },
+    { slug: 'Work', name: 'Work', icon: '💼' },
+    { slug: 'School', name: 'School', icon: '🎓' },
+    { slug: 'Friends', name: 'Friends', icon: '👥' },
+    { slug: 'Adult', name: 'Adult', icon: '🔞' },
+    { slug: 'Animals', name: 'Animals', icon: '🐶' },
+    { slug: 'Food', name: 'Food', icon: '🍕' },
+    { slug: 'Tech', name: 'Tech', icon: '💻' },
+    { slug: 'Sports', name: 'Sports', icon: '⚽' },
+    { slug: 'Old People', name: 'Old People', icon: '👴' },
+    { slug: 'Women', name: 'Women', icon: '👩' },
+    { slug: 'Men', name: 'Men', icon: '👨' }
+  ];
+};
+
+// ============================================================================
+// CACHING (OPTIONAL PERFORMANCE ENHANCEMENT)
+// ============================================================================
+
+const categoryCountCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * OPTIONAL: Get category count with in-memory caching
+ * Cache expires after 5 minutes
+ */
+export const getCategoryCountCached = async (categoryValue, language) => {
+  const cacheKey = `${categoryValue}-${language}`;
+  const cached = categoryCountCache.get(cacheKey);
+  
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log('📦 Using cached count for:', cacheKey);
+    return cached.count;
+  }
+  
+  const count = await getCategoryCount(categoryValue, language);
+  
+  categoryCountCache.set(cacheKey, {
+    count,
+    timestamp: Date.now()
+  });
+  
+  return count;
+};
+
+/**
+ * Clear the category count cache
+ * Call this when a new joke is submitted
+ */
+export const clearCategoryCountCache = () => {
+  categoryCountCache.clear();
+  console.log('🗑️ Category count cache cleared');
 };

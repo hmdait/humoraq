@@ -134,7 +134,7 @@
                   </div>
                 </div>
 
-                <!-- Categories (UPDATED: Using unified config) -->
+                <!-- Categories -->
                 <div class="mb-3">
                   <label class="form-label">
                     Categories <span class="text-danger">*</span>
@@ -195,6 +195,29 @@
                   </select>
                 </div>
 
+                <!-- Privacy & Terms Agreement -->
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input 
+                      type="checkbox" 
+                      class="form-check-input" 
+                      id="agreeTerms"
+                      v-model="formData.agreeTerms"
+                      :class="{ 'is-invalid': showTermsError }"
+                    />
+                    <label class="form-check-label" for="agreeTerms">
+                      I agree to the 
+                      <a href="/legal" target="_blank" class="privacy-link">Privacy Policy</a>
+                      and 
+                      <a href="/legal" target="_blank" class="privacy-link">Terms of Service</a>
+                      <span class="text-danger">*</span>
+                    </label>
+                  </div>
+                  <div v-if="showTermsError" class="invalid-feedback d-block">
+                    ⚠️ You must agree to the Privacy Policy and Terms of Service to submit
+                  </div>
+                </div>
+
                 <!-- Submit Button -->
                 <div class="d-grid gap-2">
                   <button 
@@ -213,6 +236,19 @@
                       🚀 Submit Joke
                     </span>
                   </button>
+                </div>
+
+                <!-- Submission Guidelines -->
+                <div class="mt-3">
+                  <small class="text-muted">
+                    <strong>Guidelines:</strong>
+                    <ul class="mb-0 mt-2">
+                      <li>Keep it funny and appropriate for all audiences</li>
+                      <li>Original jokes are preferred</li>
+                      <li>Multi-line jokes and stories are welcome</li>
+                      <li>Use emojis to enhance your joke 😄</li>
+                    </ul>
+                  </small>
                 </div>
               </form>
 
@@ -236,13 +272,12 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { createJoke } from '../services/jokeService';
 import { updateSEO } from '../utils/seo';
 import { trackJokeSubmit } from '../services/analyticsService';
-import { getCategoriesForSelect } from '../config/categories'; // UPDATED: Import from unified config
+import { getCategoriesForSelect } from '../config/categories';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 const minLength = 20;
 const maxLength = 2000;
 
-// UPDATED: Get categories from unified config
 const availableCategories = getCategoriesForSelect();
 
 const formData = reactive({
@@ -251,7 +286,8 @@ const formData = reactive({
   title: '',
   text: '',
   categories: [],
-  language: 'en'
+  language: 'en',
+  agreeTerms: false // NEW: Terms agreement
 });
 
 const submitting = ref(false);
@@ -261,6 +297,7 @@ const emailError = ref('');
 const jokeTextarea = ref(null);
 const showValidationError = ref(false);
 const showCategoriesError = ref(false);
+const showTermsError = ref(false); // NEW: Terms validation error
 
 const characterCount = computed(() => formData.text.length);
 const isTextValid = computed(() => 
@@ -270,6 +307,7 @@ const isFormValid = computed(() =>
   isTextValid.value && 
   formData.categories.length > 0 && 
   formData.language !== '' && 
+  formData.agreeTerms && // NEW: Must agree to terms
   !emailError.value
 );
 const selectedCategoriesText = computed(() => formData.categories.join(', '));
@@ -307,8 +345,10 @@ const resetForm = () => {
   formData.text = '';
   formData.categories = [];
   formData.language = 'en';
+  formData.agreeTerms = false; // NEW: Reset terms agreement
   showValidationError.value = false;
   showCategoriesError.value = false;
+  showTermsError.value = false; // NEW: Reset terms error
   emailError.value = '';
   if (jokeTextarea.value) {
     jokeTextarea.value.style.height = 'auto';
@@ -319,6 +359,7 @@ const handleSubmit = async () => {
   errorMessage.value = '';
   showValidationError.value = false;
   showCategoriesError.value = false;
+  showTermsError.value = false; // NEW: Reset terms error
 
   if (!isTextValid.value) {
     showValidationError.value = true;
@@ -329,6 +370,14 @@ const handleSubmit = async () => {
   if (formData.categories.length === 0) {
     showCategoriesError.value = true;
     errorMessage.value = 'Please select at least one category';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  // NEW: Validate terms agreement
+  if (!formData.agreeTerms) {
+    showTermsError.value = true;
+    errorMessage.value = 'You must agree to the Privacy Policy and Terms of Service';
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
@@ -374,7 +423,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Keep your existing styles */
 .joke-textarea {
   resize: vertical;
   min-height: 150px;
@@ -448,6 +496,34 @@ onMounted(() => {
   border-radius: 0.375rem;
 }
 
+/* NEW: Privacy & Terms link styling */
+.privacy-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.privacy-link:hover {
+  color: #0a58ca;
+  text-decoration: underline;
+}
+
+.form-check-label {
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.form-check-input.is-invalid {
+  border-color: #dc3545;
+}
+
+.form-check-input.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+/* Dark mode adjustments */
 .dark-mode .category-tag {
   border-color: #495057;
 }
@@ -456,5 +532,21 @@ onMounted(() => {
   background: #0d6efd;
   border-color: #0d6efd;
   color: #fff;
+}
+
+.dark-mode .email-info-box {
+  background-color: rgba(25, 135, 84, 0.15);
+}
+
+.dark-mode .selected-categories {
+  background-color: rgba(13, 110, 253, 0.15);
+}
+
+.dark-mode .privacy-link {
+  color: #6ea8fe;
+}
+
+.dark-mode .privacy-link:hover {
+  color: #9ec5fe;
 }
 </style>
