@@ -10,7 +10,7 @@ export const CATEGORIES = [
     value: 'General', 
     label: 'General', 
     slug: 'general',
-    icon: '😄',
+    icon: 'bi-chat-square-text',
     color: 'info',
     description: 'General humor for everyone'
   },
@@ -18,7 +18,7 @@ export const CATEGORIES = [
     value: 'Relationships', 
     label: 'Relationships', 
     slug: 'relationships',
-    icon: '💑',
+    icon: 'bi-heart',
     color: 'danger',
     description: 'Love, dating, and relationship humor'
   },
@@ -26,7 +26,7 @@ export const CATEGORIES = [
     value: 'Family', 
     label: 'Family', 
     slug: 'family',
-    icon: '👨‍👩‍👧‍👦',
+    icon: 'bi-people',
     color: 'success',
     description: 'Family life and parenting jokes'
   },
@@ -34,7 +34,7 @@ export const CATEGORIES = [
     value: 'Work', 
     label: 'Work', 
     slug: 'work',
-    icon: '💼',
+    icon: 'bi-briefcase',
     color: 'primary',
     description: 'Office and workplace humor'
   },
@@ -42,7 +42,7 @@ export const CATEGORIES = [
     value: 'School', 
     label: 'School', 
     slug: 'school',
-    icon: '🎓',
+    icon: 'bi-mortarboard',
     color: 'warning',
     description: 'Education and student life'
   },
@@ -50,7 +50,7 @@ export const CATEGORIES = [
     value: 'Friends', 
     label: 'Friends', 
     slug: 'friends',
-    icon: '👥',
+    icon: 'bi-person-hearts',
     color: 'info',
     description: 'Friendship and social humor'
   },
@@ -58,7 +58,7 @@ export const CATEGORIES = [
     value: 'Adult', 
     label: 'Adult', 
     slug: 'adult',
-    icon: '🔞',
+    icon: 'bi-18-square',
     color: 'dark',
     description: 'Mature audience humor'
   },
@@ -66,7 +66,7 @@ export const CATEGORIES = [
     value: 'Animals', 
     label: 'Animals', 
     slug: 'animals',
-    icon: '🐶',
+    icon: 'bi-bug',
     color: 'warning',
     description: 'Pets and animal jokes'
   },
@@ -74,7 +74,7 @@ export const CATEGORIES = [
     value: 'Food', 
     label: 'Food', 
     slug: 'food',
-    icon: '🍕',
+    icon: 'bi-cup-hot',
     color: 'danger',
     description: 'Cooking and dining humor'
   },
@@ -82,7 +82,7 @@ export const CATEGORIES = [
     value: 'Tech', 
     label: 'Tech', 
     slug: 'tech',
-    icon: '💻',
+    icon: 'bi-code-slash',
     color: 'primary',
     description: 'Technology and programming jokes'
   },
@@ -90,7 +90,7 @@ export const CATEGORIES = [
     value: 'Sports', 
     label: 'Sports', 
     slug: 'sports',
-    icon: '⚽',
+    icon: 'bi-trophy',
     color: 'success',
     description: 'Sports and fitness humor'
   },
@@ -98,7 +98,7 @@ export const CATEGORIES = [
     value: 'Old People', 
     label: 'Old People', 
     slug: 'old-people',
-    icon: '👴',
+    icon: 'bi-clock-history',
     color: 'secondary',
     description: 'Senior and aging humor'
   },
@@ -106,7 +106,7 @@ export const CATEGORIES = [
     value: 'Women', 
     label: 'Women', 
     slug: 'women',
-    icon: '♀️',
+    icon: 'bi-person-standing-dress',
     color: 'danger',
     description: 'Women-related humor'
   },
@@ -114,7 +114,7 @@ export const CATEGORIES = [
     value: 'Men', 
     label: 'Men', 
     slug: 'men',
-    icon: '♂️',
+    icon: 'bi-person-standing',
     color: 'primary',
     description: 'Men-related humor'
   }
@@ -159,11 +159,11 @@ export const getCategoryLabel = (value) => {
 /**
  * Get category icon from value
  * @param {string} value - Category value
- * @returns {string} Category icon emoji
+ * @returns {string} Bootstrap icon class
  */
 export const getCategoryIcon = (value) => {
   const category = getCategoryByValue(value);
-  return category ? category.icon : '📁';
+  return category ? category.icon : 'bi-folder';
 };
 
 /**

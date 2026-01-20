@@ -161,6 +161,7 @@
                         class="category-tag"
                         :class="{ selected: formData.categories.includes(category.value) }"
                       >
+                        <i :class="['bi', category.icon, 'category-icon']"></i>
                         <span class="category-name">{{ category.label }}</span>
                       </label>
                     </div>
@@ -287,7 +288,7 @@ const formData = reactive({
   text: '',
   categories: [],
   language: 'en',
-  agreeTerms: false // NEW: Terms agreement
+  agreeTerms: false
 });
 
 const submitting = ref(false);
@@ -297,7 +298,7 @@ const emailError = ref('');
 const jokeTextarea = ref(null);
 const showValidationError = ref(false);
 const showCategoriesError = ref(false);
-const showTermsError = ref(false); // NEW: Terms validation error
+const showTermsError = ref(false);
 
 const characterCount = computed(() => formData.text.length);
 const isTextValid = computed(() => 
@@ -307,7 +308,7 @@ const isFormValid = computed(() =>
   isTextValid.value && 
   formData.categories.length > 0 && 
   formData.language !== '' && 
-  formData.agreeTerms && // NEW: Must agree to terms
+  formData.agreeTerms && 
   !emailError.value
 );
 const selectedCategoriesText = computed(() => formData.categories.join(', '));
@@ -345,10 +346,10 @@ const resetForm = () => {
   formData.text = '';
   formData.categories = [];
   formData.language = 'en';
-  formData.agreeTerms = false; // NEW: Reset terms agreement
+  formData.agreeTerms = false;
   showValidationError.value = false;
   showCategoriesError.value = false;
-  showTermsError.value = false; // NEW: Reset terms error
+  showTermsError.value = false;
   emailError.value = '';
   if (jokeTextarea.value) {
     jokeTextarea.value.style.height = 'auto';
@@ -359,7 +360,7 @@ const handleSubmit = async () => {
   errorMessage.value = '';
   showValidationError.value = false;
   showCategoriesError.value = false;
-  showTermsError.value = false; // NEW: Reset terms error
+  showTermsError.value = false;
 
   if (!isTextValid.value) {
     showValidationError.value = true;
@@ -374,7 +375,6 @@ const handleSubmit = async () => {
     return;
   }
 
-  // NEW: Validate terms agreement
   if (!formData.agreeTerms) {
     showTermsError.value = true;
     errorMessage.value = 'You must agree to the Privacy Policy and Terms of Service';
@@ -460,10 +460,10 @@ onMounted(() => {
 .category-tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.85rem;
-  border-radius: 999px;
-  border: 1.5px solid #dee2e6;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  border: 2px solid #dee2e6;
   background: transparent;
   cursor: pointer;
   font-size: 0.875rem;
@@ -474,19 +474,29 @@ onMounted(() => {
 
 .category-tag:hover {
   border-color: #0d6efd;
-  background: rgba(13, 110, 253, 0.08);
-  transform: translateY(-1px);
+  background: rgba(13, 110, 253, 0.05);
+  transform: translateY(-2px);
 }
 
 .category-tag.selected {
-  background: #0d6efd;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), rgba(13, 110, 253, 0.08));
   border-color: #0d6efd;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+  color: #0d6efd;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
 }
 
 .category-icon {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.category-tag.selected .category-icon {
+  color: #0d6efd;
+  transform: scale(1.1);
+}
+
+.category-name {
+  font-weight: 500;
 }
 
 .selected-categories {
@@ -496,7 +506,6 @@ onMounted(() => {
   border-radius: 0.375rem;
 }
 
-/* NEW: Privacy & Terms link styling */
 .privacy-link {
   color: #0d6efd;
   text-decoration: none;
@@ -528,10 +537,18 @@ onMounted(() => {
   border-color: #495057;
 }
 
+.dark-mode .category-tag:hover {
+  background: rgba(13, 110, 253, 0.1);
+}
+
 .dark-mode .category-tag.selected {
-  background: #0d6efd;
-  border-color: #0d6efd;
-  color: #fff;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.25), rgba(13, 110, 253, 0.15));
+  border-color: #6ea8fe;
+  color: #6ea8fe;
+}
+
+.dark-mode .category-tag.selected .category-icon {
+  color: #6ea8fe;
 }
 
 .dark-mode .email-info-box {

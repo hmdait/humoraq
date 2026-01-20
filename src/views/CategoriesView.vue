@@ -10,10 +10,13 @@
             <div v-for="category in categories" :key="category.slug" class="col-md-6 col-lg-4">
               <div class="card category-card h-100" @click="navigateToCategory(category.slug)">
                 <div class="card-body text-center">
-                  <div class="display-4 mb-3">{{ category.icon }}</div>
+                  <!-- Bootstrap Icon with gradient background -->
+                  <div class="category-icon-wrapper mb-3">
+                    <i :class="['bi', category.icon, 'category-icon']"></i>
+                  </div>
                   <h5 class="card-title">{{ category.label }}</h5>
                   <p class="card-text text-muted mb-2">
-                    {{ categoryCounts[category.value] || 0 }} jokes
+                    <strong>{{ categoryCounts[category.value] || 0 }}</strong> jokes
                   </p>
                   <small class="text-muted" v-if="category.description">
                     {{ category.description }}
@@ -40,31 +43,20 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue';
 const router = useRouter();
 const store = useStore();
 
-// Get selected languages from GLOBAL state
 const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-// Get categories from centralized config
 const categories = ref(getAllCategories());
 const categoryCounts = reactive({});
 
-/**
- * OPTIMIZED: Batch load all category counts at once
- * Uses array-contains queries for categories array field
- */
 const loadCounts = async () => {
   console.log('=== Loading counts for languages:', selectedLanguages.value);
   console.time('⏱️ Category counts load time');
 
   try {
-    // Get all category values from config
     const categoryValues = getAllCategoryValues();
-    
     console.log('Querying for categories:', categoryValues);
     
-    // Batch fetch all counts (optimized: 3 queries instead of 42)
     const counts = await getBatchCategoryCounts(categoryValues, selectedLanguages.value);
-    
-    // Update reactive object with all results
     Object.assign(categoryCounts, counts);
 
     console.log('✅ Category counts loaded:', counts);
@@ -80,7 +72,6 @@ const navigateToCategory = (slug) => {
   router.push(`/category/${slug}`);
 };
 
-// Watch for language changes from GLOBAL state
 watch(selectedLanguages, () => {
   console.log('=== Languages changed, reloading counts ===');
   loadCounts();
@@ -100,23 +91,102 @@ onMounted(async () => {
 .category-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  border: 2px solid transparent;
 }
 
 .category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: rgba(13, 110, 253, 0.3);
 }
 
 .dark-mode .category-card:hover {
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
+  border-color: rgba(13, 110, 253, 0.5);
 }
 
-.card-text.text-muted {
+/* Modern Icon Wrapper */
+.category-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.05));
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon-wrapper {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(13, 110, 253, 0.1));
+  transform: scale(1.1);
+}
+
+.category-icon {
+  font-size: 2.5rem;
+  color: #0d6efd;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+  color: #0a58ca;
+  transform: scale(1.05);
+}
+
+/* Dark Mode Icon Styling */
+.dark-mode .category-icon-wrapper {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), rgba(13, 110, 253, 0.08));
+}
+
+.dark-mode .category-card:hover .category-icon-wrapper {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.25), rgba(13, 110, 253, 0.15));
+}
+
+.dark-mode .category-icon {
+  color: #6ea8fe;
+}
+
+.dark-mode .category-card:hover .category-icon {
+  color: #9ec5fe;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.card-text {
   font-weight: 500;
+}
+
+.card-text strong {
+  color: #0d6efd;
+  font-size: 1.1rem;
+}
+
+.dark-mode .card-text strong {
+  color: #6ea8fe;
 }
 
 small.text-muted {
   font-size: 0.85rem;
   line-height: 1.4;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .category-icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .category-icon {
+    font-size: 2rem;
+  }
 }
 </style>
