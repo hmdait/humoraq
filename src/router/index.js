@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { isValidCategorySlug, slugToValue, getCategoryBySlug } from '@/config/categories'; // UPDATED
+import { isValidCategorySlug, getCategoryBySlug } from '@/config/categories'; // FIXED: Removed slugToValue
 import JokesFeedView from '../views/JokesFeedView.vue';
 import SpotlightView from '../views/SpotlightView.vue';
 import JokeView from '../views/JokeView.vue';
@@ -45,10 +45,11 @@ const routes = [
     path: '/category/:slug',
     name: 'category',
     component: CategoryView,
+    // FIXED: Just pass the slug as-is, don't convert to value here
     props: route => ({
-      slug: slugToValue(route.params.slug) // UPDATED: Convert slug to value
+      slug: route.params.slug
     }),
-    // UPDATED: Validate category slug before navigation
+    // Validate category slug before navigation
     beforeEnter: (to, from, next) => {
       const slug = to.params.slug;
 

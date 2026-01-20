@@ -35,7 +35,7 @@
 <script setup>
 import { computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
-import { getCategoryBySlug, slugToValue } from '@/config/categories'; // SINGLE SOURCE OF TRUTH
+import { getCategoryBySlug, slugToValue } from '@/config/categories';
 import JokeGrid from '../components/JokeGrid.vue';
 import { updateSEO } from '../utils/seo';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
@@ -79,11 +79,6 @@ const loadJokes = async () => {
   } else {
     console.error('Invalid category slug:', props.slug);
   }
-  
-  // Debug after loading
-  console.log('=== After loading ===');
-  console.log('Jokes in state:', store.state.jokes.jokes);
-  console.log('Jokes count:', store.state.jokes.jokes.length);
 };
 
 // Watch for language changes from GLOBAL state
@@ -104,13 +99,6 @@ watch(() => props.slug, () => {
 
 onMounted(() => {
   loadJokes();
-  
-  // Debug: Log current state
-  console.log('🔍 Debug Info:');
-  console.log('- Category slug:', props.slug);
-  console.log('- Category data:', category.value);
-  console.log('- Category value:', categoryValue.value);
-  console.log('- Selected languages:', selectedLanguages.value);
   
   // Update SEO with safe fallbacks
   updateSEO({
