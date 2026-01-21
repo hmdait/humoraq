@@ -58,7 +58,7 @@ export const CATEGORIES = [
     value: 'Adult', 
     label: 'Adult', 
     slug: 'adult',
-    icon: 'bi-18-square',
+    icon: 'bi-shield-exclamation',
     color: 'dark',
     description: 'Mature audience humor'
   },

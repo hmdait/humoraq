@@ -5,7 +5,6 @@
       <div class="col-lg-8">
         <!-- Page Header -->
         <div class="text-center mb-4">
-          <h1 class="display-4 mb-2">✨ Spotlight</h1>
           <p class="lead text-muted">Jokes that rotate automatically</p>
         </div>
 
