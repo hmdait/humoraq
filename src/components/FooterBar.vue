@@ -27,6 +27,10 @@
               <router-link to="/spotlight" class="text-muted text-decoration-none footer-link">
                 Spotlight
               </router-link>
+            </li><li class="mb-2">
+              <router-link to="/videos" class="text-muted text-decoration-none footer-link">
+                Videos
+              </router-link>
             </li>
             <li class="mb-2">
               <router-link to="/categories" class="text-muted text-decoration-none footer-link">

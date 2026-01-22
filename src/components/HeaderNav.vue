@@ -9,12 +9,13 @@
         </router-link>
 
         <!-- Desktop Navigation -->
-        <div class="navbar-nav-desktop collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav-desktop" :class="{ 'show': showMobileMenu }">
           <router-link 
             v-for="link in navLinks" 
             :key="link.to"
             :to="link.to" 
             class="nav-link"
+            @click="closeMobileMenu"
           >
             <i :class="link.icon"></i>
             <span>{{ link.label }}</span>
@@ -71,10 +72,10 @@
 
           <!-- Mobile Menu Toggle -->
           <button 
-            class="btn-mobile-toggle navbar-toggler" 
+            class="btn-mobile-toggle" 
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
+            @click="toggleMobileMenu"
+            :class="{ 'active': showMobileMenu }"
             aria-label="Toggle menu"
           >
             <span class="hamburger-line"></span>
@@ -96,6 +97,7 @@ const store = useStore();
 
 // State
 const isScrolled = ref(false);
+const showMobileMenu = ref(false);
 
 // Navigation links
 const navLinks = [
@@ -141,6 +143,20 @@ const toggleLanguage = (lang) => {
   store.dispatch('preferences/toggleLanguage', lang);
 };
 
+const toggleMobileMenu = () => {
+  showMobileMenu.value = !showMobileMenu.value;
+  if (showMobileMenu.value) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+};
+
+const closeMobileMenu = () => {
+  showMobileMenu.value = false;
+  document.body.style.overflow = '';
+};
+
 // Scroll handler
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20;
@@ -153,6 +169,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  document.body.style.overflow = '';
 });
 </script>
 
@@ -243,7 +260,7 @@ onUnmounted(() => {
 
 @media (min-width: 992px) {
   .navbar-nav-desktop {
-    display: flex !important;
+    display: flex;
   }
 }
 
@@ -548,16 +565,16 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-mobile-toggle:not(.collapsed) .hamburger-line:nth-child(1) {
+.btn-mobile-toggle.active .hamburger-line:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
 
-.btn-mobile-toggle:not(.collapsed) .hamburger-line:nth-child(2) {
+.btn-mobile-toggle.active .hamburger-line:nth-child(2) {
   opacity: 0;
   transform: translateX(-10px);
 }
 
-.btn-mobile-toggle:not(.collapsed) .hamburger-line:nth-child(3) {
+.btn-mobile-toggle.active .hamburger-line:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
 
@@ -567,6 +584,7 @@ onUnmounted(() => {
 @media (max-width: 991px) {
   .navbar-content {
     padding: 0.75rem 0;
+    flex-wrap: wrap;
   }
 
   .navbar-logo {
@@ -577,20 +595,22 @@ onUnmounted(() => {
     font-size: 1.25rem;
   }
 
-  .navbar-collapse {
-    margin-top: 1rem;
+  /* Mobile menu styles */
+  .navbar-nav-desktop {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.25rem;
     padding-top: 1rem;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
-  .dark-mode .navbar-collapse {
-    border-top-color: rgba(255, 255, 255, 0.08);
+  .navbar-nav-desktop.show {
+    display: flex;
   }
 
-  .navbar-nav-desktop {
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
+  .dark-mode .navbar-nav-desktop {
+    border-top-color: rgba(255, 255, 255, 0.08);
   }
 
   .nav-link {
@@ -606,6 +626,16 @@ onUnmounted(() => {
   .nav-link.router-link-active {
     background: rgba(102, 126, 234, 0.15);
   }
+
+  /* Center dropdown on mobile */
+  .dropdown-menu {
+    position: fixed !important;
+    top: 70px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+  }
 }
 
 @media (max-width: 576px) {
@@ -619,6 +649,7 @@ onUnmounted(() => {
 
   .dropdown-menu {
     min-width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem);
   }
 }
 </style>
