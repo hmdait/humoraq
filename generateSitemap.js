@@ -4,21 +4,41 @@ const path = require('path');
 
 // Initialize Firebase Admin
 admin.initializeApp({
-     credential: admin.credential.cert(require('./serviceAccountKey.json'))
-    });
+  credential: admin.credential.cert(require('./serviceAccountKey.json'))
+});
 
 const db = admin.firestore();
 const BASE_URL = 'https://humoraq.com';
 const OUTPUT_PATH = path.join(__dirname, 'public', 'sitemap.xml');
+
+// Categories configuration (matching src/config/categories.js)
+const CATEGORIES = [
+  { slug: 'general', value: 'General' },
+  { slug: 'relationships', value: 'Relationships' },
+  { slug: 'family', value: 'Family' },
+  { slug: 'work', value: 'Work' },
+  { slug: 'school', value: 'School' },
+  { slug: 'friends', value: 'Friends' },
+  { slug: 'adult', value: 'Adult' },
+  { slug: 'animals', value: 'Animals' },
+  { slug: 'food', value: 'Food' },
+  { slug: 'tech', value: 'Tech' },
+  { slug: 'sports', value: 'Sports' },
+  { slug: 'old-people', value: 'Old People' },
+  { slug: 'women', value: 'Women' },
+  { slug: 'men', value: 'Men' }
+];
 
 // Static routes configuration
 const staticRoutes = [
   { path: '/', changefreq: 'daily', priority: '1.0' },
   { path: '/feed', changefreq: 'hourly', priority: '0.9' },
   { path: '/spotlight', changefreq: 'daily', priority: '0.8' },
+  { path: '/videos', changefreq: 'daily', priority: '0.8' },
   { path: '/categories', changefreq: 'weekly', priority: '0.7' },
   { path: '/submit', changefreq: 'monthly', priority: '0.5' },
-  { path: '/about-us', changefreq: 'monthly', priority: '0.4' }
+  { path: '/about', changefreq: 'monthly', priority: '0.4' },
+  { path: '/legal', changefreq: 'monthly', priority: '0.3' }
 ];
 
 /**
@@ -48,21 +68,24 @@ function generateUrlEntry(loc, lastmod, changefreq, priority) {
  */
 async function fetchAllJokes() {
   try {
-    const jokesSnapshot = await db.collection('jokes').get();
+    const jokesSnapshot = await db.collection('jokes')
+      .where('status', '==', 'published')
+      .get();
+    
     const jokes = [];
     
-    jokesSnapshot.forEach(doc => {
+    jokesSnapshot.forEach(function(doc) {
       const data = doc.data();
       jokes.push({
         id: doc.id,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         language: data.language,
-        category: data.category
+        categories: data.categories || (data.category ? [data.category] : ['General'])
       });
     });
     
-    console.log(`✅ Fetched ${jokes.length} jokes from Firestore`);
+    console.log('✅ Fetched ' + jokes.length + ' jokes from Firestore');
     return jokes;
   } catch (error) {
     console.error('❌ Error fetching jokes:', error);
@@ -71,10 +94,59 @@ async function fetchAllJokes() {
 }
 
 /**
+ * Fetch all videos from Firestore
+ */
+async function fetchAllVideos() {
+  try {
+    const videosSnapshot = await db.collection('videos').get();
+    const videos = [];
+    
+    videosSnapshot.forEach(function(doc) {
+      const data = doc.data();
+      videos.push({
+        id: doc.id,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt
+      });
+    });
+    
+    console.log('✅ Fetched ' + videos.length + ' videos from Firestore');
+    return videos;
+  } catch (error) {
+    console.error('Warning: Error fetching videos (collection may not exist):', error.message);
+    return [];
+  }
+}
+
+/**
+ * Get the most recent update date for a category
+ */
+async function getCategoryLastmod(categoryValue) {
+  try {
+    const snapshot = await db.collection('jokes')
+      .where('status', '==', 'published')
+      .where('categories', 'array-contains', categoryValue)
+      .orderBy('updatedAt', 'desc')
+      .limit(1)
+      .get();
+    
+    if (!snapshot.empty) {
+      const data = snapshot.docs[0].data();
+      return formatDate(data.updatedAt || data.createdAt);
+    }
+    
+    return formatDate(new Date());
+  } catch (error) {
+    console.error('Warning: Error fetching lastmod for category ' + categoryValue + ':', error.message);
+    return formatDate(new Date());
+  }
+}
+
+/**
  * Generate sitemap XML content
  */
 async function generateSitemap() {
-  console.log('🚀 Starting sitemap generation...');
+  console.log('🚀 Starting sitemap generation...\n');
   
   // Start XML
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -82,35 +154,72 @@ async function generateSitemap() {
   
   // Add static routes
   console.log('📄 Adding static routes...');
-  staticRoutes.forEach(route => {
+  staticRoutes.forEach(function(route) {
     xml += generateUrlEntry(
-      `${BASE_URL}${route.path}`,
+      BASE_URL + route.path,
       formatDate(new Date()),
       route.changefreq,
       route.priority
     );
     xml += '\n';
   });
+  console.log('   ✓ Added ' + staticRoutes.length + ' static routes\n');
+  
+  // Add category routes
+  console.log('📚 Adding category routes...');
+  let categoryCount = 0;
+  for (let i = 0; i < CATEGORIES.length; i++) {
+    const category = CATEGORIES[i];
+    const lastmod = await getCategoryLastmod(category.value);
+    xml += generateUrlEntry(
+      BASE_URL + '/category/' + category.slug,
+      lastmod,
+      'weekly',
+      '0.7'
+    );
+    xml += '\n';
+    categoryCount++;
+  }
+  console.log('   ✓ Added ' + categoryCount + ' category routes\n');
   
   // Fetch and add dynamic joke routes
-  console.log('🎭 Fetching jokes from Firestore...');
+  console.log('🎭 Adding joke routes...');
   const jokes = await fetchAllJokes();
-  
-  jokes.forEach(joke => {
+  jokes.forEach(function(joke) {
     const lastmod = formatDate(joke.updatedAt || joke.createdAt);
     xml += generateUrlEntry(
-      `${BASE_URL}/joke/${joke.id}`,
+      BASE_URL + '/joke/' + joke.id,
       lastmod,
       'monthly',
       '0.6'
     );
     xml += '\n';
   });
+  console.log('   ✓ Added ' + jokes.length + ' joke routes\n');
+  
+  // Fetch and add video routes (if any)
+  console.log('📹 Adding video routes...');
+  const videos = await fetchAllVideos();
+  if (videos.length > 0) {
+    videos.forEach(function(video) {
+      const lastmod = formatDate(video.updatedAt || video.createdAt);
+      xml += generateUrlEntry(
+        BASE_URL + '/video/' + video.id,
+        lastmod,
+        'monthly',
+        '0.5'
+      );
+      xml += '\n';
+    });
+    console.log('   ✓ Added ' + videos.length + ' video routes\n');
+  } else {
+    console.log('   ⚠️  No videos found, skipping video routes\n');
+  }
   
   // Close XML
   xml += '</urlset>';
   
-  return xml;
+  return { xml, stats: { jokes: jokes.length, videos: videos.length, categories: categoryCount } };
 }
 
 /**
@@ -126,7 +235,7 @@ function saveSitemap(content) {
     
     fs.writeFileSync(OUTPUT_PATH, content, 'utf8');
     console.log(`✅ Sitemap saved to: ${OUTPUT_PATH}`);
-    console.log(`🌐 Accessible at: ${BASE_URL}/sitemap.xml`);
+    console.log(`🌐 Accessible at: ${BASE_URL}/sitemap.xml\n`);
   } catch (error) {
     console.error('❌ Error saving sitemap:', error);
     throw error;
@@ -134,17 +243,50 @@ function saveSitemap(content) {
 }
 
 /**
+ * Validate sitemap XML
+ */
+function validateSitemap(xml) {
+  const urlCount = (xml.match(/<url>/g) || []).length;
+  const locCount = (xml.match(/<loc>/g) || []).length;
+  const lastmodCount = (xml.match(/<lastmod>/g) || []).length;
+  
+  if (urlCount !== locCount || urlCount !== lastmodCount) {
+    throw new Error('Sitemap structure validation failed: mismatched tags');
+  }
+  
+  if (urlCount > 50000) {
+    console.warn('⚠️  Warning: Sitemap contains more than 50,000 URLs. Consider creating a sitemap index.');
+  }
+  
+  console.log('✓ Sitemap XML structure validated\n');
+  return true;
+}
+
+/**
  * Main execution
  */
 async function main() {
   try {
-    const sitemapContent = await generateSitemap();
-    saveSitemap(sitemapContent);
+    const { xml, stats } = await generateSitemap();
     
-    console.log('\n🎉 Sitemap generation complete!');
+    // Validate before saving
+    validateSitemap(xml);
+    
+    saveSitemap(xml);
+    
+    console.log('🎉 Sitemap generation complete!\n');
     console.log('📊 Statistics:');
-    console.log(`   - Static routes: ${staticRoutes.length}`);
-    console.log(`   - Total URLs in sitemap: ${(sitemapContent.match(/<url>/g) || []).length}`);
+    console.log('   • Static routes:    ' + staticRoutes.length);
+    console.log('   • Category routes:  ' + stats.categories);
+    console.log('   • Joke routes:      ' + stats.jokes);
+    console.log('   • Video routes:     ' + stats.videos);
+    console.log('   • Total URLs:       ' + (xml.match(/<url>/g) || []).length);
+    console.log('');
+    console.log('📝 Next steps:');
+    console.log('   1. Deploy the sitemap to production');
+    console.log('   2. Submit to Google Search Console: https://search.google.com/search-console');
+    console.log('   3. Verify robots.txt references sitemap: https://humoraq.com/robots.txt');
+    console.log('');
     
     process.exit(0);
   } catch (error) {

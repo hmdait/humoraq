@@ -67,6 +67,7 @@ import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
 import { updateSEO } from '../utils/seo';
 import { trackJokeView } from '../services/analyticsService';
+import { getCategoryLabel } from '@/config/categories';
 
 const router = useRouter();
 const route = useRoute();
@@ -103,6 +104,149 @@ const loadJokeById = async (jokeId) => {
   }
 };
 
+// SEO Enhancement Functions
+const generateSEOTitle = (joke) => {
+  if (!joke) return 'Joke - Humoraq';
+  
+  // Get category name (handle both array and single category)
+  let categoryName = 'General';
+  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
+    categoryName = getCategoryLabel(joke.categories[0]);
+  } else if (joke.category) {
+    categoryName = getCategoryLabel(joke.category);
+  }
+  
+  const preview = joke.text.substring(0, 40).trim();
+  return `${categoryName} Joke: ${preview}... | Humoraq`;
+};
+
+const generateSEODescription = (joke) => {
+  if (!joke) return 'View and enjoy jokes from Humoraq';
+  
+  let categoryName = 'General';
+  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
+    categoryName = getCategoryLabel(joke.categories[0]);
+  } else if (joke.category) {
+    categoryName = getCategoryLabel(joke.category);
+  }
+  
+  const languageName = { en: 'English', fr: 'French', ar: 'Arabic' }[joke.language] || 'English';
+  const preview = joke.text.substring(0, 140).trim();
+  
+  return `${categoryName} joke in ${languageName}: "${preview}..." Read more funny ${categoryName.toLowerCase()} jokes on Humoraq!`;
+};
+
+const generateSEOKeywords = (joke) => {
+  if (!joke) return 'funny jokes, best jokes, humor';
+  
+  let categoryName = 'general';
+  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
+    categoryName = getCategoryLabel(joke.categories[0]).toLowerCase();
+  } else if (joke.category) {
+    categoryName = getCategoryLabel(joke.category).toLowerCase();
+  }
+  
+  const languageName = { en: 'english', fr: 'french', ar: 'arabic' }[joke.language] || 'english';
+  
+  return `${categoryName} jokes, funny ${categoryName} jokes, ${categoryName} jokes in ${languageName}, short ${categoryName} jokes, best ${categoryName} jokes 2026, ${categoryName} humor, ${categoryName} one liners`;
+};
+
+const addJokeStructuredData = (joke) => {
+  if (!joke) return;
+  
+  // Get first category
+  let category = 'General';
+  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
+    category = joke.categories[0];
+  } else if (joke.category) {
+    category = joke.category;
+  }
+  
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      // CreativeWork Schema for the Joke
+      {
+        '@type': 'CreativeWork',
+        '@id': `https://humoraq.com/joke/${joke.id}`,
+        'headline': joke.title || `Funny ${getCategoryLabel(category)} Joke`,
+        'text': joke.text,
+        'inLanguage': joke.language === 'ar' ? 'ar' : joke.language === 'fr' ? 'fr' : 'en',
+        'genre': category,
+        'author': {
+          '@type': 'Person',
+          'name': joke.author?.name || 'Anonymous'
+        },
+        'datePublished': joke.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        'dateModified': joke.updatedAt?.toDate?.()?.toISOString() || joke.createdAt?.toDate?.()?.toISOString(),
+        'interactionStatistic': [
+          {
+            '@type': 'InteractionCounter',
+            'interactionType': 'https://schema.org/LikeAction',
+            'userInteractionCount': joke.likes || 0
+          },
+          {
+            '@type': 'InteractionCounter',
+            'interactionType': 'https://schema.org/ViewAction',
+            'userInteractionCount': joke.views || 0
+          }
+        ],
+        'publisher': {
+          '@type': 'Organization',
+          'name': 'Humoraq',
+          'url': 'https://humoraq.com',
+          'logo': {
+            '@type': 'ImageObject',
+            'url': 'https://humoraq.com/logo.png'
+          }
+        }
+      },
+      // Breadcrumb Schema
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Home',
+            'item': 'https://humoraq.com'
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Jokes',
+            'item': 'https://humoraq.com/feed'
+          },
+          {
+            '@type': 'ListItem',
+            'position': 3,
+            'name': getCategoryLabel(category),
+            'item': `https://humoraq.com/category/${category.toLowerCase()}`
+          },
+          {
+            '@type': 'ListItem',
+            'position': 4,
+            'name': 'Joke',
+            'item': `https://humoraq.com/joke/${joke.id}`
+          }
+        ]
+      }
+    ]
+  };
+  
+  // Remove existing structured data
+  const existing = document.querySelector('script[type="application/ld+json"]');
+  if (existing) {
+    existing.remove();
+  }
+  
+  // Add new structured data
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(structuredData);
+  document.head.appendChild(script);
+};
+
 watch(
   () => route.params.id,
   async (newId) => {
@@ -110,10 +254,21 @@ watch(
       await loadJokeById(String(newId));
       
       if (currentJoke.value && currentJoke.value.text) {
+        const title = generateSEOTitle(currentJoke.value);
+        const description = generateSEODescription(currentJoke.value);
+        const keywords = generateSEOKeywords(currentJoke.value);
+        
+        // Update meta tags
         updateSEO({
-          title: `Joke - Humoraq`,
-          description: currentJoke.value.text.substring(0, 150)
+          title,
+          description,
+          keywords,
+          canonical: `https://humoraq.com/joke/${currentJoke.value.id}`,
+          ogImage: 'https://humoraq.com/og-joke-image.png'
         });
+        
+        // Add structured data
+        addJokeStructuredData(currentJoke.value);
       }
     }
   },
@@ -122,8 +277,9 @@ watch(
 
 onMounted(() => {
   updateSEO({
-    title: 'Joke - Humoraq',
-    description: 'View and enjoy jokes from Humoraq'
+    title: 'Funny Joke - Humoraq | Best Jokes 2026',
+    description: 'Read funny jokes from our community. Short jokes, one-liners, and humor in multiple languages.',
+    keywords: 'funny jokes, best jokes, short jokes, one line jokes, humor, comedy'
   });
 });
 </script>

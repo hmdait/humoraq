@@ -2,73 +2,163 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://humoraq.com/</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://humoraq.com/feed</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://humoraq.com/spotlight</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/videos</loc>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://humoraq.com/categories</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://humoraq.com/submit</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://humoraq.com/about-us</loc>
-    <lastmod>2026-01-11</lastmod>
+    <loc>https://humoraq.com/about</loc>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/legal</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/general</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/relationships</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/family</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/work</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/school</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/friends</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/adult</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/animals</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/food</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/tech</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/sports</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/old-people</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/women</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/category/men</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/0hB2kOIHO3omkNTUWpdJ</loc>
-    <lastmod>2026-01-07</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/1DBiIoLq5QUG6pv060Ln</loc>
-    <lastmod>2026-01-01</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/1K3JncZ3DI6zmgCrx8Eg</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/1p9ZbbfEZPXPRkbOIQ94</loc>
-    <lastmod>2026-01-01</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/2emzCpgAFOtcVmXfapBm</loc>
-    <lastmod>2026-01-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://humoraq.com/joke/491Cyvh3ge4fc63yH2tS</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -80,7 +170,7 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/4lssRwoAhbwVxo7i6EHT</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -103,6 +193,18 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/6SWQ9V9rpyReZm0hQDpK</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/6rhRpwwvEIt8mBEuI7vL</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/7DjgtNCvGm8rNR7R68Iv</loc>
     <lastmod>2026-01-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -115,8 +217,26 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/83WBEidatYeWM9GFPvZe</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/8LylfS0ClYvqk8DB1Wq7</loc>
     <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/8PvRybmhRjt9fi0sEB4a</loc>
+    <lastmod>2026-01-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/8x49BWRTtM354pNte46w</loc>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -134,13 +254,25 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/9iqxsmZfeB64juPMe2wf</loc>
-    <lastmod>2026-01-01</lastmod>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/A2ik09SGMXTLvp2RhcvZ</loc>
     <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/A4nnsMgUKa9WBv8QeIGn</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/AbEhxH0hGwFZcs6naCrs</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -169,14 +301,44 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/DD7X2szUuNUh3DRhLG2K</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/DZswF24bvhpjAbKP17St</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/EElqkf9vQoUUfYBkmkZR</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/EZgFv2H4PgUcWB0XofPB</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/EbBHGL3ORWxDuEHL052K</loc>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/EbylsNAkoYRQ7k1J7N7n</loc>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/Ef1jHTsSGyKriRcbQOAc</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -187,26 +349,50 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/F0zqPR0J91bIniV654JO</loc>
+    <lastmod>2026-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/FjbOLp8nAzPJ6k3neLaB</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/GPAJQASwun7UJr2HYAj9</loc>
     <lastmod>2026-01-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/GTxtPTuLcxcVseWR8qQ0</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/GUUfhnq1Vrn1bqiL2ZV1</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/GfKWZCybFLMhbLcot6mK</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/HIgLNZ3AjoPt9oSUXMuw</loc>
     <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/HO669rUMTi3gk2UtwbXb</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -230,13 +416,25 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/JsSwNGYc1bWAFWTl4RJV</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/JzuQX5jctLrxwa11jmCQ</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/K6aDFrScJQhiXBYyredi</loc>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/KL9ucrPS78KUT1TJ9ksd</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -247,14 +445,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://humoraq.com/joke/Kwi7TUY0VWnOjJMc3ibe</loc>
-    <lastmod>2026-01-01</lastmod>
+    <loc>https://humoraq.com/joke/KcuzTvWtRvrSIX4aqP2n</loc>
+    <lastmod>2026-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://humoraq.com/joke/L5eYqiHr0hcv5Ay38asy</loc>
-    <lastmod>2026-01-06</lastmod>
+    <loc>https://humoraq.com/joke/Kwi7TUY0VWnOjJMc3ibe</loc>
+    <lastmod>2026-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -266,7 +464,7 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/LqSWV4hqvlzZo85bXgzH</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -283,8 +481,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/MDHlO3sIBHZiG9enyo2J</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/MEIoKsHIpNrqDd8Hil9S</loc>
     <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/MSFQYPI85mo32yyHuMcW</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -297,6 +507,24 @@
   <url>
     <loc>https://humoraq.com/joke/MYrqYL1zdWf7pAMJoLXb</loc>
     <lastmod>2026-01-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/MhJWfIkTltY8THyHgcTP</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/MsnKCsoQH8xFT3iVvOeg</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/MxNHkc5uFKQm6M8WHr6B</loc>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -319,6 +547,18 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/OLtVJbhwQOvhS7XOVNCq</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/OSf7C8Y2rRhtVPzQo99H</loc>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/P4NWuUAyrUuCoxChV1l3</loc>
     <lastmod>2026-01-06</lastmod>
     <changefreq>monthly</changefreq>
@@ -331,14 +571,26 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/Pq2WbnCiiVGKccqDKXBK</loc>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/QNfIkhcIvXxy3KTU4DKs</loc>
+    <lastmod>2026-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/Qb7BiwvU12u3cHPat0gm</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/QdOCCi3WC3DodxYlfVYg</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -350,7 +602,13 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/RHPJOgfANi5vcEKRVg7Z</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/RV329sxbaY6JdsfmdN5s</loc>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -367,14 +625,26 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/TDkRJewWHPwgm3oZzpuC</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/VAcy5Es37AxnTIVbuuWO</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/VEGUClcgJglryoYZQQ1u</loc>
     <lastmod>2026-01-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/VNDuM6AJI3t70JBxWC5o</loc>
+    <lastmod>2026-01-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -392,7 +662,31 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/XMSuBrvPrGgBimept2Rb</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/XSoVhemxLGl6ACQVeLyX</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/Yhum5tb9TLhgJ1UDYih5</loc>
+    <lastmod>2026-01-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/YvXqtvtPmejoWoyQC9ze</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/ZHbIQ0LIH8MOJyVrZHNA</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -404,7 +698,7 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/ZWMIDqOfW0vHHjh1GX4M</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -422,19 +716,31 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/cia3bqgGhHROeXERNAa7</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/czNM1LQLtuKseRITzVCS</loc>
-    <lastmod>2026-01-07</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/d0uOkdW4OG57qf7TUavd</loc>
     <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/dJXgghrwPdbR9dFmblm4</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/fQTZ1DNcCims4Ii5Rmrp</loc>
+    <lastmod>2026-01-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -452,7 +758,7 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/g6t0MiRjtBVLbcFjaSLP</loc>
-    <lastmod>2026-01-10</lastmod>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -469,8 +775,14 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/hDmZFArbIfV24Hob1R8i</loc>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/hSlllUIFNdRT29G7GEQA</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -505,8 +817,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/j5CGBPXiRsV2iCNOqzIP</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/jqI6fFVWaIT0oDZGi2le</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/k76382NwaV78pCe9wNTw</loc>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -524,7 +848,7 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/kqtXJj7MFEhETCiQvbxP</loc>
-    <lastmod>2026-01-07</lastmod>
+    <lastmod>2026-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -541,8 +865,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/mKVmpf6Vb5TTOhVir5I4</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/mXOT2YkuaNSjtTuNb69w</loc>
     <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/meg66XtSMhGlZxI5JG2u</loc>
+    <lastmod>2026-01-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -553,14 +889,32 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/n8vKprAk9sgXz4uUNWp5</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/o1fQXusJ8ZT5yYcwUanw</loc>
+    <lastmod>2026-01-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/o8hbch2faU1ornc9zKwn</loc>
-    <lastmod>2026-01-01</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/oUTh3wJ674kSpz3TCwcF</loc>
     <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/pQh7GrvXccnTN5W52DsO</loc>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -583,8 +937,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/qzm53ym0vTpI0wQGXHeF</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/rVU1p3wpa2xge4pbELwG</loc>
     <lastmod>2026-01-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/sWXsHHURUAjIiVlbWEYC</loc>
+    <lastmod>2026-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -601,26 +967,44 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/thNm5TVCC7LTKc6mmUsC</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/v2FUnO2SxxnC6l83mjs1</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/wS5rTPqmq6O028p3q2JC</loc>
-    <lastmod>2026-01-07</lastmod>
+    <lastmod>2026-01-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/wUQDGiJruNsRZ5KA2ND0</loc>
-    <lastmod>2026-01-09</lastmod>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/xBQHKfg0JdjKXHlwo5pR</loc>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://humoraq.com/joke/xGTTmlmXazafoMxidarv</loc>
     <lastmod>2026-01-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/xYo53ZGqxtbSkmz1P5jG</loc>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -632,7 +1016,7 @@
   </url>
   <url>
     <loc>https://humoraq.com/joke/yfGljTWfj3vVvv5Zq3RL</loc>
-    <lastmod>2026-01-06</lastmod>
+    <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -643,8 +1027,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://humoraq.com/joke/zXRIkFQYjrbPm7yAyPn2</loc>
+    <lastmod>2026-01-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/joke/zg8a5goKBqljcIZoSZEU</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://humoraq.com/joke/zhlEp747CJQXNIsM3g82</loc>
-    <lastmod>2026-01-11</lastmod>
+    <lastmod>2026-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -653,5 +1049,203 @@
     <lastmod>2026-01-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/0kdnsxKU5VZEl9sd8UrI</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/1ndV7HhnzwGLSFNraEiq</loc>
+    <lastmod>2026-01-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/2kDOhQ87vG4toXtd73gn</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/68jeBiWefrCpAiWwdIlX</loc>
+    <lastmod>2026-01-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/9QEpDteKRsPAsRYS2vMz</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/DHxwqbLG5y47yDaHpVA5</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/Dp2EuQK37O2DM28eQU21</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/ErxYZl1VzHxjU9pNys08</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/FE0CL2vSmsweG8Wf4Mrm</loc>
+    <lastmod>2026-01-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/HDxLJm13baB4TzKMCr84</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/HQCc3ac5OxovUZ8QoDkc</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/HgteCd174nJGcrx3PCbJ</loc>
+    <lastmod>2026-01-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/JsUAwn8cDjzajKIvszQV</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/Kpg757ha7Qrk5M6mDdCO</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/OTfwt0Vuei1AM4Ljus1r</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/Pv2PkbOazk8OoWleS1aN</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/QZv2VuZ1SQN2KfZlB0vo</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/VEZFkhbWNrSZXvIY0rCv</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/VO7jAbhjm8Erpbs9Q8A0</loc>
+    <lastmod>2026-01-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/VoGTtEzn5XhA0ktauiHH</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/WH7YV2IGk16SFyB1jWQB</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/XXCgOdn5RbAL5LUy5Ype</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/a8kUuHBAzg299wCieb9S</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/buM6lAtAnETpNl7EMHcS</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/elWppvz3Dw3GvM7kNqnI</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/ji9caIVdoJ6ELxcK2aie</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/mYvKA6mNN2s9vs2GdLjO</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/oELPaiRbfDhVtXyaNp9p</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/s9T2E2Kzy8Rixa0RCFov</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/wvFPHQMgl7TJbPm6TRvM</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/y9PjoIOZmxkr0VdHNnm4</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/yB0ewLHvjB207quQNhQv</loc>
+    <lastmod>2026-01-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://humoraq.com/video/zm4LkNbxm7aPt3rvzUOj</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>
