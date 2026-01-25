@@ -52,6 +52,73 @@ function getCategorySlug(categoryValue) {
 }
 
 /**
+ * Slugify text for URL (same logic as frontend)
+ */
+function slugify(text, maxLength) {
+  if (!text) return 'untitled';
+  if (maxLength === undefined) maxLength = 60;
+
+  let slug = text
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  // Replace French accented characters
+  const replacements = {
+    'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a',
+    'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+    'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
+    'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+    'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',
+    'ý': 'y', 'ÿ': 'y',
+    'ñ': 'n', 'ç': 'c',
+    'œ': 'oe', 'æ': 'ae'
+  };
+
+  Object.keys(replacements).forEach(function(char) {
+    slug = slug.replace(new RegExp(char, 'g'), replacements[char]);
+  });
+
+  // Remove emojis and special characters
+  slug = slug.replace(/[^\w\s-]/g, ' ');
+  slug = slug.replace(/[\s_-]+/g, '-');
+  slug = slug.replace(/^-+|-+$/g, '');
+
+  // Truncate to max length at word boundary
+  if (slug.length > maxLength) {
+    slug = slug.substring(0, maxLength);
+    const lastHyphen = slug.lastIndexOf('-');
+    if (lastHyphen > maxLength * 0.7) {
+      slug = slug.substring(0, lastHyphen);
+    }
+  }
+
+  slug = slug.replace(/-+$/g, '');
+
+  return slug || 'untitled';
+}
+
+/**
+ * Generate joke slug from title or text
+ */
+function generateJokeSlug(joke) {
+  if (!joke) return 'untitled';
+
+  // Use title if available
+  if (joke.title && joke.title.trim()) {
+    return slugify(joke.title);
+  }
+
+  // Fallback to first 80 characters of joke text
+  if (joke.text && joke.text.trim()) {
+    const preview = joke.text.substring(0, 80).trim();
+    return slugify(preview);
+  }
+
+  return 'untitled';
+}
+
+/**
  * Format date to ISO 8601 format (YYYY-MM-DD)
  */
 function formatDate(timestamp) {
@@ -88,6 +155,8 @@ async function fetchAllJokes() {
       const data = doc.data();
       jokes.push({
         id: doc.id,
+        title: data.title,
+        text: data.text,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         language: data.language,
@@ -157,6 +226,7 @@ async function getCategoryLastmod(categoryValue) {
  */
 async function generateSitemap() {
   console.log('🚀 Starting sitemap generation...\n');
+  console.log('🎯 New SEO-friendly URL format: /{category}-jokes/{title-slug}-{id}\n');
   
   // Start XML
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -192,18 +262,23 @@ async function generateSitemap() {
   }
   console.log('   ✓ Added ' + categoryCount + ' category routes\n');
   
-  // Fetch and add dynamic joke routes with SEO-friendly URLs
-  console.log('🎭 Adding joke routes with SEO-friendly URLs...');
+  // Fetch and add dynamic joke routes with TITLE SLUGS
+  console.log('🎭 Adding joke routes with title slugs...');
   const jokes = await fetchAllJokes();
   const categoryStats = {};
+  const exampleUrls = [];
   
   jokes.forEach(function(joke) {
     const lastmod = formatDate(joke.updatedAt || joke.createdAt);
+    
     // Get the first category from the joke
     const primaryCategory = joke.categories && joke.categories.length > 0 
       ? joke.categories[0] 
       : 'General';
     const categorySlug = getCategorySlug(primaryCategory);
+    
+    // Generate title slug
+    const titleSlug = generateJokeSlug(joke);
     
     // Track statistics
     if (!categoryStats[categorySlug]) {
@@ -211,16 +286,38 @@ async function generateSitemap() {
     }
     categoryStats[categorySlug]++;
     
-    // Generate SEO-friendly URL: /joke-about-{category}/{id}
+    // Generate SEO-friendly URL: /{category}-jokes/{title-slug}-{id}
+    const jokeUrl = BASE_URL + '/' + categorySlug + '-jokes/' + titleSlug + '-' + joke.id;
+    
     xml += generateUrlEntry(
-      BASE_URL + '/joke-about-' + categorySlug + '/' + joke.id,
+      jokeUrl,
       lastmod,
       'monthly',
       '0.6'
     );
     xml += '\n';
+    
+    // Save first 3 examples for display
+    if (exampleUrls.length < 3) {
+      exampleUrls.push({
+        category: categorySlug,
+        title: joke.title || joke.text.substring(0, 40),
+        url: jokeUrl
+      });
+    }
   });
   console.log('   ✓ Added ' + jokes.length + ' joke routes\n');
+  
+  // Display example URLs
+  console.log('📝 Example URLs generated:');
+  exampleUrls.forEach(function(example, index) {
+    const truncatedTitle = example.title.length > 40 
+      ? example.title.substring(0, 40) + '...' 
+      : example.title;
+    console.log('   ' + (index + 1) + '. ' + truncatedTitle);
+    console.log('      → ' + example.url);
+  });
+  console.log('');
   
   // Display category breakdown
   console.log('📊 Jokes by category:');
@@ -230,7 +327,7 @@ async function generateSitemap() {
   sortedCategories.forEach(function(entry) {
     const category = entry[0];
     const count = entry[1];
-    console.log('   • ' + category + ': ' + count + ' jokes');
+    console.log('   • ' + category.padEnd(15) + ': ' + String(count).padStart(4) + ' jokes');
   });
   console.log('');
   
@@ -319,15 +416,20 @@ async function main() {
     console.log('   • Video routes:     ' + stats.videos);
     console.log('   • Total URLs:       ' + (xml.match(/<url>/g) || []).length);
     console.log('');
-    console.log('💡 SEO-friendly URL format:');
-    console.log('   Old: https://humoraq.com/joke/{id}');
-    console.log('   New: https://humoraq.com/joke-about-{category}/{id}');
+    console.log('💡 SEO-optimized URL format:');
+    console.log('   ❌ Old: https://humoraq.com/joke/{id}');
+    console.log('   ✅ New: https://humoraq.com/{category}-jokes/{title-slug}-{id}');
+    console.log('');
+    console.log('   Example transformations:');
+    console.log('   • tech/abc123 → tech-jokes/why-programmers-prefer-dark-mode-abc123');
+    console.log('   • dad/xyz789 → dad-jokes/what-do-you-call-a-fake-noodle-xyz789');
     console.log('');
     console.log('📝 Next steps:');
     console.log('   1. Deploy the sitemap to production');
     console.log('   2. Submit to Google Search Console: https://search.google.com/search-console');
     console.log('   3. Verify robots.txt references sitemap: https://humoraq.com/robots.txt');
-    console.log('   4. Update old URLs in Google Search Console (301 redirects are handled)');
+    console.log('   4. Monitor indexing progress in Search Console');
+    console.log('   5. Old URLs redirect to home (can\'t generate new URLs without joke data)');
     console.log('');
     
     process.exit(0);

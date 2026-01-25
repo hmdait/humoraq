@@ -74,7 +74,9 @@ import JokeCard from '../components/JokeCard.vue';
 import JokeButton from '../components/JokeButton.vue';
 import { updateSEO } from '../utils/seo';
 import { trackJokeView } from '../services/analyticsService';
-import { getCategoryLabel } from '@/config/categories';
+import { getCategoryLabel, valueToSlug } from '@/config/categories';
+import { getJokeUrl } from '@/utils/jokeUrlHelper';
+import { generateJokeSlug } from '@/utils/slugify';
 
 const router = useRouter();
 const route = useRoute();
@@ -101,25 +103,13 @@ const getCategoryDisplayName = (joke) => {
   return 'General';
 };
 
-const getCategoryIcon = (joke) => {
+const getCategorySlug = (joke) => {
   if (Array.isArray(joke.categories) && joke.categories.length > 0) {
-    const { getCategoryIcon: getIcon } = require('@/config/categories');
-    return getIcon(joke.categories[0]);
+    return valueToSlug(joke.categories[0]) || 'general';
   } else if (joke.category) {
-    const { getCategoryIcon: getIcon } = require('@/config/categories');
-    return getIcon(joke.category);
+    return valueToSlug(joke.category) || 'general';
   }
-  return 'bi-chat-square-text';
-};
-
-const getLanguageFullName = (code) => {
-  const names = { en: 'English', fr: 'Français', ar: 'العربية' };
-  return names[code] || 'English';
-};
-
-const getAuthorName = (author) => {
-  if (!author || !author.name) return 'Anonymous';
-  return author.name;
+  return 'general';
 };
 
 const loadRandomJoke = async () => {
@@ -130,7 +120,9 @@ const loadRandomJoke = async () => {
   await store.dispatch('jokes/fetchRandomJoke');
   
   if (currentJoke.value) {
-    router.push(`/joke/${currentJoke.value.id}`);
+    // Generate SEO-friendly URL with category and title
+    const url = getJokeUrl(currentJoke.value);
+    router.push(url);
   }
 };
 
@@ -159,6 +151,11 @@ const generateSEOTitle = (joke) => {
     categoryName = getCategoryLabel(joke.categories[0]);
   } else if (joke.category) {
     categoryName = getCategoryLabel(joke.category);
+  }
+  
+  // Use joke title if available, otherwise preview
+  if (joke.title && joke.title.trim()) {
+    return `${joke.title} | ${categoryName} Jokes | Humoraq`;
   }
   
   const preview = joke.text.substring(0, 40).trim();
@@ -193,7 +190,17 @@ const generateSEOKeywords = (joke) => {
   
   const languageName = { en: 'english', fr: 'french', ar: 'arabic' }[joke.language] || 'english';
   
-  return `${categoryName} jokes, funny ${categoryName} jokes, ${categoryName} jokes in ${languageName}, short ${categoryName} jokes, best ${categoryName} jokes 2026, ${categoryName} humor, ${categoryName} one liners`;
+  // Add title keywords if available
+  let keywords = `${categoryName} jokes, funny ${categoryName} jokes, ${categoryName} jokes in ${languageName}`;
+  
+  if (joke.title && joke.title.trim()) {
+    const titleWords = joke.title.toLowerCase().split(' ').slice(0, 3).join(' ');
+    keywords += `, ${titleWords}, ${titleWords} joke`;
+  }
+  
+  keywords += `, short ${categoryName} jokes, best ${categoryName} jokes 2026, ${categoryName} humor`;
+  
+  return keywords;
 };
 
 const addJokeStructuredData = (joke) => {
@@ -207,13 +214,17 @@ const addJokeStructuredData = (joke) => {
     category = joke.category;
   }
   
+  const categorySlug = getCategorySlug(joke);
+  const titleSlug = generateJokeSlug(joke);
+  const jokeUrl = `https://humoraq.com/${categorySlug}-jokes/${titleSlug}-${joke.id}`;
+  
   const structuredData = {
     '@context': 'https://schema.org',
     '@graph': [
       // CreativeWork Schema for the Joke
       {
         '@type': 'CreativeWork',
-        '@id': `https://humoraq.com/joke/${joke.id}`,
+        '@id': jokeUrl,
         'headline': joke.title || `Funny ${getCategoryLabel(category)} Joke`,
         'text': joke.text,
         'inLanguage': joke.language === 'ar' ? 'ar' : joke.language === 'fr' ? 'fr' : 'en',
@@ -266,13 +277,13 @@ const addJokeStructuredData = (joke) => {
             '@type': 'ListItem',
             'position': 3,
             'name': getCategoryLabel(category),
-            'item': `https://humoraq.com/category/${category.toLowerCase()}`
+            'item': `https://humoraq.com/category/${categorySlug}`
           },
           {
             '@type': 'ListItem',
             'position': 4,
-            'name': 'Joke',
-            'item': `https://humoraq.com/joke/${joke.id}`
+            'name': joke.title || 'Joke',
+            'item': jokeUrl
           }
         ]
       }
@@ -292,23 +303,30 @@ const addJokeStructuredData = (joke) => {
   document.head.appendChild(script);
 };
 
+// Watch for route changes and load joke
 watch(
-  () => route.params.id,
-  async (newId) => {
-    if (newId) {
-      await loadJokeById(String(newId));
+  () => route.params,
+  async (params) => {
+    // Get ID from props (router extracts it)
+    const jokeId = params.titleSlugWithId 
+      ? params.titleSlugWithId.substring(params.titleSlugWithId.lastIndexOf('-') + 1)
+      : null;
+    
+    if (jokeId) {
+      await loadJokeById(String(jokeId));
       
       if (currentJoke.value && currentJoke.value.text) {
         const title = generateSEOTitle(currentJoke.value);
         const description = generateSEODescription(currentJoke.value);
         const keywords = generateSEOKeywords(currentJoke.value);
+        const canonicalUrl = `https://humoraq.com${getJokeUrl(currentJoke.value)}`;
         
         // Update meta tags
         updateSEO({
           title,
           description,
           keywords,
-          canonical: `https://humoraq.com/joke/${currentJoke.value.id}`,
+          canonical: canonicalUrl,
           ogImage: 'https://humoraq.com/og-joke-image.png'
         });
         
@@ -317,7 +335,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 );
 
 onMounted(() => {
@@ -347,57 +365,9 @@ onMounted(() => {
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-color, #0f1419);
-  margin: 0 0 1rem 0;
+  margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
-}
-
-.joke-meta-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.meta-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  transition: all 0.2s ease;
-}
-
-.meta-badge:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.meta-badge i {
-  font-size: 1rem;
-}
-
-.category-badge {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-  color: #667eea;
-  border-color: #667eea;
-}
-
-.language-badge {
-  background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 110, 253, 0.1));
-  color: #0dcaf0;
-  border-color: #0dcaf0;
-}
-
-.author-badge {
-  background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
-  color: #198754;
-  border-color: #198754;
 }
 
 /* Dark mode */
@@ -410,29 +380,6 @@ onMounted(() => {
   color: var(--text-color, #e7e9ea);
 }
 
-.dark-mode .meta-badge {
-  background: rgba(44, 48, 52, 0.8);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .category-badge {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-  color: #9ec5fe;
-  border-color: #6ea8fe;
-}
-
-.dark-mode .language-badge {
-  background: linear-gradient(135deg, rgba(13, 202, 240, 0.2), rgba(13, 110, 253, 0.2));
-  color: #6edff6;
-  border-color: #0dcaf0;
-}
-
-.dark-mode .author-badge {
-  background: linear-gradient(135deg, rgba(25, 135, 84, 0.2), rgba(32, 201, 151, 0.2));
-  color: #75b798;
-  border-color: #198754;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .joke-title-section {
@@ -441,11 +388,6 @@ onMounted(() => {
 
   .joke-main-title {
     font-size: 1.5rem;
-  }
-
-  .meta-badge {
-    font-size: 0.8125rem;
-    padding: 0.375rem 0.75rem;
   }
 }
 
@@ -457,25 +399,11 @@ onMounted(() => {
   .joke-main-title {
     font-size: 1.25rem;
   }
-
-  .joke-meta-info {
-    gap: 0.5rem;
-  }
-
-  .meta-badge {
-    font-size: 0.75rem;
-    padding: 0.375rem 0.625rem;
-  }
-
-  .meta-badge i {
-    font-size: 0.875rem;
-  }
 }
 
 /* ============================================
-   CTA SECTION (existing styles)
+   CTA SECTION
    ============================================ */
-/* CTA Section Styling */
 .cta-section {
   margin-top: 2rem;
   animation: fadeInUp 0.5s ease;

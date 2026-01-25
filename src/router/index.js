@@ -29,15 +29,28 @@ const routes = [
     component: SpotlightView,
     meta: { title: 'Humoraq - Spotlight' }
   },
-  // NEW: SEO-friendly joke URL with category
+  // NEW: SEO-friendly joke URL - /{category}-jokes/{title-slug}-{id}
   {
-    path: '/joke-about-:categorySlug/:id',
+    path: '/:categorySlug-jokes/:titleSlugWithId',
     name: 'joke-seo',
     component: JokeView,
-    props: route => ({
-      id: route.params.id,
-      categorySlug: route.params.categorySlug
-    }),
+    props: route => {
+      // Extract ID from the titleSlugWithId parameter
+      // Format: title-slug-{id} where ID is after the LAST hyphen
+      const titleSlugWithId = route.params.titleSlugWithId;
+      
+      // Find the last hyphen and extract everything after it as the ID
+      const lastHyphenIndex = titleSlugWithId.lastIndexOf('-');
+      const id = lastHyphenIndex !== -1 
+        ? titleSlugWithId.substring(lastHyphenIndex + 1)
+        : titleSlugWithId;
+      
+      return {
+        id: id,
+        categorySlug: route.params.categorySlug,
+        titleSlug: titleSlugWithId
+      };
+    },
     beforeEnter: (to, from, next) => {
       const categorySlug = to.params.categorySlug;
       
@@ -54,19 +67,27 @@ const routes = [
     },
     meta: { title: 'Joke Details - Humoraq' }
   },
-  // OLD: Keep old URL format for backward compatibility (redirect to new format)
+  // OLD FORMATS: Redirect to home (we can't generate title slug without fetching the joke)
   {
     path: '/joke/:id',
-    redirect: to => {
-      // Try to fetch the joke to get its category, or default to 'general'
-      // For simplicity, redirect to general category
-      return { 
-        name: 'joke-seo', 
-        params: { 
-          categorySlug: 'general', 
-          id: to.params.id 
-        } 
-      };
+    redirect: () => {
+      // Redirect to home - user can find the joke there
+      // We can't create the new URL without fetching joke data
+      return { name: 'home' };
+    }
+  },
+  {
+    path: '/joke-about-:categorySlug/:id',
+    redirect: () => {
+      // Redirect to home
+      return { name: 'home' };
+    }
+  },
+  {
+    path: '/:categorySlug-jokes/:id',
+    redirect: () => {
+      // Redirect to home
+      return { name: 'home' };
     }
   },
   {
