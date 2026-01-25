@@ -73,7 +73,7 @@ const updateLinkTag = (rel, href) => {
  */
 export const setDefaultSEO = () => {
   updateSEO({
-    title: 'Humoraq - Funny Jokes in Multiple Languages | Best Jokes 2026',
+    title: 'Funny Jokes in Multiple Languages | Best Jokes 2026',
     description: 'Discover the best funny jokes in English, French, and Arabic. Short jokes, one-liners, dark humor, clean jokes for adults. Browse by category: tech, work, relationships, and more!',
     keywords: 'funny jokes, short funny jokes, one line jokes, funny jokes to tell friends, clean jokes for adults, dark humor jokes, best jokes 2026, funny jokes in english, funny jokes in french, short jokes for social media',
     canonical: 'https://humoraq.com'

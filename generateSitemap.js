@@ -42,6 +42,16 @@ const staticRoutes = [
 ];
 
 /**
+ * Get category slug from category value
+ */
+function getCategorySlug(categoryValue) {
+  const category = CATEGORIES.find(function(cat) {
+    return cat.value === categoryValue;
+  });
+  return category ? category.slug : 'general';
+}
+
+/**
  * Format date to ISO 8601 format (YYYY-MM-DD)
  */
 function formatDate(timestamp) {
@@ -182,13 +192,28 @@ async function generateSitemap() {
   }
   console.log('   ✓ Added ' + categoryCount + ' category routes\n');
   
-  // Fetch and add dynamic joke routes
-  console.log('🎭 Adding joke routes...');
+  // Fetch and add dynamic joke routes with SEO-friendly URLs
+  console.log('🎭 Adding joke routes with SEO-friendly URLs...');
   const jokes = await fetchAllJokes();
+  const categoryStats = {};
+  
   jokes.forEach(function(joke) {
     const lastmod = formatDate(joke.updatedAt || joke.createdAt);
+    // Get the first category from the joke
+    const primaryCategory = joke.categories && joke.categories.length > 0 
+      ? joke.categories[0] 
+      : 'General';
+    const categorySlug = getCategorySlug(primaryCategory);
+    
+    // Track statistics
+    if (!categoryStats[categorySlug]) {
+      categoryStats[categorySlug] = 0;
+    }
+    categoryStats[categorySlug]++;
+    
+    // Generate SEO-friendly URL: /joke-about-{category}/{id}
     xml += generateUrlEntry(
-      BASE_URL + '/joke/' + joke.id,
+      BASE_URL + '/joke-about-' + categorySlug + '/' + joke.id,
       lastmod,
       'monthly',
       '0.6'
@@ -196,6 +221,18 @@ async function generateSitemap() {
     xml += '\n';
   });
   console.log('   ✓ Added ' + jokes.length + ' joke routes\n');
+  
+  // Display category breakdown
+  console.log('📊 Jokes by category:');
+  const sortedCategories = Object.entries(categoryStats).sort(function(a, b) {
+    return b[1] - a[1];
+  });
+  sortedCategories.forEach(function(entry) {
+    const category = entry[0];
+    const count = entry[1];
+    console.log('   • ' + category + ': ' + count + ' jokes');
+  });
+  console.log('');
   
   // Fetch and add video routes (if any)
   console.log('📹 Adding video routes...');
@@ -282,10 +319,15 @@ async function main() {
     console.log('   • Video routes:     ' + stats.videos);
     console.log('   • Total URLs:       ' + (xml.match(/<url>/g) || []).length);
     console.log('');
+    console.log('💡 SEO-friendly URL format:');
+    console.log('   Old: https://humoraq.com/joke/{id}');
+    console.log('   New: https://humoraq.com/joke-about-{category}/{id}');
+    console.log('');
     console.log('📝 Next steps:');
     console.log('   1. Deploy the sitemap to production');
     console.log('   2. Submit to Google Search Console: https://search.google.com/search-console');
     console.log('   3. Verify robots.txt references sitemap: https://humoraq.com/robots.txt');
+    console.log('   4. Update old URLs in Google Search Console (301 redirects are handled)');
     console.log('');
     
     process.exit(0);

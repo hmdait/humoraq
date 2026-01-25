@@ -67,6 +67,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
+import { getJokeUrl } from '@/utils/jokeUrlHelper';
 
 const props = defineProps({
   joke: {
@@ -86,7 +87,7 @@ const canUseNativeShare = computed(() => {
 
 // Generate joke URL
 const jokeUrl = computed(() => {
-  return `${window.location.origin}/joke/${props.joke.id}`;
+  return `${window.location.origin}${getJokeUrl(props.joke)}`;
 });
 
 // Get joke text preview (first 100 chars)

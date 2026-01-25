@@ -4,7 +4,7 @@
       v-for="joke in jokes" 
       :key="joke.id"
       class="joke-grid-item"
-      @click="navigateToJoke(joke.id)"
+      @click="navigateToJoke(joke)"
     >
       <!-- Header -->
       <div class="joke-card-header">
@@ -86,6 +86,7 @@
 import { useRouter } from 'vue-router';
 import { getCategoryLabel, getCategoryColor, getCategoryIcon } from '@/config/categories';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
+import { getJokeUrl } from '@/utils/jokeUrlHelper';
 
 const props = defineProps({
   jokes: {
@@ -101,8 +102,9 @@ const props = defineProps({
 
 const router = useRouter();
 
-const navigateToJoke = (jokeId) => {
-  router.push(`/joke/${jokeId}`);
+const navigateToJoke = (joke) => {
+  const url = getJokeUrl(joke);
+  router.push(url);
 };
 
 const getJokeCategories = (joke) => {

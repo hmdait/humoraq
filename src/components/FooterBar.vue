@@ -83,7 +83,7 @@
             </a>
 
             <!-- Instagram -->
-            <a href="https://instagram.com/humoraq_ar" target="_blank" rel="noopener noreferrer" class="social-icon"
+            <a href="https://instagram.com/humoraq_jks" target="_blank" rel="noopener noreferrer" class="social-icon"
               aria-label="Instagram" title="Instagram">
               <i class="bi bi-instagram fs-4"></i>
             </a>

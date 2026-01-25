@@ -104,6 +104,8 @@ import { likeJoke } from '../services/jokeService';
 import { trackJokeLike } from '../services/analyticsService';
 import { getTextDirection, getDirectionClass } from '../utils/rtl';
 import SocialShare from './SocialShare.vue';
+import { getJokeUrl } from '@/utils/jokeUrlHelper';
+
 
 const props = defineProps({
   joke: {
@@ -163,7 +165,7 @@ const handleLike = async () => {
 };
 
 const handleCardClick = () => {
-  router.push(`/joke/${props.joke.id}`);
+  router.push(getJokeUrl(props.joke));
 };
 
 const getJokeCategories = (joke) => {

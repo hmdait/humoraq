@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { isValidCategorySlug, getCategoryBySlug } from '@/config/categories'; // FIXED: Removed slugToValue
+import { isValidCategorySlug, getCategoryBySlug } from '@/config/categories';
 import JokesFeedView from '../views/JokesFeedView.vue';
 import SpotlightView from '../views/SpotlightView.vue';
 import JokeView from '../views/JokeView.vue';
@@ -29,11 +29,45 @@ const routes = [
     component: SpotlightView,
     meta: { title: 'Humoraq - Spotlight' }
   },
+  // NEW: SEO-friendly joke URL with category
+  {
+    path: '/joke-about-:categorySlug/:id',
+    name: 'joke-seo',
+    component: JokeView,
+    props: route => ({
+      id: route.params.id,
+      categorySlug: route.params.categorySlug
+    }),
+    beforeEnter: (to, from, next) => {
+      const categorySlug = to.params.categorySlug;
+      
+      // Validate category slug
+      if (isValidCategorySlug(categorySlug)) {
+        const category = getCategoryBySlug(categorySlug);
+        to.meta.title = `${category.label} Joke - Humoraq`;
+        next();
+      } else {
+        // Invalid category, redirect to 404
+        console.warn(`Invalid category slug in joke URL: ${categorySlug}`);
+        next({ name: 'not-found' });
+      }
+    },
+    meta: { title: 'Joke Details - Humoraq' }
+  },
+  // OLD: Keep old URL format for backward compatibility (redirect to new format)
   {
     path: '/joke/:id',
-    name: 'joke',
-    component: JokeView,
-    meta: { title: 'Joke Details - Humoraq' }
+    redirect: to => {
+      // Try to fetch the joke to get its category, or default to 'general'
+      // For simplicity, redirect to general category
+      return { 
+        name: 'joke-seo', 
+        params: { 
+          categorySlug: 'general', 
+          id: to.params.id 
+        } 
+      };
+    }
   },
   {
     path: '/categories',
@@ -45,22 +79,18 @@ const routes = [
     path: '/category/:slug',
     name: 'category',
     component: CategoryView,
-    // FIXED: Just pass the slug as-is, don't convert to value here
     props: route => ({
       slug: route.params.slug
     }),
-    // Validate category slug before navigation
     beforeEnter: (to, from, next) => {
       const slug = to.params.slug;
 
       if (isValidCategorySlug(slug)) {
         const category = getCategoryBySlug(slug);
-        // Update meta with category info
         to.meta.title = `${category.label} Jokes - Humoraq`;
         to.meta.description = category.description;
         next();
       } else {
-        // Invalid category - redirect to categories list
         console.warn(`Invalid category slug: ${slug}`);
         next({ name: 'categories' });
       }
@@ -86,16 +116,16 @@ const routes = [
     meta: { title: 'Funny Videos - Humoraq' }
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    component: NotFoundView,
-    meta: { title: '404 - Humoraq' }
-  },
-  {
     path: '/legal',
     name: 'legal',
     component: LegalView,
     meta: { title: 'Privacy & Terms - Humoraq' }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: NotFoundView,
+    meta: { title: '404 - Humoraq' }
   }
 ];
 

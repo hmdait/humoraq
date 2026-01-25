@@ -3,9 +3,16 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <router-link to="/" class="btn btn-outline-secondary mb-4">
-            ← Back to Feed
+          <router-link to="/categories" class="btn btn-outline-secondary mb-4">
+            ← Back to Categories
           </router-link>
+
+          <!-- Enhanced Title Section for SEO -->
+          <div v-if="currentJoke" class="joke-title-section mb-4">
+            <h1 class="joke-main-title">
+              {{ currentJoke.title || generateDefaultTitle(currentJoke) }}
+            </h1>
+          </div>
 
           <JokeCard 
             v-if="currentJoke" 
@@ -76,6 +83,44 @@ const store = useStore();
 const currentJoke = computed(() => store.getters['jokes/currentJoke']);
 const loading = computed(() => store.getters['jokes/loading']);
 const selectedLanguage = computed(() => store.getters['preferences/selectedLanguage']);
+
+// Helper functions for title section
+const generateDefaultTitle = (joke) => {
+  if (!joke) return 'Funny Joke';
+  const categoryName = getCategoryDisplayName(joke);
+  const preview = joke.text.substring(0, 60).trim();
+  return `${categoryName} Joke: ${preview}${preview.length < joke.text.length ? '...' : ''}`;
+};
+
+const getCategoryDisplayName = (joke) => {
+  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
+    return getCategoryLabel(joke.categories[0]);
+  } else if (joke.category) {
+    return getCategoryLabel(joke.category);
+  }
+  return 'General';
+};
+
+const getCategoryIcon = (joke) => {
+  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
+    const { getCategoryIcon: getIcon } = require('@/config/categories');
+    return getIcon(joke.categories[0]);
+  } else if (joke.category) {
+    const { getCategoryIcon: getIcon } = require('@/config/categories');
+    return getIcon(joke.category);
+  }
+  return 'bi-chat-square-text';
+};
+
+const getLanguageFullName = (code) => {
+  const names = { en: 'English', fr: 'Français', ar: 'العربية' };
+  return names[code] || 'English';
+};
+
+const getAuthorName = (author) => {
+  if (!author || !author.name) return 'Anonymous';
+  return author.name;
+};
 
 const loadRandomJoke = async () => {
   console.log('=== JokeView: loadRandomJoke called ===');
@@ -285,6 +330,151 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ============================================
+   ENHANCED TITLE SECTION FOR SEO
+   ============================================ */
+.joke-title-section {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  border-left: 4px solid #667eea;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.5s ease;
+}
+
+.joke-main-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-color, #0f1419);
+  margin: 0 0 1rem 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.joke-meta-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.meta-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.meta-badge i {
+  font-size: 1rem;
+}
+
+.category-badge {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  color: #667eea;
+  border-color: #667eea;
+}
+
+.language-badge {
+  background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 110, 253, 0.1));
+  color: #0dcaf0;
+  border-color: #0dcaf0;
+}
+
+.author-badge {
+  background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+  color: #198754;
+  border-color: #198754;
+}
+
+/* Dark mode */
+.dark-mode .joke-title-section {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-left-color: #6ea8fe;
+}
+
+.dark-mode .joke-main-title {
+  color: var(--text-color, #e7e9ea);
+}
+
+.dark-mode .meta-badge {
+  background: rgba(44, 48, 52, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .category-badge {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+  color: #9ec5fe;
+  border-color: #6ea8fe;
+}
+
+.dark-mode .language-badge {
+  background: linear-gradient(135deg, rgba(13, 202, 240, 0.2), rgba(13, 110, 253, 0.2));
+  color: #6edff6;
+  border-color: #0dcaf0;
+}
+
+.dark-mode .author-badge {
+  background: linear-gradient(135deg, rgba(25, 135, 84, 0.2), rgba(32, 201, 151, 0.2));
+  color: #75b798;
+  border-color: #198754;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .joke-title-section {
+    padding: 1.5rem;
+  }
+
+  .joke-main-title {
+    font-size: 1.5rem;
+  }
+
+  .meta-badge {
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .joke-title-section {
+    padding: 1.25rem;
+  }
+
+  .joke-main-title {
+    font-size: 1.25rem;
+  }
+
+  .joke-meta-info {
+    gap: 0.5rem;
+  }
+
+  .meta-badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+  }
+
+  .meta-badge i {
+    font-size: 0.875rem;
+  }
+}
+
+/* ============================================
+   CTA SECTION (existing styles)
+   ============================================ */
 /* CTA Section Styling */
 .cta-section {
   margin-top: 2rem;
