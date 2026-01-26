@@ -104,6 +104,7 @@ const navLinks = [
   { to: '/', label: 'Feed', icon: 'bi bi-grid' },
   { to: '/spotlight', label: 'Spotlight', icon: 'bi bi-star' },
   { to: '/videos', label: 'Videos', icon: 'bi bi-play-circle' },
+  { to: '/blogs', label: 'Blogs', icon: 'bi bi-journal-text' },
   { to: '/categories', label: 'Categories', icon: 'bi bi-folder' },
   { to: '/submit', label: 'Submit', icon: 'bi bi-plus-circle' },
   { to: '/about', label: 'About', icon: 'bi bi-info-circle' }

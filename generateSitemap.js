@@ -29,12 +29,27 @@ const CATEGORIES = [
   { slug: 'men', value: 'Men' }
 ];
 
+// Comedians configuration (matching src/data/comedians.js)
+const COMEDIANS = [
+  { slug: 'eddie-murphy', name: 'Eddie Murphy' },
+  { slug: 'charlie-chaplin', name: 'Charlie Chaplin' },
+  { slug: 'jim-carrey', name: 'Jim Carrey' },
+  { slug: 'robin-williams', name: 'Robin Williams' },
+  { slug: 'lucille-ball', name: 'Lucille Ball' },
+  { slug: 'richard-pryor', name: 'Richard Pryor' },
+  { slug: 'george-carlin', name: 'George Carlin' },
+  { slug: 'whoopi-goldberg', name: 'Whoopi Goldberg' },
+  { slug: 'steve-martin', name: 'Steve Martin' },
+  { slug: 'chris-rock', name: 'Chris Rock' }
+];
+
 // Static routes configuration
 const staticRoutes = [
   { path: '/', changefreq: 'daily', priority: '1.0' },
   { path: '/feed', changefreq: 'hourly', priority: '0.9' },
   { path: '/spotlight', changefreq: 'daily', priority: '0.8' },
   { path: '/videos', changefreq: 'daily', priority: '0.8' },
+  { path: '/blogs', changefreq: 'weekly', priority: '0.8' }, // NEW: Blog home
   { path: '/categories', changefreq: 'weekly', priority: '0.7' },
   { path: '/submit', changefreq: 'monthly', priority: '0.5' },
   { path: '/about', changefreq: 'monthly', priority: '0.4' },
@@ -262,6 +277,28 @@ async function generateSitemap() {
   }
   console.log('   ✓ Added ' + categoryCount + ' category routes\n');
   
+  // NEW: Add blog routes
+  console.log('📝 Adding blog comedian routes...');
+  let blogCount = 0;
+  COMEDIANS.forEach(function(comedian) {
+    xml += generateUrlEntry(
+      BASE_URL + '/blogs/' + comedian.slug,
+      formatDate(new Date()),
+      'monthly',
+      '0.7'
+    );
+    xml += '\n';
+    blogCount++;
+  });
+  console.log('   ✓ Added ' + blogCount + ' blog routes\n');
+  
+  console.log('📝 Blog URLs generated:');
+  COMEDIANS.slice(0, 3).forEach(function(comedian, index) {
+    console.log('   ' + (index + 1) + '. ' + comedian.name);
+    console.log('      → ' + BASE_URL + '/blogs/' + comedian.slug);
+  });
+  console.log('   ... and ' + (COMEDIANS.length - 3) + ' more\n');
+  
   // Fetch and add dynamic joke routes with TITLE SLUGS
   console.log('🎭 Adding joke routes with title slugs...');
   const jokes = await fetchAllJokes();
@@ -353,7 +390,15 @@ async function generateSitemap() {
   // Close XML
   xml += '</urlset>';
   
-  return { xml, stats: { jokes: jokes.length, videos: videos.length, categories: categoryCount } };
+  return { 
+    xml, 
+    stats: { 
+      jokes: jokes.length, 
+      videos: videos.length, 
+      categories: categoryCount,
+      blogs: blogCount
+    } 
+  };
 }
 
 /**
@@ -412,24 +457,20 @@ async function main() {
     console.log('📊 Statistics:');
     console.log('   • Static routes:    ' + staticRoutes.length);
     console.log('   • Category routes:  ' + stats.categories);
+    console.log('   • Blog routes:      ' + stats.blogs); // NEW
     console.log('   • Joke routes:      ' + stats.jokes);
     console.log('   • Video routes:     ' + stats.videos);
     console.log('   • Total URLs:       ' + (xml.match(/<url>/g) || []).length);
     console.log('');
-    console.log('💡 SEO-optimized URL format:');
-    console.log('   ❌ Old: https://humoraq.com/joke/{id}');
-    console.log('   ✅ New: https://humoraq.com/{category}-jokes/{title-slug}-{id}');
-    console.log('');
-    console.log('   Example transformations:');
-    console.log('   • tech/abc123 → tech-jokes/why-programmers-prefer-dark-mode-abc123');
-    console.log('   • dad/xyz789 → dad-jokes/what-do-you-call-a-fake-noodle-xyz789');
+    console.log('💡 SEO-optimized URL formats:');
+    console.log('   ✅ Jokes:  https://humoraq.com/{category}-jokes/{title-slug}-{id}');
+    console.log('   ✅ Blogs:  https://humoraq.com/blogs/{comedian-slug}');
     console.log('');
     console.log('📝 Next steps:');
     console.log('   1. Deploy the sitemap to production');
     console.log('   2. Submit to Google Search Console: https://search.google.com/search-console');
     console.log('   3. Verify robots.txt references sitemap: https://humoraq.com/robots.txt');
     console.log('   4. Monitor indexing progress in Search Console');
-    console.log('   5. Old URLs redirect to home (can\'t generate new URLs without joke data)');
     console.log('');
     
     process.exit(0);

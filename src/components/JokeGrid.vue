@@ -357,6 +357,7 @@ const formatCount = (count) => {
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -387,6 +388,7 @@ const formatCount = (count) => {
   overflow-wrap: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -492,6 +494,7 @@ const formatCount = (count) => {
   .joke-preview-text {
     font-size: 0.8125rem;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
   }
 }
 
