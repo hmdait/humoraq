@@ -8,7 +8,7 @@ export const comedians = [
     slug: 'eddie-murphy',
     birthYear: 1961,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+    image: require('@/assets/images/img_Eddie_Murphy.jpg'),
     shortBio: 'Stand-up legend and SNL icon',
     bio: `Eddie Murphy is an American actor, comedian, and singer who rose to fame on Saturday Night Live in the early 1980s. Known for his energetic and versatile performances, Murphy became one of the most successful comedians and actors of his generation.
 
@@ -39,7 +39,7 @@ Murphy's film career includes iconic roles in "48 Hrs.", "Trading Places", "Beve
     slug: 'charlie-chaplin',
     birthYear: 1889,
     nationality: 'British',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+    image: require('@/assets/images/img_Charlie_Chaplin.web.jpg'),
     shortBio: 'Silent film pioneer and The Tramp',
     bio: `Sir Charles Spencer Chaplin was an English comic actor, filmmaker, and composer who rose to fame in the era of silent film. His iconic character "The Tramp" became one of the most recognizable figures in cinema history.
 
@@ -71,7 +71,7 @@ As a filmmaker, Chaplin was a perfectionist who wrote, directed, produced, edite
     slug: 'jim-carrey',
     birthYear: 1962,
     nationality: 'Canadian-American',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
+    image: require('@/assets/images/img_Jim_Carrey.jpg'),
     shortBio: 'Rubber-faced comedy genius',
     bio: `Jim Carrey is a Canadian-American actor and comedian known for his energetic slapstick performances and elastic facial expressions. He became one of the biggest comedy stars of the 1990s with his unique brand of physical comedy.
 
@@ -105,7 +105,7 @@ Known for his commitment to physical comedy and willingness to completely transf
     slug: 'robin-williams',
     birthYear: 1951,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+    image: require('@/assets/images/img_Robin_Williams.png'),
     shortBio: 'Improvisational master and beloved actor',
     bio: `Robin Williams was an American actor and comedian renowned for his improvisational skills and wide range of voices and characters. His rapid-fire comedy style and ability to seamlessly transition from comedy to drama made him one of the most beloved entertainers of his generation.
 
@@ -140,7 +140,7 @@ Known for his generosity, humanitarian work, and ability to make anyone laugh, W
     slug: 'lucille-ball',
     birthYear: 1911,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    image: require('@/assets/images/img_Lucille_Ball.png'),
     shortBio: 'TV comedy pioneer and I Love Lucy star',
     bio: `Lucille Ball was an American actress, comedian, and producer who revolutionized television comedy. Best known for her iconic role as Lucy Ricardo in "I Love Lucy", she became one of the most beloved entertainers of the 20th century and a trailblazer for women in television production.
 
@@ -172,7 +172,7 @@ As one of the first women to run a major television production company, Ball bro
     slug: 'richard-pryor',
     birthYear: 1940,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400',
+    image: require('@/assets/images/img_Richard_Pryor.png'),
     shortBio: 'Groundbreaking stand-up revolutionary',
     bio: `Richard Pryor was an American stand-up comedian, actor, and writer who is widely regarded as one of the greatest and most influential comedians of all time. His raw, honest, and often controversial comedy broke barriers and paved the way for future generations of comedians.
 
@@ -205,7 +205,7 @@ Beyond stand-up, Pryor had a successful film career, starring in comedies like "
     slug: 'george-carlin',
     birthYear: 1937,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400',
+    image: require('@/assets/images/img_George_Carlin.png'),
     shortBio: 'Counterculture icon and wordsmith',
     bio: `George Carlin was an American stand-up comedian, actor, author, and social critic known for his dark comedy and reflections on politics, language, psychology, religion, and taboo subjects. Over five decades, he became one of the most important and influential stand-up comedians in American history.
 
@@ -238,7 +238,7 @@ With 14 HBO specials and numerous bestselling books, Carlin's legacy as a fearle
     slug: 'whoopi-goldberg',
     birthYear: 1955,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+    image: require('@/assets/images/img_Whoopi_Goldberg.jpg'),
     shortBio: 'EGOT winner and comedy trailblazer',
     bio: `Whoopi Goldberg is an American actor, comedian, author, and television personality who has achieved EGOT status (Emmy, Grammy, Oscar, Tony). She is one of the few entertainers to have won all four major American entertainment awards and one of the most versatile performers in entertainment history.
 
@@ -272,7 +272,7 @@ Since 2007, she has been a co-host of "The View", where she continues to share h
     slug: 'steve-martin',
     birthYear: 1945,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+    image: require('@/assets/images/img_Steve_Martin.jpeg'),
     shortBio: 'Wild and crazy guy turned Renaissance man',
     bio: `Steve Martin is an American actor, comedian, writer, producer, and musician whose career spans over five decades. He is one of the most successful and influential comedians in American entertainment, known for his absurdist comedy and later his work as a serious actor and author.
 
@@ -308,7 +308,7 @@ A true Renaissance man, Martin has successfully pursued multiple artistic endeav
     slug: 'chris-rock',
     birthYear: 1965,
     nationality: 'American',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+    image: require('@/assets/images/img_Chris_Rock.jpeg'),
     shortBio: 'Sharp social commentator and SNL alumnus',
     bio: `Chris Rock is an American comedian, actor, writer, producer, and director known for his sharp observations on American politics, race relations, and popular culture. He is widely regarded as one of the greatest stand-up comedians of all time.
 

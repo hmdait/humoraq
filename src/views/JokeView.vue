@@ -19,6 +19,7 @@
             :joke="currentJoke"
             :show-link="false"
             class="mb-4"
+            :key="currentJoke.id"
           />
 
           <div v-else-if="!loading" class="alert alert-warning">
@@ -303,18 +304,23 @@ const addJokeStructuredData = (joke) => {
   document.head.appendChild(script);
 };
 
-// Watch for route changes and load joke
+// CRITICAL FIX: Watch the specific parameter that changes between jokes
 watch(
-  () => route.params,
-  async (params) => {
-    // Get ID from props (router extracts it)
-    const jokeId = params.titleSlugWithId 
-      ? params.titleSlugWithId.substring(params.titleSlugWithId.lastIndexOf('-') + 1)
-      : null;
+  () => route.params.titleSlugWithId,
+  async (titleSlugWithId, oldTitleSlugWithId) => {
+    // Only proceed if the parameter actually changed and exists
+    if (!titleSlugWithId || titleSlugWithId === oldTitleSlugWithId) return;
+    
+    // Extract ID from titleSlugWithId
+    const jokeId = titleSlugWithId.substring(titleSlugWithId.lastIndexOf('-') + 1);
     
     if (jokeId) {
+      console.log('=== JokeView: Route changed, loading new joke:', jokeId);
+      
+      // Load the joke - this will update the store
       await loadJokeById(String(jokeId));
       
+      // Update SEO after joke is loaded
       if (currentJoke.value && currentJoke.value.text) {
         const title = generateSEOTitle(currentJoke.value);
         const description = generateSEODescription(currentJoke.value);
@@ -335,7 +341,7 @@ watch(
       }
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true }
 );
 
 onMounted(() => {
@@ -348,9 +354,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ============================================
-   ENHANCED TITLE SECTION FOR SEO
-   ============================================ */
+/* ... (styles remain the same) ... */
 .joke-title-section {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
   border-left: 4px solid #667eea;
@@ -370,7 +374,6 @@ onMounted(() => {
   overflow-wrap: break-word;
 }
 
-/* Dark mode */
 .dark-mode .joke-title-section {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
   border-left-color: #6ea8fe;
@@ -380,7 +383,6 @@ onMounted(() => {
   color: var(--text-color, #e7e9ea);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .joke-title-section {
     padding: 1.5rem;
@@ -401,9 +403,6 @@ onMounted(() => {
   }
 }
 
-/* ============================================
-   CTA SECTION
-   ============================================ */
 .cta-section {
   margin-top: 2rem;
   animation: fadeInUp 0.5s ease;
@@ -435,7 +434,6 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
 }
 
-/* Dark mode support */
 .dark-mode .cta-section .card {
   background-color: var(--card-bg);
   border-color: var(--primary-color);
@@ -445,7 +443,6 @@ onMounted(() => {
   box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3) !important;
 }
 
-/* Fade-in animation */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -457,7 +454,6 @@ onMounted(() => {
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 576px) {
   .cta-section .btn {
     min-width: 100%;
