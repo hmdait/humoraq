@@ -89,7 +89,7 @@
             </a>
 
             <!-- TikTok -->
-            <a href="www.tiktok.com/@brianna_humoraq" target="_blank" rel="noopener noreferrer" class="social-icon"
+            <a href="https://tiktok.com/@brianna_humoraq" target="_blank" rel="noopener noreferrer" class="social-icon"
               aria-label="TikTok" title="TikTok">
               <i class="bi bi-tiktok fs-4"></i>
             </a>

@@ -30,7 +30,9 @@ const CATEGORIES = [
 ];
 
 // Comedians configuration (matching src/data/comedians.js)
+// UPDATED: Complete list including classic, modern, and international comedians
 const COMEDIANS = [
+  // Classic Comedians
   { slug: 'eddie-murphy', name: 'Eddie Murphy' },
   { slug: 'charlie-chaplin', name: 'Charlie Chaplin' },
   { slug: 'jim-carrey', name: 'Jim Carrey' },
@@ -40,7 +42,22 @@ const COMEDIANS = [
   { slug: 'george-carlin', name: 'George Carlin' },
   { slug: 'whoopi-goldberg', name: 'Whoopi Goldberg' },
   { slug: 'steve-martin', name: 'Steve Martin' },
-  { slug: 'chris-rock', name: 'Chris Rock' }
+  { slug: 'chris-rock', name: 'Chris Rock' },
+  
+  // Modern Comedians (2000s-present)
+  { slug: 'dave-chappelle', name: 'Dave Chappelle' },
+  { slug: 'kevin-hart', name: 'Kevin Hart' },
+  { slug: 'ricky-gervais', name: 'Ricky Gervais' },
+  { slug: 'bill-burr', name: 'Bill Burr' },
+  { slug: 'ali-wong', name: 'Ali Wong' },
+  { slug: 'trevor-noah', name: 'Trevor Noah' },
+  { slug: 'amy-schumer', name: 'Amy Schumer' },
+  { slug: 'hasan-minhaj', name: 'Hasan Minhaj' },
+  { slug: 'john-mulaney', name: 'John Mulaney' },
+  { slug: 'bo-burnham', name: 'Bo Burnham' },
+  
+  // International Comedian
+  { slug: 'adel-imam', name: 'Adel Imam' }
 ];
 
 // Static routes configuration
@@ -49,7 +66,7 @@ const staticRoutes = [
   { path: '/feed', changefreq: 'hourly', priority: '0.9' },
   { path: '/spotlight', changefreq: 'daily', priority: '0.8' },
   { path: '/videos', changefreq: 'daily', priority: '0.8' },
-  { path: '/blogs', changefreq: 'weekly', priority: '0.8' }, // NEW: Blog home
+  { path: '/blogs', changefreq: 'weekly', priority: '0.8' },
   { path: '/categories', changefreq: 'weekly', priority: '0.7' },
   { path: '/submit', changefreq: 'monthly', priority: '0.5' },
   { path: '/about', changefreq: 'monthly', priority: '0.4' },
@@ -241,7 +258,9 @@ async function getCategoryLastmod(categoryValue) {
  */
 async function generateSitemap() {
   console.log('🚀 Starting sitemap generation...\n');
-  console.log('🎯 New SEO-friendly URL format: /{category}-jokes/{title-slug}-{id}\n');
+  console.log('🎯 SEO-friendly URL formats:');
+  console.log('   • Jokes: /{category}-jokes/{title-slug}-{id}');
+  console.log('   • Blogs: /blogs/{comedian-slug}\n');
   
   // Start XML
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -277,7 +296,7 @@ async function generateSitemap() {
   }
   console.log('   ✓ Added ' + categoryCount + ' category routes\n');
   
-  // NEW: Add blog routes
+  // Add blog routes (ALL COMEDIANS)
   console.log('📝 Adding blog comedian routes...');
   let blogCount = 0;
   COMEDIANS.forEach(function(comedian) {
@@ -292,12 +311,15 @@ async function generateSitemap() {
   });
   console.log('   ✓ Added ' + blogCount + ' blog routes\n');
   
-  console.log('📝 Blog URLs generated:');
-  COMEDIANS.slice(0, 3).forEach(function(comedian, index) {
+  console.log('📝 Blog URLs generated (sample):');
+  COMEDIANS.slice(0, 5).forEach(function(comedian, index) {
     console.log('   ' + (index + 1) + '. ' + comedian.name);
     console.log('      → ' + BASE_URL + '/blogs/' + comedian.slug);
   });
-  console.log('   ... and ' + (COMEDIANS.length - 3) + ' more\n');
+  if (COMEDIANS.length > 5) {
+    console.log('   ... and ' + (COMEDIANS.length - 5) + ' more');
+  }
+  console.log('');
   
   // Fetch and add dynamic joke routes with TITLE SLUGS
   console.log('🎭 Adding joke routes with title slugs...');
@@ -346,7 +368,7 @@ async function generateSitemap() {
   console.log('   ✓ Added ' + jokes.length + ' joke routes\n');
   
   // Display example URLs
-  console.log('📝 Example URLs generated:');
+  console.log('📝 Example joke URLs:');
   exampleUrls.forEach(function(example, index) {
     const truncatedTitle = example.title.length > 40 
       ? example.title.substring(0, 40) + '...' 
@@ -454,13 +476,19 @@ async function main() {
     saveSitemap(xml);
     
     console.log('🎉 Sitemap generation complete!\n');
-    console.log('📊 Statistics:');
+    console.log('📊 Final Statistics:');
     console.log('   • Static routes:    ' + staticRoutes.length);
     console.log('   • Category routes:  ' + stats.categories);
-    console.log('   • Blog routes:      ' + stats.blogs); // NEW
+    console.log('   • Blog routes:      ' + stats.blogs + ' (Classic + Modern + International)');
     console.log('   • Joke routes:      ' + stats.jokes);
     console.log('   • Video routes:     ' + stats.videos);
     console.log('   • Total URLs:       ' + (xml.match(/<url>/g) || []).length);
+    console.log('');
+    console.log('👥 Blog Coverage:');
+    console.log('   • Classic Comedians:       10');
+    console.log('   • Modern Comedians:        10');
+    console.log('   • International:           1 (Adel Imam)');
+    console.log('   • Total Biographies:       ' + COMEDIANS.length);
     console.log('');
     console.log('💡 SEO-optimized URL formats:');
     console.log('   ✅ Jokes:  https://humoraq.com/{category}-jokes/{title-slug}-{id}');

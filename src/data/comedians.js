@@ -34,12 +34,45 @@ Murphy's film career includes iconic roles in "48 Hrs.", "Trading Places", "Beve
     ]
   },
   {
+  id: 'adel-imam',
+  name: 'Adel Imam',
+  slug: 'adel-imam',
+  birthYear: 1940,
+  nationality: 'Egyptian',
+  image: require('@/assets/images/img_Adel_Imam.jpg'),
+  shortBio: 'Arab comedy legend and cultural icon',
+  bio: `Adel Imam is an Egyptian actor and comedian widely regarded as one of the greatest and most influential comedians in the Arab world. Known as "El Za'eem" (The Leader), Imam has dominated Arabic cinema and television for over five decades, using comedy to address social and political issues in Egyptian and Arab society.
+
+Born in Al Mansoura, Egypt, Imam studied agriculture at Cairo University but found his true calling in theater and comedy. He began his career in the 1960s performing in university theater before transitioning to film and television. His comedic style combines physical humor with sharp social satire, making him accessible to audiences across class and educational backgrounds.
+
+Imam's films and television series have broken box office records throughout the Middle East and North Africa. He has fearlessly tackled controversial subjects including corruption, religious extremism, bureaucracy, and social hypocrisy through his comedic work. His character portrayals often represent the everyday Egyptian struggling against societal and governmental obstacles, making him deeply beloved by millions. Despite facing legal challenges and controversies for some of his more provocative work, Imam remains an iconic figure who shaped Arabic comedy and entertainment.`,
+  famousWorks: [
+    'The Terrorist (1994)',
+    'Al-Irhab wal Kabab (Terrorism and Kebab) (1992)',
+    'Al-Mansy (The Forgotten) (1993)',
+    'Al-Zaeem (The Leader) series',
+    'Birds of Darkness (1995)',
+    'Hassan and Morcos (2008)',
+    'The Yacoubian Building (2006)'
+  ],
+  style: 'Social satire, physical comedy, political commentary, relatable characters',
+  achievements: [
+    'Best Actor at numerous Arab film festivals',
+    'Cairo International Film Festival lifetime achievement',
+    'Star on the Egyptian Walk of Fame',
+    'UN Goodwill Ambassador',
+    'Decorated by Egyptian government',
+    'Hundreds of films and TV series spanning 50+ years',
+    'Most commercially successful actor in Arab cinema history'
+  ]
+},
+  {
     id: 'charlie-chaplin',
     name: 'Charlie Chaplin',
     slug: 'charlie-chaplin',
     birthYear: 1889,
     nationality: 'British',
-    image: require('@/assets/images/img_Charlie_Chaplin.web.jpg'),
+    image: require('@/assets/images/img_Charlie_Chaplin.jpg'),
     shortBio: 'Silent film pioneer and The Tramp',
     bio: `Sir Charles Spencer Chaplin was an English comic actor, filmmaker, and composer who rose to fame in the era of silent film. His iconic character "The Tramp" became one of the most recognizable figures in cinema history.
 
@@ -335,7 +368,294 @@ Beyond stand-up, Rock has had success in film (both acting and directing), telev
       'Writer and director of successful films',
       'Hollywood Walk of Fame star'
     ]
-  }
+  },
+{
+  id: 'kevin-hart',
+  name: 'Kevin Hart',
+  slug: 'kevin-hart',
+  birthYear: 1979,
+  nationality: 'American',
+  image: require('@/assets/images/img_Kevin_Hart.jpg'),
+  shortBio: 'High-energy comedy powerhouse',
+  bio: `Kevin Hart is an American comedian and actor who has become one of the highest-grossing stand-up comedians and most recognizable entertainment figures worldwide. His energetic performance style and relatable humor about family, relationships, and everyday life have made him a global phenomenon.
+
+Born in Philadelphia, Hart began his comedy career performing at amateur nights in local clubs. After years of persistence and refinement of his craft, he broke through with his Comedy Central special "I'm a Grown Little Man" in 2009, followed by the massively successful "Laugh at My Pain" tour.
+
+Hart has since dominated both stand-up comedy and film, starring in numerous box office hits while continuing to sell out arenas worldwide. His tours consistently break attendance records, and his work ethic and business acumen have established him as one of entertainment's most successful entrepreneurs. He has parlayed his comedy success into film production, a media company, and various business ventures.`,
+  famousWorks: [
+    'Laugh at My Pain (2011)',
+    'Let Me Explain (2013)',
+    'What Now? (2016)',
+    'Irresponsible (2019)',
+    'Jumanji series',
+    'Ride Along series',
+    'Central Intelligence (2016)',
+    'The Upside (2017)'
+  ],
+  style: 'High-energy, self-deprecating, physical comedy, relatable storytelling',
+  achievements: [
+    'Multiple sold-out arena tours',
+    'Highest-grossing comedy tours worldwide',
+    'Time 100 most influential people',
+    'Producers Guild Award',
+    'Successful production company',
+    'Hollywood Walk of Fame star'
+  ]
+},
+{
+  id: 'ricky-gervais',
+  name: 'Ricky Gervais',
+  slug: 'ricky-gervais',
+  birthYear: 1961,
+  nationality: 'British',
+  image: require('@/assets/images/img_Ricky_Gervais.jpg'),
+  shortBio: 'Creator of The Office and fearless host',
+  bio: `Ricky Gervais is a British comedian, actor, writer, and director who revolutionized television comedy with "The Office" and became known for his provocative humor and willingness to mock celebrity culture. His influence on modern comedy spans multiple continents and has redefined the sitcom format.
+
+Born in Reading, England, Gervais initially pursued a career in music and radio before finding his calling in comedy. He co-created and starred in "The Office" in 2001, which became a cultural phenomenon and spawned successful adaptations worldwide, most notably the American version.
+
+Gervais has hosted the Golden Globe Awards multiple times, earning both praise and controversy for his sharp, irreverent hosting style. His stand-up specials showcase his atheistic views, animal rights activism, and willingness to tackle taboo subjects. Beyond comedy, he has created several acclaimed television series and continues to be one of the most talked-about comedians in the world.`,
+  famousWorks: [
+    'The Office (UK) (2001-2003)',
+    'Extras (2005-2007)',
+    'After Life (2019-2022)',
+    'Humanity (2018)',
+    'SuperNature (2022)',
+    'Golden Globe Awards host',
+    'An Idiot Abroad (creator)'
+  ],
+  style: 'Observational, provocative, satirical, dry British wit',
+  achievements: [
+    'Golden Globe Awards',
+    'BAFTA Awards',
+    'Emmy Awards',
+    'Time 100 most influential people',
+    'International Emmy Founders Award',
+    'Comedy Awards (UK)'
+  ]
+},
+{
+  id: 'bill-burr',
+  name: 'Bill Burr',
+  slug: 'bill-burr',
+  birthYear: 1968,
+  nationality: 'American',
+  image: require('@/assets/images/img_Bill_Burr.jpg'),
+  shortBio: 'Unfiltered Boston truth-teller',
+  bio: `Bill Burr is an American stand-up comedian, actor, and podcaster known for his honest, aggressive style and rants about modern life, sports, and gender dynamics. His no-nonsense approach and willingness to express unpopular opinions have made him one of comedy's most respected voices.
+
+Born in Canton, Massachusetts, Burr moved to New York City to pursue comedy in the early 1990s. He spent years developing his craft in clubs before gaining wider recognition. His breakout moment came with viral videos of his performances, particularly his legendary Philadelphia incident where he turned a hostile crowd in his favor.
+
+Burr's Netflix specials have been critically acclaimed, and he has successfully transitioned into acting with roles in "Breaking Bad" and his own series "F is for Family." His podcast "Monday Morning Podcast" has become one of the most popular in comedy, showcasing his ability to connect with audiences through long-form conversation and improvisation.`,
+  famousWorks: [
+    'Paper Tiger (2019)',
+    'Walk Your Way Out (2017)',
+    'F is for Family (creator)',
+    'Monday Morning Podcast',
+    'Breaking Bad',
+    'The Mandalorian',
+    'Old Dads (2023)'
+  ],
+  style: 'Aggressive, honest, observational rants, Boston accent and attitude',
+  achievements: [
+    'Grammy Award nomination',
+    'Emmy nominations',
+    'Successful podcast with millions of listeners',
+    'Sold-out arena tours worldwide',
+    'Critical acclaim for stand-up specials',
+    'Successful voice acting and animation work'
+  ]
+},
+{
+  id: 'ali-wong',
+  name: 'Ali Wong',
+  slug: 'ali-wong',
+  birthYear: 1982,
+  nationality: 'American',
+  image: require('@/assets/images/img_Ali_Wong.jpg'),
+  shortBio: 'Groundbreaking and unapologetically honest',
+  bio: `Ali Wong is an American comedian and actress who broke barriers with her bold, unapologetic comedy about pregnancy, motherhood, marriage, and female sexuality. Her groundbreaking Netflix special "Baby Cobra," performed while seven months pregnant, became a cultural phenomenon and redefined what mainstream comedy could address.
+
+Born in San Francisco to a Vietnamese mother and Chinese-American father, Wong studied Asian American Studies at UCLA before moving to New York to pursue stand-up comedy. She spent years performing at clubs and appearing in television shows before her breakthrough Netflix specials.
+
+Wong's comedy is refreshingly honest about topics often considered taboo, presented with confidence and sharp wit. Beyond stand-up, she has starred in romantic comedy films, written a bestselling book, and created the Netflix series "Beef," which earned critical acclaim and multiple Emmy Awards. She represents a new generation of comedians who use their unique perspectives to challenge conventions and expand comedy's boundaries.`,
+  famousWorks: [
+    'Baby Cobra (2016)',
+    'Hard Knock Wife (2018)',
+    'Don Wong (2022)',
+    'Beef (2023)',
+    'Always Be My Maybe (2019)',
+    'American Housewife',
+    'Dear Girls (book)'
+  ],
+  style: 'Bold, honest, feminist perspective, taboo-breaking humor',
+  achievements: [
+    'Emmy Awards for Beef',
+    'Golden Globe Award',
+    'New York Times bestselling author',
+    'Time 100 most influential people',
+    'Breakthrough Netflix specials',
+    'Critical acclaim for acting and writing'
+  ]
+},
+{
+  id: 'trevor-noah',
+  name: 'Trevor Noah',
+  slug: 'trevor-noah',
+  birthYear: 1984,
+  nationality: 'South African',
+  image: require('@/assets/images/img_Trevor_Noah.jpg'),
+  shortBio: 'Daily Show host and global perspective',
+  bio: `Trevor Noah is a South African comedian, television host, and political commentator who became internationally known as host of "The Daily Show" on Comedy Central from 2015 to 2022. His unique perspective as someone born during apartheid in South Africa has given him a distinctive voice in American comedy and political commentary.
+
+Born in Johannesburg during apartheid to a black South African mother and white Swiss father, Noah's existence was itself illegal under apartheid law. His memoir "Born a Crime" details his extraordinary childhood and became a bestseller. He began his career in South Africa as a comedian, actor, and television host before gaining international attention with his stand-up.
+
+Noah's tenure on "The Daily Show" showcased his ability to analyze American politics and culture from an outsider's perspective, offering insights that resonated with diverse audiences. His stand-up specials demonstrate his skill at navigating different cultures and languages, making him one of the most internationally successful comedians of his generation.`,
+  famousWorks: [
+    'The Daily Show (2015-2022)',
+    'Born a Crime (memoir)',
+    'Son of Patricia (2018)',
+    'Afraid of the Dark (2017)',
+    'I Wish You Would (2022)',
+    'The Daily Show global correspondent'
+  ],
+  style: 'Political satire, cultural observation, multilingual, international perspective',
+  achievements: [
+    'Emmy nominations',
+    'NAACP Image Awards',
+    'New York Times bestselling author',
+    'Time 100 most influential people',
+    'Successful world tours',
+    'Primetime Emmy Award'
+  ]
+},
+{
+  id: 'amy-schumer',
+  name: 'Amy Schumer',
+  slug: 'amy-schumer',
+  birthYear: 1981,
+  nationality: 'American',
+  image: require('@/assets/images/img_Amy_Schumer.jpg'),
+  shortBio: 'Fearless feminist comedy voice',
+  bio: `Amy Schumer is an American stand-up comedian, actress, and writer known for her feminist comedy and willingness to discuss topics like sex, relationships, and body image with unprecedented frankness. She became a major force in comedy through her Comedy Central series "Inside Amy Schumer" and mainstream film success.
+
+Born in New York City, Schumer studied theater before pursuing stand-up comedy. Her breakthrough came with her fourth-place finish on "Last Comic Standing" in 2007, but she truly exploded into the mainstream with her Comedy Central show, which won a Peabody Award for its sharp social commentary and sketch comedy.
+
+Schumer's film "Trainwreck," which she wrote and starred in, was both a critical and commercial success, establishing her as a leading voice in comedy. She has used her platform to advocate for gun control, women's rights, and body positivity. Her comedy continues to challenge societal expectations while maintaining broad appeal through her relatable, self-deprecating style.`,
+  famousWorks: [
+    'Inside Amy Schumer (2013-2016)',
+    'Trainwreck (2015)',
+    'The Leather Special (2017)',
+    'Growing (2019)',
+    'I Feel Pretty (2018)',
+    'Snatched (2017)',
+    'Life & Beth (2022)'
+  ],
+  style: 'Feminist, sex-positive, self-deprecating, social commentary',
+  achievements: [
+    'Emmy Award',
+    'Peabody Award',
+    'Time 100 most influential people',
+    'New York Times bestselling author',
+    'Grammy nomination',
+    'Writers Guild Award'
+  ]
+},
+{
+  id: 'hasan-minhaj',
+  name: 'Hasan Minhaj',
+  slug: 'hasan-minhaj',
+  birthYear: 1985,
+  nationality: 'American',
+  image: require('@/assets/images/img_Hasan_Minhaj.jpg'),
+  shortBio: 'Political comedy meets personal storytelling',
+  bio: `Hasan Minhaj is an American comedian, writer, and television host known for blending political commentary with deeply personal storytelling. His unique ability to discuss serious issues like immigration, politics, and identity while maintaining humor and authenticity has made him a distinctive voice in modern comedy.
+
+Born in Davis, California to Indian Muslim immigrant parents, Minhaj studied political science before pursuing comedy. He gained recognition as a correspondent on "The Daily Show with Jon Stewart" before creating and hosting his own Netflix series "Patriot Act with Hasan Minhaj," which combined investigative journalism with comedy.
+
+Minhaj's stand-up specials, particularly "Homecoming King," showcase his talent for weaving personal experiences as a first-generation American with broader political and social commentary. His work addresses issues facing immigrant communities, the Muslim-American experience, and contemporary politics with intelligence, humor, and emotional depth.`,
+  famousWorks: [
+    'Patriot Act with Hasan Minhaj (2018-2020)',
+    'Homecoming King (2017)',
+    'The King\'s Jester (2022)',
+    'The Daily Show correspondent',
+    'White House Correspondents\' Dinner (2017)'
+  ],
+  style: 'Political satire, personal storytelling, investigative comedy',
+  achievements: [
+    'Peabody Award',
+    'Emmy Award',
+    'White House Correspondents\' Dinner host',
+    'Time 100 most influential people',
+    'Webby Awards',
+    'Television Critics Association Award'
+  ]
+},
+{
+  id: 'john-mulaney',
+  name: 'John Mulaney',
+  slug: 'john-mulaney',
+  birthYear: 1982,
+  nationality: 'American',
+  image: require('@/assets/images/img_John_Mulaney.jpg'),
+  shortBio: 'Sharp wit and impeccable storytelling',
+  bio: `John Mulaney is an American stand-up comedian, actor, and writer known for his clever wordplay, pristine delivery, and masterful storytelling. His clean yet sophisticated comedy style, reminiscent of classic comedians while remaining distinctly modern, has earned him critical acclaim and a devoted fanbase.
+
+Born in Chicago, Mulaney studied English literature before moving to New York to pursue comedy. He worked as a writer for "Saturday Night Live" from 2008 to 2013, co-creating memorable characters like Stefon with Bill Hader. His stand-up career took off with acclaimed specials that showcase his gift for crafting perfectly structured jokes and relatable observations.
+
+Mulaney's comedy often draws from his Catholic upbringing, his experiences in New York, and astute observations about modern life. Beyond stand-up, he has created and starred in sitcoms, hosted "Saturday Night Live" multiple times, and created the successful children's show "Big Mouth." His ability to appeal to diverse audiences while maintaining artistic integrity has made him one of the most respected comedians of his generation.`,
+  famousWorks: [
+    'Kid Gorgeous (2018)',
+    'Baby J (2023)',
+    'The Comeback Kid (2015)',
+    'New in Town (2012)',
+    'Big Mouth (co-creator)',
+    'Documentary Now!',
+    'SNL writer and multiple-time host'
+  ],
+  style: 'Storytelling, wordplay, observational, clean but sophisticated',
+  achievements: [
+    'Emmy Awards (multiple)',
+    'Peabody Award',
+    'Writers Guild Awards',
+    'Grammy nomination',
+    'Critical acclaim for stand-up specials',
+    'Successful Broadway show'
+  ]
+},
+{
+  id: 'bo-burnham',
+  name: 'Bo Burnham',
+  slug: 'bo-burnham',
+  birthYear: 1990,
+  nationality: 'American',
+  image: require('@/assets/images/img_Bo_Burnham.jpg'),
+  shortBio: 'Musical comedy innovator and filmmaker',
+  bio: `Bo Burnham is an American comedian, musician, actor, and filmmaker who rose to fame through YouTube before becoming one of comedy's most innovative and introspective voices. His unique blend of music, comedy, and social commentary, combined with his willingness to explore mental health and existential themes, has redefined what comedy specials can be.
+
+Born in Hamilton, Massachusetts, Burnham began posting comedy songs on YouTube at age 16 and quickly gained a massive following. He became the youngest person to record a Comedy Central special at age 18. His comedy evolved from clever wordplay and musical parodies to increasingly sophisticated examinations of performance, technology, and modern life.
+
+Burnham's Netflix special "Inside," created entirely by himself during the COVID-19 pandemic, became a cultural phenomenon and earned critical acclaim for its honest exploration of isolation, mental health, and internet culture. He has also found success as a filmmaker, directing the acclaimed film "Eighth Grade." His work continues to push boundaries and challenge what comedy can express.`,
+  famousWorks: [
+    'Inside (2021)',
+    'Make Happy (2016)',
+    'what. (2013)',
+    'Eighth Grade (2018)',
+    'Words, Words, Words',
+    'Zach Stone Is Gonna Be Famous',
+    'Promising Young Woman (actor)'
+  ],
+  style: 'Musical comedy, meta-humor, introspective, multimedia performance',
+  achievements: [
+    'Emmy Awards',
+    'Grammy nomination',
+    'Peabody Award',
+    'Writers Guild Award',
+    'Directors Guild nomination',
+    'Cultural impact of Inside',
+    'Innovative YouTube pioneer'
+  ]
+}
 ];
 
 export function getComedianBySlug(slug) {
