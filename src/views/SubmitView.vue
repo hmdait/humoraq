@@ -234,7 +234,7 @@
                       ✓ Submitted!
                     </span>
                     <span v-else>
-                      🚀 Submit Joke
+                      <i class="bi bi-send me-1"></i> Submit Joke
                     </span>
                   </button>
                 </div>

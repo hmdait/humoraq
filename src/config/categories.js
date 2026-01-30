@@ -6,119 +6,128 @@
  * Used by: submit/, category/, videos/, and all components
  */
 export const CATEGORIES = [
-  { 
-    value: 'General', 
-    label: 'General', 
+  {
+    value: 'General',
+    label: 'General',
     slug: 'general',
     icon: 'bi-chat-square-text',
     color: 'info',
-    description: 'General humor for everyone'
+    description: 'Enjoy the best funny jokes of all kinds, from classic humor to trending jokes loved by everyone.'
   },
-  { 
-    value: 'Relationships', 
-    label: 'Relationships', 
+  {
+    value: 'Relationships',
+    label: 'Relationships',
     slug: 'relationships',
     icon: 'bi-heart',
     color: 'danger',
-    description: 'Love, dating, and relationship humor'
+    description: 'Funny relationship jokes about love, dating, couples, and the ups and downs of romantic life.'
   },
-  { 
-    value: 'Family', 
-    label: 'Family', 
+  {
+    value: 'Family',
+    label: 'Family',
     slug: 'family',
     icon: 'bi-people',
     color: 'success',
-    description: 'Family life and parenting jokes'
+    description: 'Relatable family jokes about parents, kids, marriage, and everyday family life moments.'
   },
-  { 
-    value: 'Work', 
-    label: 'Work', 
+  {
+    value: 'Work',
+    label: 'Work',
     slug: 'work',
     icon: 'bi-briefcase',
     color: 'primary',
-    description: 'Office and workplace humor'
+    description: 'Hilarious work jokes about office life, coworkers, bosses, meetings, and workplace struggles.'
   },
-  { 
-    value: 'School', 
-    label: 'School', 
+  {
+    value: 'School',
+    label: 'School',
     slug: 'school',
     icon: 'bi-mortarboard',
     color: 'warning',
-    description: 'Education and student life'
+    description: 'Funny school jokes about students, teachers, exams, homework, and classroom life.'
   },
-  { 
-    value: 'Friends', 
-    label: 'Friends', 
+  {
+    value: 'Friends',
+    label: 'Friends',
     slug: 'friends',
     icon: 'bi-person-hearts',
     color: 'info',
-    description: 'Friendship and social humor'
+    description: 'Laugh with funny friends jokes about friendship, social life, best friends, and shared memories.'
   },
-  { 
-    value: 'Adult', 
-    label: 'Adult', 
+  {
+    value: 'Adult',
+    label: 'Adult',
     slug: 'adult',
     icon: 'bi-shield-exclamation',
     color: 'dark',
-    description: 'Mature audience humor'
+    description: 'Adult humor jokes for mature audiences, featuring bold, edgy, and uncensored comedy.'
   },
-  { 
-    value: 'Animals', 
-    label: 'Animals', 
+  {
+    value: 'Animals',
+    label: 'Animals',
     slug: 'animals',
     icon: 'bi-bug',
     color: 'warning',
-    description: 'Pets and animal jokes'
+    description: 'Cute and funny animal jokes about pets, dogs, cats, and hilarious animal behavior.'
   },
-  { 
-    value: 'Food', 
-    label: 'Food', 
+  {
+    value: 'Food',
+    label: 'Food',
     slug: 'food',
     icon: 'bi-cup-hot',
     color: 'danger',
-    description: 'Cooking and dining humor'
+    description: 'Delicious food jokes about cooking, eating, restaurants, snacks, and foodie life.'
   },
-  { 
-    value: 'Tech', 
-    label: 'Tech', 
+  {
+    value: 'Tech',
+    label: 'Tech',
     slug: 'tech',
     icon: 'bi-code-slash',
     color: 'primary',
-    description: 'Technology and programming jokes'
+    description: 'Tech jokes about programming, developers, coding bugs, computers, and modern technology.'
   },
-  { 
-    value: 'Sports', 
-    label: 'Sports', 
+  {
+    value: 'Sports',
+    label: 'Sports',
     slug: 'sports',
     icon: 'bi-trophy',
     color: 'success',
-    description: 'Sports and fitness humor'
+    description: 'Funny sports jokes about football, fitness, athletes, competitions, and sports fans.'
   },
-  { 
-    value: 'Old People', 
-    label: 'Old People', 
+  {
+    value: 'Old People',
+    label: 'Old People',
     slug: 'old-people',
     icon: 'bi-clock-history',
     color: 'secondary',
-    description: 'Senior and aging humor'
+    description: 'Lighthearted jokes about aging, seniors, retirement, and funny moments of getting older.'
   },
-  { 
-    value: 'Women', 
-    label: 'Women', 
+  {
+    value: 'Women',
+    label: 'Women',
     slug: 'women',
     icon: 'bi-person-standing-dress',
     color: 'danger',
-    description: 'Women-related humor'
+    description: 'Humorous jokes inspired by women, daily life situations, and modern lifestyle humor.'
   },
-  { 
-    value: 'Men', 
-    label: 'Men', 
+  {
+    value: 'Men',
+    label: 'Men',
     slug: 'men',
     icon: 'bi-person-standing',
     color: 'primary',
-    description: 'Men-related humor'
+    description: 'Funny jokes about men, everyday struggles, relationships, and modern man life.'
+  },
+  {
+    value: 'Kids',
+    label: 'Kids',
+    slug: 'kids',
+    icon: 'bi-emoji-smile',
+    color: 'success',
+    description: 'Fun, clean, and family-friendly kids jokes perfect for children, parents, and all ages.'
   }
 ];
+
 
 /**
  * Get all categories

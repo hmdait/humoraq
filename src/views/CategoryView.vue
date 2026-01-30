@@ -90,20 +90,21 @@ const getCategoryDescription = () => {
   
   // Otherwise provide SEO-friendly descriptions
   const descriptions = {
-    'General': 'Explore our collection of general humor for everyone. From everyday situations to universal experiences that make us laugh.',
-    'Tech': 'Hilarious jokes about technology, programming, coding, and the digital world. Perfect for developers, engineers, and tech enthusiasts!',
-    'Work': 'Office humor and workplace jokes that every professional can relate to. Lighten up your work day with these funny work stories!',
-    'Animals': 'Funny jokes about our furry, feathered, and finned friends. Perfect for pet lovers and animal enthusiasts!',
-    'Food': 'Delicious humor about cooking, eating, restaurants, and all things culinary. Food jokes that will make you hungry for more laughs!',
-    'Relationships': 'Humorous takes on dating, love, marriage, and relationships. Laugh about the ups and downs of romance!',
-    'Family': 'Family-friendly jokes about parents, kids, siblings, and family life. Humor the whole family can enjoy together!',
-    'School': 'Student life, teachers, homework, and educational humor. Perfect for anyone who\'s been through the school experience!',
-    'Friends': 'Jokes about friendship, social situations, and hanging out with buddies. Share these with your best friends!',
-    'Adult': 'Mature humor for adult audiences. Sophisticated jokes and witty humor for grown-ups.',
-    'Sports': 'Funny jokes about sports, athletes, games, and competition. Score big laughs with these sporting jokes!',
-    'Old People': 'Lighthearted humor about aging, retirement, and senior life. Age is just a number, but these jokes are timeless!',
-    'Women': 'Jokes celebrating women and female perspectives. Humor from a woman\'s point of view!',
-    'Men': 'Jokes about guys and male perspectives. Laugh at the funny side of being a man!'
+    'General': 'knock knock jokes: Explore our collection of general humor for everyone. From everyday situations to universal experiences that make us laugh.',
+    'Tech': 'knock knock jokes: Hilarious jokes about technology, programming, coding, and the digital world. Perfect for developers, engineers, and tech enthusiasts!',
+    'Work': 'knock knock jokes: Office humor and workplace jokes that every professional can relate to. Lighten up your work day with these funny work stories!',
+    'Animals': 'knock knock jokes: Funny jokes about our furry, feathered, and finned friends. Perfect for pet lovers and animal enthusiasts!',
+    'Food': 'knock knock jokes: Delicious humor about cooking, eating, restaurants, and all things culinary. Food jokes that will make you hungry for more laughs!',
+    'Relationships': 'knock knock jokes: Humorous takes on dating, love, marriage, and relationships. Laugh about the ups and downs of romance!',
+    'Family': 'knock knock jokes: Family-friendly, dad jokes 2026, jokes about parents, kids, siblings, and family life. Humor the whole family can enjoy together!',
+    'School': 'knock knock jokes: Student life, teachers, homework, and educational humor. Perfect for anyone who\'s been through the school experience!',
+    'Friends': 'knock knock jokes: Jokes about friendship, social situations, and hanging out with buddies. Share these with your best friends!',
+    'Adult': 'knock knock jokes: Mature humor for adult audiences. Sophisticated jokes and witty humor for grown-ups.',
+    'Sports': 'knock knock jokes: unny jokes about sports, athletes, games, and competition. Score big laughs with these sporting jokes!',
+    'Old People': 'knock knock jokes: Lighthearted humor about aging, retirement, and senior life. Age is just a number, but these jokes are timeless!',
+    'Women': 'knock knock jokes: Jokes celebrating women and female perspectives. Humor from a woman\'s point of view!',
+    'Men': 'knock knock jokes: Jokes about guys and male perspectives. Laugh at the funny side of being a man!',
+    'Kids': 'knock knock jokes: Fun, clean, and family-friendly kids jokes perfect for children, parents, and all ages.'
   };
   
   return descriptions[category.value.label] || 'Browse our collection of funny jokes in this category.';
@@ -217,10 +218,6 @@ const updateCategorySEO = () => {
 };
 
 const loadJokes = async () => {
-  console.log('=== Loading jokes for category slug:', props.slug);
-  console.log('=== Category value for Firestore:', categoryValue.value);
-  console.log('=== Languages:', selectedLanguages.value);
-  
   if (categoryValue.value) {
     await store.dispatch('jokes/fetchJokesByCategory', categoryValue.value);
   } else {
