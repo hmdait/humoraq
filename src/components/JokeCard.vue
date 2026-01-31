@@ -66,8 +66,8 @@
         <span class="engagement-count">{{ formatCount(joke.views || 0) }}</span>
       </div>
 
-      <!-- Shares (optional) -->
-      <div v-if="joke.shares && joke.shares > 0" class="engagement-stat d-none d-sm-flex">
+      <!-- Shares (FIXED: Now visible on mobile) -->
+      <div v-if="joke.shares && joke.shares > 0" class="engagement-stat">
         <i class="bi bi-arrow-repeat"></i>
         <span class="engagement-count">{{ formatCount(joke.shares) }}</span>
       </div>
@@ -476,6 +476,9 @@ const formatCount = (count) => {
   font-weight: 500;
   min-width: 20px;
   text-align: left;
+  /* MOBILE FIX: Ensure count is always visible */
+  display: inline-block !important;
+  visibility: visible !important;
 }
 
 .engagement-stat {
@@ -609,6 +612,7 @@ const formatCount = (count) => {
   .engagement-bar {
     gap: 0.75rem;
     flex-wrap: wrap;
+    max-width: 100%;
   }
 
   .engagement-btn,
@@ -621,6 +625,13 @@ const formatCount = (count) => {
     font-size: 1rem;
   }
 
+  /* MOBILE FIX: Ensure all counts are visible */
+  .engagement-count {
+    display: inline-block !important;
+    visibility: visible !important;
+    font-size: 0.75rem;
+  }
+
   .btn-view-details {
     display: none;
   }
@@ -628,20 +639,17 @@ const formatCount = (count) => {
 
 @media (max-width: 375px) {
   .engagement-bar {
-    max-width: 100%;
+    gap: 0.5rem;
   }
 
   .engagement-count {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    min-width: 15px;
   }
 
-  /* Show only engaged like count on very small screens */
-  .engagement-stat .engagement-count {
-    display: none;
-  }
-
-  .engagement-btn.engaged .engagement-count {
-    display: inline;
+  .engagement-btn i,
+  .engagement-stat i {
+    font-size: 0.95rem;
   }
 }
 </style>

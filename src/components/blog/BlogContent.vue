@@ -202,7 +202,7 @@ const copyLink = async () => {
 .hero-image-wrapper {
   position: absolute;
   inset: 0;
-  opacity: 0.2;
+  opacity: 0.5;
 }
 
 .hero-image {

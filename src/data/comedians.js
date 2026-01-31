@@ -655,7 +655,143 @@ Burnham's Netflix special "Inside," created entirely by himself during the COVID
     'Cultural impact of Inside',
     'Innovative YouTube pioneer'
   ]
+},
+{
+  id: 'gad-elmaleh',
+  name: 'Gad Elmaleh',
+  slug: 'gad-elmaleh',
+  birthYear: 1971,
+  nationality: 'Moroccan-French',
+  image: require('@/assets/images/img_Gad_Elmaleh.jpg'),
+  shortBio: 'One of the most influential modern Moroccan-French stand-up comedians',
+  bio: `Gad Elmaleh is one of the most popular and influential French comedians of modern times. He played a key role in bringing contemporary stand-up comedy to mainstream audiences in France.
+
+His humor focuses on everyday life, family relationships, cultural differences, and personal experiences. Known for his strong storytelling skills and natural stage presence, he appeals to a broad international audience.
+
+Still very active today, Gad Elmaleh continues to perform live shows in France and abroad, maintaining a strong digital and media presence.`,
+  famousWorks: [
+    'L’autre c’est moi',
+    'La Vie normale',
+    'Papa est en haut',
+    'D’ailleurs',
+    'Chouchou',
+    'Coco'
+  ],
+  style: 'Observational humor, storytelling, self-deprecation',
+  achievements: [
+    'Multiple sold-out tours',
+    'International comedy career',
+    'Major figure in French stand-up comedy'
+  ]
+},
+
+{
+  id: 'jamel-debbouze',
+  name: 'Jamel Debbouze',
+  slug: 'jamel-debbouze',
+  birthYear: 1975,
+  nationality: 'Moroccan-French',
+  image: require('@/assets/images/img_Jamel_Debbouze.jpg'),
+  shortBio: 'Key figure in contemporary French comedy',
+  bio: `Jamel Debbouze is a major figure in modern Moroccan-French comedy, known for his spontaneous style and socially driven humor rooted in personal experience.
+
+As the creator of the Jamel Comedy Club, he has helped launch the careers of many of today’s top comedians, shaping the current comedy scene.
+
+He remains highly active in film, television, and live performances.`,
+  famousWorks: [
+    'Jamel Comedy Club',
+    'Astérix & Obélix: Mission Cleopatra',
+    'Days of Glory',
+    'One-man shows'
+  ],
+  style: 'Spontaneous humor, social commentary, improvisation',
+  achievements: [
+    'Creator of the Jamel Comedy Club',
+    'César Award winner',
+    'Influential cultural figure in France'
+  ]
+},
+{
+  id: 'paul-mirabel',
+  name: 'Paul Mirabel',
+  slug: 'paul-mirabel',
+  birthYear: 1996,
+  nationality: 'French',
+  image: require('@/assets/images/img_Paul_Mirabel.jpg'),
+  shortBio: 'Rising star of the new French stand-up generation',
+  bio: `Paul Mirabel is one of the fastest-rising comedians in the French stand-up scene. His calm, awkward, and minimalist delivery contrasts with traditional high-energy comedy styles.
+
+Highly viral on social media platforms, his clips regularly attract millions of views, making him particularly attractive for SEO and digital content strategies.
+
+His unique comedic voice has quickly earned him widespread recognition.`,
+  famousWorks: [
+    'Zèbre',
+    'Viral stand-up clips',
+    'Live comedy shows'
+  ],
+  style: 'Minimalist humor, awkward delivery, absurd comedy',
+  achievements: [
+    'Massive viral success on social media',
+    'Sold-out shows nationwide',
+    'Breakthrough figure of modern stand-up'
+  ]
+},
+{
+  id: 'florence-foresti',
+  name: 'Florence Foresti',
+  slug: 'florence-foresti',
+  birthYear: 1973,
+  nationality: 'French',
+  image: require('@/assets/images/img_Florence_Foresti.jpg'),
+  shortBio: 'Leading female stand-up comedian in France',
+  bio: `Florence Foresti is one of the most respected and successful comedians in France today. Her sharp and intelligent humor explores relationships, modern society, parenthood, and gender roles.
+
+Her shows consistently sell out and perform extremely well on streaming platforms, reinforcing her strong digital visibility.
+
+She is widely regarded as a reference point for contemporary French stand-up comedy.`,
+  famousWorks: [
+    'Mother Fucker',
+    'Épilogue',
+    'Madame Foresti',
+    'Boys Boys Boys'
+  ],
+  style: 'Observational humor, satire, self-irony',
+  achievements: [
+    'Sold-out national tours',
+    'High streaming viewership',
+    'Most influential female comedian in France'
+  ]
+},
+
+{
+  id: 'kev-adams',
+  name: 'Kev Adams',
+  slug: 'kev-adams',
+  birthYear: 1991,
+  nationality: 'French',
+  image: require('@/assets/images/img_Kev_Adams.jpeg'),
+  shortBio: 'Extremely popular comedian among younger audiences',
+  bio: `Kev Adams is one of the most successful comedians of his generation in France. He rose to fame at a very young age with humor centered on school life, youth culture, and everyday situations.
+
+Highly active on social media, in movies, and on stage, he has built a massive online following, making him a strong SEO asset for modern entertainment platforms.
+
+His accessible humor and modern image keep him consistently relevant.`,
+  famousWorks: [
+    'The Young Man Show',
+    'Voilà Voilà',
+    'Soda',
+    'Les Profs',
+    'Maison de retraite'
+  ],
+  style: 'Youth-oriented humor, high energy, self-deprecation',
+  achievements: [
+    'Massive popularity with younger audiences',
+    'Major box-office success in French cinema',
+    'Strong social media influence'
+  ]
 }
+
+
 ];
 
 export function getComedianBySlug(slug) {

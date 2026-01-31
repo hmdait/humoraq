@@ -114,6 +114,7 @@ const navLinks = [
 const availableLanguages = [
   { code: 'en', name: 'English' },
   { code: 'fr', name: 'Français' },
+  { code: 'es', name: 'Español' },
   { code: 'ar', name: 'العربية' }
 ];
 
@@ -122,16 +123,16 @@ const selectedLanguages = computed(() => store.getters['preferences/selectedLang
 
 const languageButtonText = computed(() => {
   const langs = selectedLanguages.value;
-  if (langs.length === 3) return 'All';
+  if (langs.length === 4) return 'All';
   if (langs.length === 1) {
-    const names = { en: 'EN', fr: 'FR', ar: 'AR' };
+    const names = { en: 'EN', fr: 'FR', es : 'ES', ar: 'AR' };
     return names[langs[0]] || 'Lang';
   }
   return langs.map(l => l.toUpperCase()).join(', ');
 });
 
 const selectedLanguagesText = computed(() => {
-  const names = { en: 'English', fr: 'Français', ar: 'العربية' };
+  const names = { en: 'English', fr: 'Français',es: 'Español' , ar: 'العربية' };
   return selectedLanguages.value.map(l => names[l]).join(', ');
 });
 
@@ -223,6 +224,7 @@ onUnmounted(() => {
   gap: 0.75rem;
   text-decoration: none;
   transition: transform 0.2s ease;
+  z-index: 1031; /* Ensure logo stays above menu */
 }
 
 .navbar-brand:hover {
@@ -327,6 +329,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  z-index: 1031; /* Ensure actions stay above menu */
+  margin-left: auto; /* Push to right side */
 }
 
 /* ============================================
@@ -407,6 +411,7 @@ onUnmounted(() => {
   padding: 0.5rem;
   margin-top: 8px !important;
   animation: dropdownSlideIn 0.2s ease-out;
+  z-index: 1040; /* Above navbar */
 }
 
 .dark-mode .dropdown-menu {
@@ -546,6 +551,8 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease;
+  position: relative;
+  z-index: 1032; /* Above everything */
 }
 
 @media (min-width: 992px) {
@@ -585,7 +592,8 @@ onUnmounted(() => {
 @media (max-width: 991px) {
   .navbar-content {
     padding: 0.75rem 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Keep items in one row */
+    position: relative;
   }
 
   .navbar-logo {
@@ -599,11 +607,17 @@ onUnmounted(() => {
   /* Mobile menu styles */
   .navbar-nav-desktop {
     display: none;
+    position: absolute; /* Position absolutely */
+    top: 100%; /* Below navbar-content */
+    left: 0;
+    right: 0;
     width: 100%;
     flex-direction: column;
     gap: 0.25rem;
-    padding-top: 1rem;
+    padding: 1rem 0;
+    background: var(--card-bg, #ffffff); /* Match navbar background */
     border-top: 1px solid rgba(0, 0, 0, 0.08);
+    z-index: 1029; /* Below navbar-actions */
   }
 
   .navbar-nav-desktop.show {
@@ -612,6 +626,7 @@ onUnmounted(() => {
 
   .dark-mode .navbar-nav-desktop {
     border-top-color: rgba(255, 255, 255, 0.08);
+    background: var(--card-bg, #2c3034); /* Match dark mode navbar background */
   }
 
   .nav-link {
@@ -628,15 +643,29 @@ onUnmounted(() => {
     background: rgba(102, 126, 234, 0.15);
   }
 
-  /* Center dropdown on mobile */
+  /* FIXED: Dropdown positioning on mobile */
   .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+    transform: none !important;
+    margin-top: 0.5rem !important;
+    min-width: 280px;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  /* Alternative: If you want it centered */
+  /* .dropdown-menu {
     position: fixed !important;
     top: 70px !important;
     left: 50% !important;
     right: auto !important;
     transform: translateX(-50%) !important;
     margin: 0 !important;
-  }
+    min-width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem);
+  } */
 }
 
 @media (max-width: 576px) {
@@ -646,11 +675,88 @@ onUnmounted(() => {
 
   .btn-language {
     padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
   }
 
+  .btn-language i {
+    font-size: 1rem;
+  }
+
+  .badge-count {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.625rem;
+  }
+
+  /* Ensure dropdown doesn't overflow on small screens */
   .dropdown-menu {
-    min-width: calc(100vw - 2rem);
-    max-width: calc(100vw - 2rem);
+    min-width: 260px;
+    max-width: calc(100vw - 1rem);
+    right: 0.5rem !important;
+  }
+  
+  .hamburger-line {
+    width: 22px;
+  }
+}
+
+@media (max-width: 375px) {
+  .navbar-logo {
+    height: 28px;
+  }
+
+  .brand-name {
+    font-size: 1.125rem;
+  }
+
+  .navbar-actions {
+    gap: 0.375rem;
+  }
+
+  .btn-language {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-language i {
+    font-size: 0.95rem;
+  }
+
+  .badge-count {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.5625rem;
+    padding: 0 0.25rem;
+  }
+}
+
+/* ============================================
+   FIX: Prevent content shift when menu opens
+   ============================================ */
+.navbar-content {
+  min-height: 56px; /* Prevent height jump */
+}
+
+@media (max-width: 991px) {
+  .navbar-content {
+    width: 100%;
+    justify-content: space-between;
+    min-height: 48px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  .nav-link,
+  .btn-language,
+  .btn-mobile-toggle,
+  .hamburger-line,
+  .dropdown-menu {
+    transition: none !important;
+    animation: none !important;
   }
 }
 </style>

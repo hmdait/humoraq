@@ -192,6 +192,7 @@
                   >
                     <option value="en">English</option>
                     <option value="fr">Français</option>
+                    <option value="es">Español</option>
                     <option value="ar">العربية</option>
                   </select>
                 </div>

@@ -12,12 +12,13 @@
                 <div class="col-lg-10">
                     <!-- Hero Section -->
                     <div class="hero-section text-center mb-5" data-aos="fade-up">
-                        <div class="icon-bounce mb-4">
-                            <i class="bi bi-emoji-laughing"></i>
-                        </div>
+                        
                         <h1 class="hero-title mb-3">
                             About <span class="gradient-text">Humoraq</span>
                         </h1>
+                        <div class="icon-bounce mb-4">
+                            <i class="bi bi-emoji-laughing"></i>
+                        </div>
                         <p class="hero-subtitle">
                             Your multilingual hub for laughter and joy
                         </p>
@@ -153,6 +154,17 @@
                                     <div class="col-md-6">
                                         <div class="feature-item">
                                             <div class="feature-icon">
+                                                <i class="bi bi-camera-video-fill"></i>
+                                            </div>
+                                            <div class="feature-content">
+                                                <h5 class="feature-title">Video Jokes</h5>
+                                                <p class="feature-text">Watch and share funny video content</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-item">
+                                            <div class="feature-icon">
                                                 <i class="bi bi-heart-fill"></i>
                                             </div>
                                             <div class="feature-content">
@@ -191,14 +203,6 @@
                                     We're constantly evolving to make Humoraq the best platform for humor. Here's what's coming:
                                 </p>
                                 <div class="vision-grid">
-                                    <div class="vision-item">
-                                        <span class="vision-icon">
-                                            <i class="bi bi-camera-video-fill"></i>
-                                        </span>
-                                        <div class="vision-content">
-                                            <strong>Video Jokes:</strong> Watch and share funny video content
-                                        </div>
-                                    </div>
                                     <div class="vision-item">
                                         <span class="vision-icon">
                                             <i class="bi bi-person-circle"></i>

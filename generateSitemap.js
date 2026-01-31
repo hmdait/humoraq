@@ -26,7 +26,8 @@ const CATEGORIES = [
   { slug: 'sports', value: 'Sports' },
   { slug: 'old-people', value: 'Old People' },
   { slug: 'women', value: 'Women' },
-  { slug: 'men', value: 'Men' }
+  { slug: 'men', value: 'Men' },
+  { slug: 'kids', value: 'Kids' },
 ];
 
 // Comedians configuration (matching src/data/comedians.js)
@@ -57,7 +58,13 @@ const COMEDIANS = [
   { slug: 'bo-burnham', name: 'Bo Burnham' },
   
   // International Comedian
-  { slug: 'adel-imam', name: 'Adel Imam' }
+  { slug: 'adel-imam', name: 'Adel Imam' },
+  { slug: 'gad-elmaleh', name: 'Gad Elmaleh' },
+  { slug: 'jamel-debbouze', name: 'Jamel Debbouze' },
+  { slug: 'paul-mirabel', name: 'Paul Mirabel' },
+  { slug: 'florence-foresti', name: 'Florence Foresti' }
+  
+
 ];
 
 // Static routes configuration

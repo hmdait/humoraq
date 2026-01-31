@@ -23,7 +23,7 @@
                   <!-- Subtitle -->
                   <p class="hero-subtitle mb-5">
                     From <strong>dad jokes</strong> and <strong>kids jokes</strong> to
-                    <strong>knock knock</strong> and <strong>dark humor</strong>.
+                    <strong>knock knock jokes</strong> and <strong>dark humor</strong>.
                     Discover the <strong>joke of the day</strong> loved by our global community.
                   </p>
 
