@@ -1,75 +1,114 @@
 <template>
   <DefaultLayout>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <router-link to="/categories" class="btn btn-outline-secondary mb-4">
-            ← Back to Categories
-          </router-link>
+    <div class="joke-view-modern">
+      <!-- Animated background -->
+      <div class="view-background">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+      </div>
 
-          <!-- Enhanced Title Section for SEO -->
-          <div v-if="currentJoke" class="joke-title-section mb-4">
-            <h1 class="joke-main-title">
-              {{ currentJoke.title || generateDefaultTitle(currentJoke) }}
-            </h1>
-          </div>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            
+            <!-- Back Button -->
+            <router-link to="/categories" class="btn-back">
+              <i class="bi bi-arrow-left"></i>
+              <span>Back to Categories</span>
+            </router-link>
 
-          <!-- Main Joke Card -->
-          <JokeCard 
-            v-if="currentJoke" 
-            :joke="currentJoke"
-            :show-link="false"
-            class="mb-4"
-            :key="currentJoke.id"
-          />
-
-          <div v-else-if="!loading" class="alert alert-warning">
-            Joke not found
-          </div>
-
-          <div v-if="loading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </div>
-
-          <!-- Actions Section -->
-          <div v-if="currentJoke" class="text-center mb-4">
-            <JokeButton 
-              @click="loadRandomJoke"
-              text="Get Another Joke"
-            />
-          </div>
-
-          <!-- NEW: Related Jokes Section for SEO -->
-          <section v-if="currentJoke && !loading" class="related-jokes-section">
-            <div class="section-header">
-              <h2 class="section-title">
-                Most Loved {{ getCategoryDisplayName(currentJoke) }} Jokes
-              </h2>
-              <span class="title-icon">⭐ ⭐ ⭐ ⭐ ⭐</span>
-              <p class="section-subtitle">
-                Discover more hilarious {{ getCategoryDisplayName(currentJoke).toLowerCase() }} jokes loved by our community
-              </p>
-            </div>
-
-            <!-- Related Jokes Grid -->
-            <div v-if="relatedJokesLoading" class="text-center py-4">
-              <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Loading related jokes...</span>
+            <!-- Enhanced Title Section for SEO -->
+            <div v-if="currentJoke" class="joke-title-section">
+              <div class="title-decoration"></div>
+              <h1 class="joke-main-title">
+                {{ currentJoke.title || generateDefaultTitle(currentJoke) }}
+              </h1>
+              <div class="title-meta">
+                <span class="meta-badge">
+                  <i class="bi bi-eye"></i>
+                  {{ formatCount(currentJoke.views || 0) }} views
+                </span>
+                <span class="meta-badge">
+                  <i class="bi bi-heart-fill"></i>
+                  {{ formatCount(currentJoke.likes || 0) }} likes
+                </span>
               </div>
             </div>
 
-            <div v-else-if="relatedJokes.length > 0" class="related-jokes-grid">
-              <article 
-                v-for="joke in relatedJokes" 
-                :key="joke.id"
-                class="related-joke-card"
-                @click="navigateToJoke(joke)"
-                :aria-label="`Read joke: ${getJokePreview(joke, 50)}`"
+            <!-- Main Joke Card -->
+            <transition name="fade-scale" mode="out-in">
+              <JokeCard 
+                v-if="currentJoke" 
+                :joke="currentJoke"
+                :show-link="false"
+                class="main-joke-card"
+                :key="currentJoke.id"
+              />
+            </transition>
+
+            <div v-if="!currentJoke" class="alert-modern alert-warning">
+              <i class="bi bi-exclamation-triangle"></i>
+              <div>
+                <h5>Joke not found</h5>
+                <p>This joke may have been removed or doesn't exist.</p>
+              </div>
+            </div>
+
+            <div v-if="loading" class="loading-container">
+              <div class="spinner-modern">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+              </div>
+              <p class="loading-text">Loading joke...</p>
+            </div>
+
+            <!-- Actions Section -->
+            <div v-if="currentJoke" class="actions-section">
+              <JokeButton 
+                @click="loadRandomJoke"
+                text="Get Another Joke"
+                class="action-button"
+              />
+            </div>
+
+            <!-- Related Jokes Section -->
+            <section v-if="currentJoke && !loading" class="related-jokes-section">
+              <div class="section-header">
+                <div class="header-line"></div>
+                <h2 class="section-title">
+                  <i class="bi bi-stars"></i>
+                  Most Loved {{ getCategoryDisplayName(currentJoke) }} Jokes
+                </h2>
+                <p class="section-subtitle">
+                  Discover more hilarious {{ getCategoryDisplayName(currentJoke).toLowerCase() }} jokes loved by our community
+                </p>
+              </div>
+
+              <!-- Loading State -->
+              <div v-if="relatedJokesLoading" class="related-loading">
+                <div class="spinner-small"></div>
+                <span>Loading related jokes...</span>
+              </div>
+
+              <!-- Related Jokes Grid -->
+              <transition-group 
+                v-else-if="relatedJokes.length > 0" 
+                name="stagger"
+                tag="div"
+                class="related-jokes-grid"
               >
-                <div class="card-content">
-                  <!-- Category Badge -->
+                <article 
+                  v-for="(joke, index) in relatedJokes" 
+                  :key="joke.id"
+                  class="related-joke-card"
+                  :style="{ '--delay': index * 0.05 + 's' }"
+                  @click="navigateToJoke(joke)"
+                  :aria-label="`Read joke: ${getJokePreview(joke, 50)}`"
+                >
+                  <div class="card-shine"></div>
+                  
+                  <!-- Category Badges -->
                   <div class="category-badges">
                     <span 
                       v-for="cat in getJokeCategories(joke).slice(0, 2)" 
@@ -89,7 +128,7 @@
                     {{ getJokePreview(joke, 120) }}
                   </p>
 
-                  <!-- Engagement Stats -->
+                  <!-- Card Footer -->
                   <div class="card-footer">
                     <div class="stat-item">
                       <i class="bi bi-heart-fill"></i>
@@ -100,68 +139,55 @@
                       <span>{{ formatCount(joke.views || 0) }}</span>
                     </div>
                     <div class="read-more">
-                      Read more <i class="bi bi-arrow-right-short"></i>
+                      Read <i class="bi bi-arrow-right"></i>
                     </div>
                   </div>
-                </div>
-              </article>
-            </div>
+                </article>
+              </transition-group>
 
-            <div v-else class="text-center text-muted py-4">
-              <i class="bi bi-emoji-frown display-4 mb-3"></i>
-              <p>No more {{ getCategoryDisplayName(currentJoke).toLowerCase() }} jokes available yet.</p>
-              <router-link to="/categories" class="btn btn-outline-primary btn-sm mt-2">
-                Browse Other Categories
-              </router-link>
-            </div>
+              <!-- Empty State -->
+              <div v-else class="empty-related">
+                <i class="bi bi-emoji-frown"></i>
+                <p>No more {{ getCategoryDisplayName(currentJoke).toLowerCase() }} jokes available yet.</p>
+                <router-link to="/categories" class="btn-outline-modern">
+                  Browse Other Categories
+                </router-link>
+              </div>
 
-            <!-- View All Link -->
-            <div v-if="relatedJokes.length > 0" class="text-center mt-4">
-              <router-link 
-                :to="`/category/${getCategorySlug(currentJoke)}`"
-                class="btn btn-outline-primary"
-              >
-                View All {{ getCategoryDisplayName(currentJoke) }} Jokes
-                <i class="bi bi-arrow-right ms-2"></i>
-              </router-link>
-            </div>
-          </section>
+              <!-- View All Link -->
+              <div v-if="relatedJokes.length > 0" class="view-all-section">
+                <router-link 
+                  :to="`/category/${getCategorySlug(currentJoke)}`"
+                  class="btn-view-all"
+                >
+                  <span>View All {{ getCategoryDisplayName(currentJoke) }} Jokes</span>
+                  <i class="bi bi-arrow-right"></i>
+                </router-link>
+              </div>
+            </section>
 
-          <!-- Call-to-Action Section -->
-          <div v-if="currentJoke" class="cta-section">
-            <div class="cta-card">
+            <!-- CTA Section -->
+            <div v-if="currentJoke" class="cta-section-modern">
               <div class="cta-background">
-                <div class="cta-gradient"></div>
-                <div class="cta-shapes">
-                  <div class="shape shape-1"></div>
-                  <div class="shape shape-2"></div>
-                  <div class="shape shape-3"></div>
-                </div>
+                <div class="cta-pattern"></div>
               </div>
               <div class="cta-content">
                 <div class="cta-icon">
                   <i class="bi bi-emoji-laughing"></i>
                 </div>
-                <h3 class="cta-title">
-                  Got a joke to share?
-                </h3>
+                <h3 class="cta-title">Got a joke to share?</h3>
                 <p class="cta-description">
                   Join our community of humor enthusiasts! Share your favorite jokes and make the world laugh.
                 </p>
-                <router-link 
-                  to="/submit" 
-                  class="cta-button"
-                >
-                  <span class="cta-button-text">Share Your Joke</span>
-                  <i class="bi bi-arrow-right cta-button-icon"></i>
+                <router-link to="/submit" class="btn-cta">
+                  <span>Share Your Joke</span>
+                  <i class="bi bi-arrow-right"></i>
                 </router-link>
-                <p class="cta-hint">
-                  It only takes a minute ✨
-                </p>
+                <p class="cta-hint">It only takes a minute ✨</p>
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
     </div>
@@ -197,7 +223,7 @@ const selectedLanguages = computed(() => store.getters['preferences/selectedLang
 const relatedJokes = ref([]);
 const relatedJokesLoading = ref(false);
 
-// Helper functions for title section
+// Helper functions
 const generateDefaultTitle = (joke) => {
   if (!joke) return 'Funny Joke';
   const categoryName = getCategoryDisplayName(joke);
@@ -255,21 +281,17 @@ const navigateToJoke = (joke) => {
   router.push(url);
 };
 
-// Load related jokes by category, sorted by likes
+// Load related jokes
 const loadRelatedJokes = async (joke) => {
   if (!joke) return;
   
   relatedJokesLoading.value = true;
   
   try {
-    // Get primary category
     const primaryCategory = Array.isArray(joke.categories) && joke.categories.length > 0
       ? joke.categories[0]
       : joke.category || 'General';
     
-    console.log('Loading related jokes for category:', primaryCategory);
-    
-    // Fetch jokes from all selected languages
     let allJokes = [];
     
     for (const language of selectedLanguages.value) {
@@ -277,16 +299,10 @@ const loadRelatedJokes = async (joke) => {
       allJokes = [...allJokes, ...jokes];
     }
     
-    // Filter out current joke
     allJokes = allJokes.filter(j => j.id !== joke.id);
-    
-    // Sort by likes (descending)
     allJokes.sort((a, b) => (b.likes || 0) - (a.likes || 0));
     
-    // Take top 10
     relatedJokes.value = allJokes.slice(0, 10);
-    
-    console.log(`Loaded ${relatedJokes.value.length} related jokes`);
   } catch (error) {
     console.error('Error loading related jokes:', error);
     relatedJokes.value = [];
@@ -296,23 +312,16 @@ const loadRelatedJokes = async (joke) => {
 };
 
 const loadRandomJoke = async () => {
-  console.log('=== JokeView: loadRandomJoke called ===');
-  console.log('JokeView: Current language:', selectedLanguage.value);
-  
   await store.dispatch('jokes/setCategory', '');
   await store.dispatch('jokes/fetchRandomJoke');
   
   if (currentJoke.value) {
-    // Generate SEO-friendly URL with category and title
     const url = getJokeUrl(currentJoke.value);
     router.push(url);
   }
 };
 
 const loadJokeById = async (jokeId) => {
-  console.log('=== JokeView: loadJokeById called ===');
-  console.log('JokeView: Loading joke ID:', jokeId);
-  
   await store.dispatch('jokes/fetchJokeById', jokeId);
   
   if (currentJoke.value) {
@@ -321,194 +330,26 @@ const loadJokeById = async (jokeId) => {
       currentJoke.value.category, 
       currentJoke.value.language
     );
-    
-    // Load related jokes after main joke is loaded
     await loadRelatedJokes(currentJoke.value);
   }
-};
-
-// SEO Enhancement Functions
-const generateSEOTitle = (joke) => {
-  if (!joke) return 'Joke - Humoraq';
-  
-  let categoryName = 'General';
-  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
-    categoryName = getCategoryLabel(joke.categories[0]);
-  } else if (joke.category) {
-    categoryName = getCategoryLabel(joke.category);
-  }
-  
-  if (joke.title && joke.title.trim()) {
-    return `${joke.title} | ${categoryName} Jokes | Humoraq`;
-  }
-  
-  const preview = joke.text.substring(0, 40).trim();
-  return `${categoryName} Joke: ${preview}... | Humoraq`;
-};
-
-const generateSEODescription = (joke) => {
-  if (!joke) return 'View and enjoy jokes from Humoraq';
-  
-  let categoryName = 'General';
-  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
-    categoryName = getCategoryLabel(joke.categories[0]);
-  } else if (joke.category) {
-    categoryName = getCategoryLabel(joke.category);
-  }
-  
-  const languageName = { en: 'English', fr: 'French', ar: 'Arabic' }[joke.language] || 'English';
-  const preview = joke.text.substring(0, 140).trim();
-  
-  return `${categoryName} joke in ${languageName}: "${preview}..." Read more funny ${categoryName.toLowerCase()} jokes on Humoraq!`;
-};
-
-const generateSEOKeywords = (joke) => {
-  if (!joke) return 'funny jokes, best jokes, humor';
-  
-  let categoryName = 'general';
-  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
-    categoryName = getCategoryLabel(joke.categories[0]).toLowerCase();
-  } else if (joke.category) {
-    categoryName = getCategoryLabel(joke.category).toLowerCase();
-  }
-  
-  const languageName = { en: 'english', fr: 'french', ar: 'arabic' }[joke.language] || 'english';
-  
-  let keywords = `${categoryName} jokes, funny ${categoryName} jokes, ${categoryName} jokes in ${languageName}`;
-  
-  if (joke.title && joke.title.trim()) {
-    const titleWords = joke.title.toLowerCase().split(' ').slice(0, 3).join(' ');
-    keywords += `, ${titleWords}, ${titleWords} joke`;
-  }
-  
-  keywords += `, short ${categoryName} jokes, best ${categoryName} jokes 2026, ${categoryName} humor`;
-  
-  return keywords;
-};
-
-const addJokeStructuredData = (joke) => {
-  if (!joke) return;
-  
-  let category = 'General';
-  if (Array.isArray(joke.categories) && joke.categories.length > 0) {
-    category = joke.categories[0];
-  } else if (joke.category) {
-    category = joke.category;
-  }
-  
-  const categorySlug = getCategorySlug(joke);
-  const titleSlug = generateJokeSlug(joke);
-  const jokeUrl = `https://humoraq.com/${categorySlug}-jokes/${titleSlug}-${joke.id}`;
-  
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'CreativeWork',
-        '@id': jokeUrl,
-        'headline': joke.title || `Funny ${getCategoryLabel(category)} Joke`,
-        'text': joke.text,
-        'inLanguage': joke.language === 'ar' ? 'ar' : joke.language === 'fr' ? 'fr' : 'en',
-        'genre': category,
-        'author': {
-          '@type': 'Person',
-          'name': joke.author?.name || 'Anonymous'
-        },
-        'datePublished': joke.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-        'dateModified': joke.updatedAt?.toDate?.()?.toISOString() || joke.createdAt?.toDate?.()?.toISOString(),
-        'interactionStatistic': [
-          {
-            '@type': 'InteractionCounter',
-            'interactionType': 'https://schema.org/LikeAction',
-            'userInteractionCount': joke.likes || 0
-          },
-          {
-            '@type': 'InteractionCounter',
-            'interactionType': 'https://schema.org/ViewAction',
-            'userInteractionCount': joke.views || 0
-          }
-        ],
-        'publisher': {
-          '@type': 'Organization',
-          'name': 'Humoraq',
-          'url': 'https://humoraq.com',
-          'logo': {
-            '@type': 'ImageObject',
-            'url': 'https://humoraq.com/logo.png'
-          }
-        }
-      },
-      {
-        '@type': 'BreadcrumbList',
-        'itemListElement': [
-          {
-            '@type': 'ListItem',
-            'position': 1,
-            'name': 'Home',
-            'item': 'https://humoraq.com'
-          },
-          {
-            '@type': 'ListItem',
-            'position': 2,
-            'name': 'Jokes',
-            'item': 'https://humoraq.com/feed'
-          },
-          {
-            '@type': 'ListItem',
-            'position': 3,
-            'name': getCategoryLabel(category),
-            'item': `https://humoraq.com/category/${categorySlug}`
-          },
-          {
-            '@type': 'ListItem',
-            'position': 4,
-            'name': joke.title || 'Joke',
-            'item': jokeUrl
-          }
-        ]
-      }
-    ]
-  };
-  
-  const existing = document.querySelector('script[type="application/ld+json"]');
-  if (existing) {
-    existing.remove();
-  }
-  
-  const script = document.createElement('script');
-  script.type = 'application/ld+json';
-  script.textContent = JSON.stringify(structuredData);
-  document.head.appendChild(script);
 };
 
 // Watch for route changes
 watch(
   () => route.params.titleSlugWithId,
-  async (titleSlugWithId, oldTitleSlugWithId) => {
-    if (!titleSlugWithId || titleSlugWithId === oldTitleSlugWithId) return;
+  async (titleSlugWithId) => {
+    if (!titleSlugWithId) return;
     
     const jokeId = titleSlugWithId.substring(titleSlugWithId.lastIndexOf('-') + 1);
     
     if (jokeId) {
-      console.log('=== JokeView: Route changed, loading new joke:', jokeId);
-      
       await loadJokeById(String(jokeId));
       
-      if (currentJoke.value && currentJoke.value.text) {
-        const title = generateSEOTitle(currentJoke.value);
-        const description = generateSEODescription(currentJoke.value);
-        const keywords = generateSEOKeywords(currentJoke.value);
-        const canonicalUrl = `https://humoraq.com${getJokeUrl(currentJoke.value)}`;
-        
+      if (currentJoke.value) {
         updateSEO({
-          title,
-          description,
-          keywords,
-          canonical: canonicalUrl,
-          ogImage: 'https://humoraq.com/og-joke-image.png'
+          title: `${currentJoke.value.title || 'Joke'} | Humoraq`,
+          description: currentJoke.value.text.substring(0, 160)
         });
-        
-        addJokeStructuredData(currentJoke.value);
       }
     }
   },
@@ -517,79 +358,328 @@ watch(
 
 onMounted(() => {
   updateSEO({
-    title: 'Funny Joke - Humoraq | Best Jokes 2026',
-    description: 'Read funny jokes from our community. Short jokes, one-liners, and humor in multiple languages.',
-    keywords: 'funny jokes, best jokes, short jokes, one line jokes, humor, comedy'
+    title: 'Funny Joke - Humoraq',
+    description: 'Read funny jokes from our community.'
   });
 });
 </script>
 
 <style scoped>
-/* Existing styles */
-.joke-title-section {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-  border-left: 4px solid #667eea;
-  padding: 2rem;
+/* ============================================
+   VIEW CONTAINER & BACKGROUND
+   ============================================ */
+.joke-view-modern {
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem 0 4rem;
+}
+
+.view-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+}
+
+.dark-mode .view-background {
+  background: linear-gradient(135deg, #0f1419 0%, #1a1d20 100%);
+}
+
+.bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  animation: float 20s infinite ease-in-out;
+}
+
+.shape-1 {
+  width: 600px;
+  height: 600px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  top: -300px;
+  left: -300px;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  bottom: -250px;
+  right: -250px;
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(50px, -50px) rotate(5deg); }
+  66% { transform: translate(-30px, 30px) rotate(-5deg); }
+}
+
+/* ============================================
+   BACK BUTTON
+   ============================================ */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 12px;
-  margin-bottom: 1.5rem;
-  animation: fadeInUp 0.5s ease;
+  color: #6c757d;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.btn-back:hover {
+  background: white;
+  color: #667eea;
+  transform: translateX(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-back i {
+  transition: transform 0.3s ease;
+}
+
+.btn-back:hover i {
+  transform: translateX(-3px);
+}
+
+.dark-mode .btn-back {
+  background: rgba(28, 32, 36, 0.9);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #adb5bd;
+}
+
+.dark-mode .btn-back:hover {
+  background: #2c3034;
+  color: #9ec5fe;
+}
+
+/* ============================================
+   TITLE SECTION
+   ============================================ */
+.joke-title-section {
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  animation: fadeInUp 0.6s ease;
+}
+
+.title-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
 }
 
 .joke-main-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.25rem;
+  font-weight: 800;
   line-height: 1.3;
   color: var(--text-color, #0f1419);
-  margin: 0;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.title-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(102, 126, 234, 0.08);
+  border-radius: 12px;
+  color: #667eea;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.meta-badge i {
+  font-size: 1rem;
 }
 
 .dark-mode .joke-title-section {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-  border-left-color: #6ea8fe;
+  background: rgba(28, 32, 36, 0.9);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .dark-mode .joke-main-title {
   color: var(--text-color, #e7e9ea);
 }
 
-/* NEW: Related Jokes Section Styles */
+.dark-mode .meta-badge {
+  background: rgba(102, 126, 234, 0.15);
+  color: #9ec5fe;
+}
+
+/* ============================================
+   MAIN JOKE CARD
+   ============================================ */
+.main-joke-card {
+  animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.loading-container {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.spinner-modern {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+}
+
+.spinner-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid transparent;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.spinner-ring:nth-child(1) { animation-delay: -0.45s; opacity: 0.3; }
+.spinner-ring:nth-child(2) { animation-delay: -0.3s; opacity: 0.5; }
+.spinner-ring:nth-child(3) { animation-delay: -0.15s; opacity: 0.7; }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 1.125rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* ============================================
+   ALERT MODERN
+   ============================================ */
+.alert-modern {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: rgba(255, 193, 7, 0.08);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.alert-modern i {
+  font-size: 2rem;
+  color: #ffc107;
+  flex-shrink: 0;
+}
+
+.alert-modern h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.alert-modern p {
+  margin: 0;
+  color: #6c757d;
+}
+
+/* ============================================
+   ACTIONS SECTION
+   ============================================ */
+.actions-section {
+  text-align: center;
+  margin: 2.5rem 0;
+  animation: fadeInUp 0.8s ease;
+}
+
+.action-button {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* ============================================
+   RELATED JOKES SECTION
+   ============================================ */
 .related-jokes-section {
   margin-top: 4rem;
   padding-top: 3rem;
-  border-top: 2px solid rgba(0, 0, 0, 0.08);
-  animation: fadeInUp 0.6s ease;
+  border-top: 2px solid rgba(0, 0, 0, 0.06);
+  animation: fadeInUp 1s ease;
 }
 
 .dark-mode .related-jokes-section {
-  border-top-color: rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.06);
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.header-line {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  margin: 0 auto 1.5rem;
+  border-radius: 2px;
 }
 
 .section-title {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text-color, #0f1419);
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 1rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.title-icon {
-  font-size: 1.5rem;
+.section-title i {
+  color: #ffc107;
+  font-size: 1.75rem;
 }
 
 .section-subtitle {
-  font-size: 1rem;
-  color: #536471;
+  font-size: 1.0625rem;
+  color: #6c757d;
   margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .dark-mode .section-title {
@@ -597,92 +687,116 @@ onMounted(() => {
 }
 
 .dark-mode .section-subtitle {
-  color: #71767b;
+  color: #adb5bd;
+}
+
+/* Related Loading */
+.related-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem;
+  color: #6c757d;
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 /* Related Jokes Grid */
 .related-jokes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .related-joke-card {
-  background: var(--card-bg, #fff);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  padding: 1.25rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 1.75rem;
+  cursor: pointer;
   overflow: hidden;
-}
-
-.related-joke-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  animation: fadeInScale 0.6s ease both;
+  animation-delay: var(--delay, 0s);
 }
 
 .related-joke-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
-.related-joke-card:hover::before {
-  transform: scaleX(1);
+.card-shine {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  transition: transform 0.6s ease;
+}
+
+.related-joke-card:hover .card-shine {
+  transform: translateX(100%) translateY(100%) rotate(45deg);
 }
 
 .dark-mode .related-joke-card {
-  background: var(--card-bg, #2c3034);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(28, 32, 36, 0.9);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
 .dark-mode .related-joke-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
-.card-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 180px;
-}
-
-/* Category Badges */
 .category-badges {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .category-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 0.875rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  transition: transform 0.3s ease;
 }
 
-.badge-primary { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
-.badge-success { background: rgba(25, 135, 84, 0.1); color: #198754; }
-.badge-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
-.badge-warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
-.badge-info { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
-.badge-secondary { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
-.badge-dark { background: rgba(33, 37, 41, 0.1); color: #212529; }
+.related-joke-card:hover .category-badge {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.badge-primary { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
+.badge-success { background: rgba(25, 135, 84, 0.12); color: #198754; }
+.badge-danger { background: rgba(220, 53, 69, 0.12); color: #dc3545; }
+.badge-warning { background: rgba(255, 193, 7, 0.12); color: #ffc107; }
+.badge-info { background: rgba(13, 202, 240, 0.12); color: #0dcaf0; }
+.badge-secondary { background: rgba(108, 117, 125, 0.12); color: #6c757d; }
+.badge-dark { background: rgba(33, 37, 41, 0.12); color: #212529; }
 
 .dark-mode .badge-primary { background: rgba(13, 110, 253, 0.2); color: #6ea8fe; }
 .dark-mode .badge-success { background: rgba(25, 135, 84, 0.2); color: #75b798; }
@@ -692,19 +806,17 @@ onMounted(() => {
 .dark-mode .badge-secondary { background: rgba(108, 117, 125, 0.2); color: #adb5bd; }
 .dark-mode .badge-dark { background: rgba(255, 255, 255, 0.2); color: #f8f9fa; }
 
-/* Joke Preview */
 .joke-preview {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--text-color, #0f1419);
-  margin: 0 0 auto 0;
+  margin: 0 0 1.5rem 0;
   flex-grow: 1;
   display: -webkit-box;
   -webkit-line-clamp: 4;
-  line-clamp: 4;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: pre-wrap;
 }
 
@@ -712,7 +824,6 @@ onMounted(() => {
   color: var(--text-color, #e7e9ea);
 }
 
-/* RTL Support */
 .rtl-text.joke-preview {
   text-align: right !important;
   direction: rtl !important;
@@ -723,13 +834,11 @@ onMounted(() => {
   direction: ltr !important;
 }
 
-/* Card Footer */
 .card-footer {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding-top: 1rem;
-  margin-top: 1rem;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -742,90 +851,218 @@ onMounted(() => {
   align-items: center;
   gap: 0.375rem;
   font-size: 0.875rem;
-  color: #536471;
+  color: #6c757d;
   font-weight: 500;
 }
 
-.stat-item i {
-  font-size: 1rem;
-}
-
-.stat-item:first-child i {
+.stat-item:first-child {
   color: #f91880;
 }
 
-.stat-item:nth-child(2) i {
+.stat-item:nth-child(2) {
   color: #1d9bf0;
-}
-
-.dark-mode .stat-item {
-  color: #71767b;
 }
 
 .read-more {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.375rem;
   margin-left: auto;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1d9bf0;
-  transition: gap 0.2s ease;
+  color: #667eea;
+  transition: gap 0.3s ease;
 }
 
 .related-joke-card:hover .read-more {
-  gap: 0.5rem;
+  gap: 0.625rem;
 }
 
 .read-more i {
-  font-size: 1.25rem;
+  transition: transform 0.3s ease;
 }
 
-/* CTA Section */
-.cta-section {
-  margin-top: 2rem;
-  animation: fadeInUp 0.5s ease;
+.related-joke-card:hover .read-more i {
+  transform: translateX(3px);
 }
 
-.cta-section .card {
-  border-width: 2px;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+/* Empty Related */
+.empty-related {
+  text-align: center;
+  padding: 3rem 2rem;
 }
 
-.cta-section .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(13, 110, 253, 0.2) !important;
+.empty-related i {
+  font-size: 4rem;
+  opacity: 0.3;
+  margin-bottom: 1.5rem;
+  display: block;
 }
 
-.cta-section .card-title {
+.empty-related p {
+  font-size: 1.0625rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+/* View All Section */
+.view-all-section {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.btn-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px;
+  color: #667eea;
+  text-decoration: none;
   font-weight: 600;
-  color: var(--text-color);
+  font-size: 1.0625rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cta-section .btn {
-  min-width: 200px;
+.btn-view-all:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+  color: #667eea;
+}
+
+.btn-view-all i {
+  transition: transform 0.3s ease;
+}
+
+.btn-view-all:hover i {
+  transform: translateX(4px);
+}
+
+.dark-mode .btn-view-all {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+  border-color: rgba(102, 126, 234, 0.3);
+  color: #9ec5fe;
+}
+
+.dark-mode .btn-view-all:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.25));
+  border-color: #9ec5fe;
+  color: #9ec5fe;
+}
+
+/* ============================================
+   CTA SECTION MODERN
+   ============================================ */
+.cta-section-modern {
+  position: relative;
+  margin-top: 4rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 32px;
+  padding: 4rem 2rem;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+  animation: fadeInUp 1.2s ease;
+}
+
+.cta-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.cta-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.cta-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.cta-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.cta-description {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.125rem 2.5rem;
+  background: white;
+  color: #667eea;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: #667eea;
+}
+
+.btn-cta i {
+  transition: transform 0.3s ease;
+}
+
+.btn-cta:hover i {
+  transform: translateX(4px);
+}
+
+.cta-hint {
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9375rem;
   font-weight: 500;
-  transition: all 0.2s ease;
 }
 
-.cta-section .btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-}
-
-.dark-mode .cta-section .card {
-  background-color: var(--card-bg);
-  border-color: var(--primary-color);
-}
-
-.dark-mode .cta-section .card:hover {
-  box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3) !important;
-}
-
+/* ============================================
+   ANIMATIONS
+   ============================================ */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -833,61 +1070,149 @@ onMounted(() => {
   }
 }
 
-/* Responsive Design */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Transition groups */
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.stagger-enter-active {
+  transition: all 0.6s ease;
+}
+
+.stagger-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* ============================================
+   OUTLINE BUTTON
+   ============================================ */
+.btn-outline-modern {
+  display: inline-flex;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-modern:hover {
+  background: rgba(102, 126, 234, 0.08);
+  border-color: #667eea;
+  transform: translateY(-2px);
+  color: #667eea;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
 @media (max-width: 768px) {
+  .joke-view-modern {
+    padding: 1.5rem 0 3rem;
+  }
+
   .joke-title-section {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
   }
 
   .joke-main-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     flex-direction: column;
-  }
-
-  .section-subtitle {
-    font-size: 0.9375rem;
+    gap: 0.5rem;
   }
 
   .related-jokes-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
-  .card-content {
-    min-height: 160px;
+  .cta-section-modern {
+    padding: 3rem 1.5rem;
+    border-radius: 24px;
+  }
+
+  .cta-title {
+    font-size: 2rem;
+  }
+
+  .cta-description {
+    font-size: 1rem;
+  }
+
+  .btn-cta {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 576px) {
   .joke-title-section {
-    padding: 1.25rem;
+    padding: 1.5rem 1.25rem;
   }
 
   .joke-main-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 
   .section-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 
-  .cta-section .btn {
-    min-width: 100%;
-    font-size: 0.95rem;
+  .section-subtitle {
+    font-size: 1rem;
   }
 
-  .cta-section .card-body {
-    padding: 1.5rem !important;
+  .related-joke-card {
+    padding: 1.5rem;
   }
 
-  .joke-preview {
-    font-size: 0.875rem;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+  .cta-icon {
+    font-size: 3rem;
+  }
+
+  .cta-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .bg-shape,
+  .spinner-modern,
+  .cta-icon,
+  .cta-pattern,
+  .card-shine,
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>
