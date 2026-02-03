@@ -12,7 +12,8 @@ export const CATEGORIES = [
     slug: 'general',
     icon: 'bi-chat-square-text',
     color: 'info',
-    description: 'Enjoy the best funny jokes of all kinds, from classic humor to trending jokes loved by everyone.'
+    title: '+100 Hilarious All-Purpose Jokes That Work for Any Occasion',    
+    description: 'Discover the funniest jokes of all time! Our collection features trending jokes, classic humor, and popular one-liners that everyone loves to share. Perfect for any occasion.'
   },
   {
     value: 'Relationships',
@@ -20,7 +21,8 @@ export const CATEGORIES = [
     slug: 'relationships',
     icon: 'bi-heart',
     color: 'danger',
-    description: 'Funny relationship jokes about love, dating, couples, and the ups and downs of romantic life.'
+    title: 'The best 10 Funny Relationship Jokes That Will Make Your Partner Laugh',
+    description: 'Hilarious dating jokes, funny couple humor, and romantic comedy one-liners. Perfect for sharing with your partner, friends, or on date nights. Love jokes that make everyone smile!'
   },
   {
     value: 'Family',
@@ -28,7 +30,8 @@ export const CATEGORIES = [
     slug: 'family',
     icon: 'bi-people',
     color: 'success',
-    description: 'Relatable family jokes about parents, kids, marriage, and everyday family life moments.'
+    title: '100 Relatable Family Jokes Perfect for Dinner Table Laughs',
+    description: 'Relatable family jokes about parents, kids, marriage, siblings, and home life. Clean family-friendly humor perfect for sharing at dinner tables and family gatherings.'
   },
   {
     value: 'Work',
@@ -36,7 +39,8 @@ export const CATEGORIES = [
     slug: 'work',
     icon: 'bi-briefcase',
     color: 'primary',
-    description: 'Hilarious work jokes about office life, coworkers, bosses, meetings, and workplace struggles.'
+    title: 'Top 10 Office Jokes to Survive Your 9-to-5 with Laughter',
+    description: 'Office jokes, funny work stories, boss humor, and coworker comedy. Perfect for Monday motivation, team meetings, or surviving the 9-to-5 grind with laughter.'
   },
   {
     value: 'School',
@@ -44,7 +48,8 @@ export const CATEGORIES = [
     slug: 'school',
     icon: 'bi-mortarboard',
     color: 'warning',
-    description: 'Funny school jokes about students, teachers, exams, homework, and classroom life.'
+    title: '100 Classroom Jokes Every Student and Teacher Will Love',
+    description: 'Funny classroom jokes, student humor, teacher comedy, and exam jokes. Great for students, educators, and anyone who remembers their school days with a smile.'
   },
   {
     value: 'Friends',
@@ -52,7 +57,8 @@ export const CATEGORIES = [
     slug: 'friends',
     icon: 'bi-person-hearts',
     color: 'info',
-    description: 'Laugh with funny friends jokes about friendship, social life, best friends, and shared memories.'
+    title: '100 Friend Jokes Perfect for Sharing with Your Squad',
+    description: 'Best friend jokes, social life humor, friend group comedy, and hilarious memories. Perfect for sharing with your squad or posting on social media.'
   },
   {
     value: 'Adult',
@@ -60,7 +66,8 @@ export const CATEGORIES = [
     slug: 'adult',
     icon: 'bi-shield-exclamation',
     color: 'dark',
-    description: 'Adult humor jokes for mature audiences, featuring bold, edgy, and uncensored comedy.'
+    title: 'More than 100 Adult Jokes for Mature Audiences and Grown-Up Laughs',
+    description: 'Mature jokes, edgy humor, and uncensored comedy for adults only. Bold jokes perfect for parties, nights out, and grown-up laughter sessions.'
   },
   {
     value: 'Animals',
@@ -68,7 +75,8 @@ export const CATEGORIES = [
     slug: 'animals',
     icon: 'bi-bug',
     color: 'warning',
-    description: 'Cute and funny animal jokes about pets, dogs, cats, and hilarious animal behavior.'
+    title: '+20 Animal Jokes That Every Pet Owner Will Find Hilarious',
+    description: 'Funny pet jokes, hilarious animal stories, dog and cat humor, and wildlife comedy. Perfect for animal lovers, pet owners, and anyone who enjoys creature comedy.'
   },
   {
     value: 'Food',
@@ -76,7 +84,8 @@ export const CATEGORIES = [
     slug: 'food',
     icon: 'bi-cup-hot',
     color: 'danger',
-    description: 'Delicious food jokes about cooking, eating, restaurants, snacks, and foodie life.'
+    title: '100 Food Jokes to Spice Up Your Meal Times with Laughter',
+    description: 'Delicious food jokes, cooking humor, restaurant comedy, and foodie laughs. From kitchen disasters to restaurant fails, we serve up the best food comedy.'
   },
   {
     value: 'Tech',
@@ -84,7 +93,8 @@ export const CATEGORIES = [
     slug: 'tech',
     icon: 'bi-code-slash',
     color: 'primary',
-    description: 'Tech jokes about programming, developers, coding bugs, computers, and modern technology.'
+    title: '100 Tech Jokes That Only Programmers Will Truly Understand',
+    description: 'Programming jokes, developer humor, computer comedy, and tech meme laughs. Perfect for coders, IT professionals, and anyone who speaks geek.'
   },
   {
     value: 'Sports',
@@ -92,7 +102,8 @@ export const CATEGORIES = [
     slug: 'sports',
     icon: 'bi-trophy',
     color: 'success',
-    description: 'Funny sports jokes about football, fitness, athletes, competitions, and sports fans.'
+    title: 'Top 100 Sports Jokes That Score Big with Fans and Athletes',
+    description: 'Football jokes, fitness humor, athlete comedy, and sports fan laughs. Whether you play or watch, these jokes score big on the humor field.'
   },
   {
     value: 'Old People',
@@ -100,7 +111,8 @@ export const CATEGORIES = [
     slug: 'old-people',
     icon: 'bi-clock-history',
     color: 'secondary',
-    description: 'Lighthearted jokes about aging, seniors, retirement, and funny moments of getting older.'
+    title: '100 Senior Jokes About Aging with Humor and Grace',
+    description: 'Funny aging jokes, senior citizen humor, retirement comedy, and golden years laughs. Lighthearted jokes about getting older with grace and humor.'
   },
   {
     value: 'Women',
@@ -108,7 +120,8 @@ export const CATEGORIES = [
     slug: 'women',
     icon: 'bi-person-standing-dress',
     color: 'danger',
-    description: 'Humorous jokes inspired by women, daily life situations, and modern lifestyle humor.'
+    title: 'The best 10 Women Jokes About Modern Life and Everyday Situations',
+    description: 'Women\'s lifestyle jokes, female humor, daily life comedy, and girl power laughs. Relatable jokes about modern womanhood, friendships, and life.'
   },
   {
     value: 'Men',
@@ -116,7 +129,8 @@ export const CATEGORIES = [
     slug: 'men',
     icon: 'bi-person-standing',
     color: 'primary',
-    description: 'Funny jokes about men, everyday struggles, relationships, and modern man life.'
+    title: '100+ Men Jokes About Guy Stuff and Everyday Man Life',
+    description: 'Men\'s lifestyle jokes, guy humor, male bonding comedy, and everyday man laughs. From relationships to hobbies, jokes that speak to the modern man.'
   },
   {
     value: 'Kids',
@@ -124,7 +138,8 @@ export const CATEGORIES = [
     slug: 'kids',
     icon: 'bi-emoji-smile',
     color: 'success',
-    description: 'Fun, clean, and family-friendly kids jokes perfect for children, parents, and all ages.'
+    title: '18 Clean Kids Jokes Perfect for Children and Parents',
+    description: 'Clean kids jokes, children\'s humor, family-friendly comedy, and school-appropriate laughs. Perfect for parents, teachers, and children of all ages.'
   }
 ];
 
@@ -193,6 +208,16 @@ export const getCategoryColor = (value) => {
 export const getCategoryDescription = (value) => {
   const category = getCategoryByValue(value);
   return category ? category.description : '';
+};
+
+/**
+ * Get category title from value
+ * @param {string} value - Category value
+ * @returns {string} Category title
+ */
+export const getCategoryTitle = (value) => {
+  const category = getCategoryByValue(value);
+  return category ? category.title : '';
 };
 
 /**

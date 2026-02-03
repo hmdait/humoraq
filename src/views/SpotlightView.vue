@@ -13,7 +13,8 @@
           <!-- Joke Card with Fade Transition -->
           <div class="joke-spotlight-container" @mouseenter="pauseAutoRotation" @mouseleave="resumeAutoRotation">
             <Transition name="fade" mode="out-in">
-              <JokeCard v-if="currentJoke" :key="currentJoke.id" :joke="currentJoke" class="mb-4" />
+              <!-- FIXED: Use local spotlightJoke instead of shared store currentJoke -->
+              <JokeCard v-if="spotlightJoke" :key="spotlightJoke.id" :joke="spotlightJoke" class="mb-4" />
             </Transition>
           </div>
 
@@ -55,9 +56,15 @@
   import { updateSEO } from '../utils/seo';
   import { trackSpotlightAction } from '../services/analyticsService';
   import DefaultLayout from '@/layouts/DefaultLayout.vue';
+  // FIXED: Import getRandomJoke directly instead of using Vuex
+  import { getRandomJoke } from '../services/jokeService';
 
   const store = useStore();
 
+  // FIXED: Use LOCAL state for Spotlight instead of shared Vuex store
+  const spotlightJoke = ref(null);
+  const loading = ref(false);
+  
   // Local state (NO category filter)
   const isAutoRotationActive = ref(true);
   const isPaused = ref(false);
@@ -66,9 +73,7 @@
   const currentDelay = ref(0);
   const elapsedTime = ref(0);
 
-  // Get data from GLOBAL Vuex state
-  const currentJoke = computed(() => store.getters['jokes/currentJoke']);
-  const loading = computed(() => store.getters['jokes/loading']);
+  // Get selected languages from preferences (this is config, not joke data)
   const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
   // Progress calculation
@@ -87,40 +92,69 @@
     if (!joke || !joke.text) return 5000;
     const characterCount = joke.text.length;
     const delay = (characterCount * 40) + 2000;
-    console.log(`Delay calculation: ${characterCount} chars × 40ms + 2000ms = ${delay}ms`);
+    console.log(`Spotlight delay: ${characterCount} chars × 40ms + 2000ms = ${delay}ms`);
     return delay;
   };
 
-  // Load random joke (NO category - uses GLOBAL languages)
+  // FIXED: Load random joke into LOCAL state (doesn't touch Vuex store)
   const loadRandomJoke = async () => {
-    console.log('=== Loading random joke ===');
+    console.log('=== Spotlight: Loading random joke (local state only) ===');
     stopAutoRotation();
+    loading.value = true;
 
-    // Clear category and fetch (will use GLOBAL languages from Vuex)
-    await store.dispatch('jokes/setCategory', '');
-    await store.dispatch('jokes/fetchRandomJoke');
+    try {
+      let allJokes = [];
 
-    if (currentJoke.value) {
-      trackSpotlightAction('next', currentJoke.value.id);
-    }
-
-    if (isAutoRotationActive.value && !isPaused.value) {
-      startAutoRotation();
+      // Fetch jokes for all selected languages
+      for (const language of selectedLanguages.value) {
+        const filters = {
+          language: language,
+          category: undefined // No category filter in Spotlight
+        };
+        
+        console.log('Spotlight: Fetching with filters:', filters);
+        
+        const joke = await getRandomJoke(filters);
+        if (joke) {
+          allJokes.push(joke);
+        }
+      }
+      
+      console.log('Spotlight: Total jokes fetched:', allJokes.length);
+      
+      // Pick a random joke from all fetched jokes
+      if (allJokes.length > 0) {
+        const randomJoke = allJokes[Math.floor(Math.random() * allJokes.length)];
+        // FIXED: Update LOCAL state only - doesn't affect JokeView!
+        spotlightJoke.value = randomJoke;
+        
+        if (randomJoke) {
+          trackSpotlightAction('next', randomJoke.id);
+        }
+      } else {
+        spotlightJoke.value = null;
+        console.warn('Spotlight: No jokes found for selected languages');
+      }
+    } catch (error) {
+      console.error('Spotlight: Error loading random joke:', error);
+      spotlightJoke.value = null;
+    } finally {
+      loading.value = false;
     }
   };
 
   const startAutoRotation = () => {
-    if (!currentJoke.value) return;
+    if (!spotlightJoke.value) return;
 
-    console.log('=== Starting auto-rotation ===');
+    console.log('=== Spotlight: Starting auto-rotation ===');
     stopAutoRotation();
 
-    currentDelay.value = calculateDelay(currentJoke.value);
+    currentDelay.value = calculateDelay(spotlightJoke.value);
     elapsedTime.value = 0;
 
     rotationTimer.value = setTimeout(() => {
       if (isAutoRotationActive.value && !isPaused.value) {
-        trackSpotlightAction('auto_rotate', currentJoke.value?.id);
+        trackSpotlightAction('auto_rotate', spotlightJoke.value?.id);
         loadRandomJoke();
       }
     }, currentDelay.value);
@@ -177,20 +211,21 @@
     }
   };
 
-  // Watch for language changes from GLOBAL state
+  // Watch for language changes
   watch(selectedLanguages, () => {
-    console.log('=== Languages changed, loading new joke ===');
+    console.log('=== Spotlight: Languages changed, loading new joke ===');
     loadRandomJoke();
   }, { deep: true });
 
-  watch(currentJoke, (newJoke) => {
+  // FIXED: Watch LOCAL spotlightJoke for auto-rotation
+  watch(spotlightJoke, (newJoke) => {
     if (newJoke && isAutoRotationActive.value && !isPaused.value) {
       startAutoRotation();
     }
   });
 
   onMounted(() => {
-    console.log('=== Spotlight mounted ===');
+    console.log('=== Spotlight: Component mounted ===');
 
     updateSEO({
       title: 'Spotlight - Humoraq',
@@ -202,6 +237,8 @@
   });
 
   onUnmounted(() => {
+    console.log('=== Spotlight: Component unmounted - cleaning up timers ===');
+    // IMPORTANT: Clean up timers when component is destroyed
     stopAutoRotation();
     document.removeEventListener('visibilitychange', handleVisibilityChange);
   });

@@ -33,6 +33,7 @@
             :key="category.value"
             class="category-checkbox"
           >
+          
             <input
               :id="`category-${category.slug}`"
               type="checkbox"
@@ -147,7 +148,6 @@ const clearAll = () =>
   cursor: pointer;
   transition: all 0.2s ease;
   background: var(--card-bg, #fff);
-  min-height: 80px;
   position: relative;
 }
 

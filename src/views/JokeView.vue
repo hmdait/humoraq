@@ -347,7 +347,7 @@ watch(
       
       if (currentJoke.value) {
         updateSEO({
-          title: `${currentJoke.value.title || 'Joke'} | Humoraq`,
+          title: `${currentJoke.value.title || 'Joke'}`,
           description: currentJoke.value.text.substring(0, 160)
         });
       }
@@ -358,7 +358,7 @@ watch(
 
 onMounted(() => {
   updateSEO({
-    title: 'Funny Joke - Humoraq',
+    title: 'Funny Joke - Laugh Out Loud!',
     description: 'Read funny jokes from our community.'
   });
 });

@@ -10,7 +10,7 @@
           <!-- Enhanced Header with SEO-optimized content -->
           <div class="category-header mb-4">
             <h1 class="display-5 mb-2">
-              {{ categoryName }} Jokes
+              {{ categoryTitle }} Jokes
             </h1>
             <p class="lead text-muted" v-if="category">
               {{ getCategoryDescription() }}
@@ -77,6 +77,7 @@ const selectedLanguages = computed(() => store.getters['preferences/selectedLang
 
 const category = computed(() => getCategoryBySlug(props.slug));
 const categoryName = computed(() => category.value ? category.value.label : props.slug);
+const categoryTitle = computed(() => category.value ? category.value.title : props.slug);
 const categoryValue = computed(() => slugToValue(props.slug));
 
 // Enhanced category descriptions for SEO

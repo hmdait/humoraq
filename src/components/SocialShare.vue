@@ -14,11 +14,11 @@
     </button>
 
     <!-- Dropdown Menu - Using Teleport to avoid parent overflow issues -->
+    <!-- FIXED: Only render when dropdown is actually open to prevent extra space -->
     <Teleport to="body">
       <div 
-        v-if="isMounted"
-        class="share-dropdown-wrapper"
-        :class="{ 'show': isDropdownOpen }"
+        v-if="isMounted && isDropdownOpen"
+        class="share-dropdown-wrapper show"
         :style="dropdownStyles"
         ref="dropdownMenu"
         @click.stop
@@ -137,35 +137,8 @@ const trackShare = async () => {
 
 // Get accurate dropdown dimensions
 const getDropdownDimensions = async () => {
-  if (!dropdownMenu.value) return { width: 200, height: 250 };
-  
-  // Temporarily make visible to measure
-  const menu = dropdownMenu.value;
-  const originalDisplay = menu.style.display;
-  const originalVisibility = menu.style.visibility;
-  const originalPosition = menu.style.position;
-  
-  // Make it invisible but rendered to measure
-  menu.style.display = 'block';
-  menu.style.visibility = 'hidden';
-  menu.style.position = 'fixed';
-  menu.style.top = '-9999px';
-  menu.style.left = '-9999px';
-  
-  await nextTick();
-  
-  const rect = menu.getBoundingClientRect();
-  const width = rect.width || 200;
-  const height = rect.height || 250;
-  
-  // Restore original styles
-  menu.style.display = originalDisplay;
-  menu.style.visibility = originalVisibility;
-  menu.style.position = originalPosition;
-  menu.style.top = '';
-  menu.style.left = '';
-  
-  return { width, height };
+  // Return default dimensions since dropdown is not yet rendered
+  return { width: 200, height: 250 };
 };
 
 // Calculate optimal dropdown position
@@ -177,12 +150,12 @@ const calculateDropdownPosition = async () => {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   
-  // Get accurate dropdown dimensions
+  // Get dropdown dimensions
   const { width: menuWidth, height: menuHeight } = await getDropdownDimensions();
   
   // Constants
-  const gap = 8; // Gap between button and dropdown
-  const edgePadding = 16; // Minimum distance from viewport edge
+  const gap = 8;
+  const edgePadding = 16;
   
   // Check if we're on mobile
   const isMobile = viewportWidth <= 576;
@@ -208,58 +181,34 @@ const calculateDropdownPosition = async () => {
     zIndex: '9998'
   };
   
-  // Vertical positioning (up vs down)
+  // Vertical positioning
   const spaceBelow = viewportHeight - buttonRect.bottom - gap;
   const spaceAbove = buttonRect.top - gap;
   
-  let openUpward = false;
-  
   if (spaceBelow >= menuHeight) {
-    // Enough space below - open downward
     styles.top = `${buttonRect.bottom + gap}px`;
-    openUpward = false;
   } else if (spaceAbove >= menuHeight) {
-    // Not enough space below but enough above - open upward
     styles.bottom = `${viewportHeight - buttonRect.top + gap}px`;
-    openUpward = true;
   } else {
-    // Not enough space either way - choose the side with more space
     if (spaceBelow > spaceAbove) {
-      // More space below
       styles.top = `${buttonRect.bottom + gap}px`;
       styles.maxHeight = `${spaceBelow - edgePadding}px`;
-      openUpward = false;
     } else {
-      // More space above
       styles.bottom = `${viewportHeight - buttonRect.top + gap}px`;
       styles.maxHeight = `${spaceAbove - edgePadding}px`;
-      openUpward = true;
     }
     styles.overflowY = 'auto';
   }
   
-  // Horizontal positioning (left vs right alignment)
-  const spaceRight = viewportWidth - buttonRect.right;
-  const spaceLeft = buttonRect.left;
-  
+  // Horizontal positioning
   if (buttonRect.right + menuWidth <= viewportWidth - edgePadding) {
-    // Align left edge with button left
     styles.left = `${buttonRect.left}px`;
   } else if (buttonRect.right - menuWidth >= edgePadding) {
-    // Align right edge with button right
     styles.left = `${buttonRect.right - menuWidth}px`;
-  } else if (spaceRight > spaceLeft) {
-    // More space on right - align to left edge
-    styles.left = `${buttonRect.left}px`;
-    styles.maxWidth = `${spaceRight - edgePadding}px`;
   } else {
-    // More space on left - align to right edge
     styles.right = `${viewportWidth - buttonRect.right}px`;
-    styles.maxWidth = `${spaceLeft - edgePadding}px`;
+    styles.maxWidth = `${buttonRect.left - edgePadding}px`;
   }
-  
-  // Add animation origin based on direction
-  styles.transformOrigin = openUpward ? 'bottom center' : 'top center';
   
   return styles;
 };
@@ -434,11 +383,9 @@ onUnmounted(() => {
   color: var(--text-color, #536471);
   cursor: pointer;
   user-select: none;
-  /* Improve mobile tap target */
   min-width: 44px;
   min-height: 44px;
   justify-content: center;
-  /* Prevent text selection on mobile */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }
@@ -463,30 +410,28 @@ onUnmounted(() => {
   transform: rotate(15deg);
 }
 
-/* CRITICAL: Dropdown wrapper using Teleport */
+/* Dropdown wrapper */
 .share-dropdown-wrapper {
-  /* Position will be set via inline styles */
   min-width: 200px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background: var(--card-bg, #fff);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  
-  /* Animation */
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  pointer-events: none;
-  
-  /* Prevent text selection */
   user-select: none;
   -webkit-user-select: none;
+  /* Animation for show state */
+  animation: dropdownFadeIn 0.15s ease;
 }
 
-.share-dropdown-wrapper.show {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .share-dropdown-menu {
@@ -507,9 +452,7 @@ onUnmounted(() => {
   width: 100%;
   text-align: left;
   cursor: pointer;
-  /* Improve mobile tap target */
   min-height: 44px;
-  /* Prevent text selection on mobile */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
