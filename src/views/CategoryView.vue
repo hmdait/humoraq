@@ -10,10 +10,10 @@
           <!-- Enhanced Header with SEO-optimized content -->
           <div class="category-header mb-4">
             <h1 class="display-5 mb-2">
-              {{ categoryTitle }} Jokes
+              {{ categoryTitle }}
             </h1>
             <p class="lead text-muted" v-if="category">
-              {{ getCategoryDescription() }}
+              ⭐⭐⭐⭐⭐ 5/5 - {{ getCategoryDescription() }}
             </p>
             <div class="category-meta text-muted">
               <small>
@@ -91,21 +91,21 @@ const getCategoryDescription = () => {
   
   // Otherwise provide SEO-friendly descriptions
   const descriptions = {
-    'General': 'knock knock jokes: Explore our collection of general humor for everyone. From everyday situations to universal experiences that make us laugh.',
-    'Tech': 'knock knock jokes: Hilarious jokes about technology, programming, coding, and the digital world. Perfect for developers, engineers, and tech enthusiasts!',
-    'Work': 'knock knock jokes: Office humor and workplace jokes that every professional can relate to. Lighten up your work day with these funny work stories!',
-    'Animals': 'knock knock jokes: Funny jokes about our furry, feathered, and finned friends. Perfect for pet lovers and animal enthusiasts!',
-    'Food': 'knock knock jokes: Delicious humor about cooking, eating, restaurants, and all things culinary. Food jokes that will make you hungry for more laughs!',
-    'Relationships': 'knock knock jokes: Humorous takes on dating, love, marriage, and relationships. Laugh about the ups and downs of romance!',
-    'Family': 'knock knock jokes: Family-friendly, dad jokes 2026, jokes about parents, kids, siblings, and family life. Humor the whole family can enjoy together!',
-    'School': 'knock knock jokes: Student life, teachers, homework, and educational humor. Perfect for anyone who\'s been through the school experience!',
-    'Friends': 'knock knock jokes: Jokes about friendship, social situations, and hanging out with buddies. Share these with your best friends!',
-    'Adult': 'knock knock jokes: Mature humor for adult audiences. Sophisticated jokes and witty humor for grown-ups.',
-    'Sports': 'knock knock jokes: unny jokes about sports, athletes, games, and competition. Score big laughs with these sporting jokes!',
-    'Old People': 'knock knock jokes: Lighthearted humor about aging, retirement, and senior life. Age is just a number, but these jokes are timeless!',
-    'Women': 'knock knock jokes: Jokes celebrating women and female perspectives. Humor from a woman\'s point of view!',
-    'Men': 'knock knock jokes: Jokes about guys and male perspectives. Laugh at the funny side of being a man!',
-    'Kids': 'knock knock jokes: Fun, clean, and family-friendly kids jokes perfect for children, parents, and all ages.'
+    'General': '⭐⭐⭐⭐⭐ 5/5 knock knock jokes: Explore our collection of general humor for everyone. From everyday situations to universal experiences that make us laugh.',
+    'Tech': '⭐⭐⭐⭐⭐ 5/5: Hilarious jokes about technology, programming, coding, and the digital world. Perfect for developers, engineers, and tech enthusiasts!',
+    'Work': '⭐⭐⭐⭐⭐ 5/5: Office humor and workplace jokes that every professional can relate to. Lighten up your work day with these funny work stories!',
+    'Animals': '⭐⭐⭐⭐⭐ 5/5: Funny jokes about our furry, feathered, and finned friends. Perfect for pet lovers and animal enthusiasts!',
+    'Food': '⭐⭐⭐⭐⭐ 5/5: Delicious humor about cooking, eating, restaurants, and all things culinary. Food jokes that will make you hungry for more laughs!',
+    'Relationships': '⭐⭐⭐⭐⭐ 5/5: Humorous takes on dating, love, marriage, and relationships. Laugh about the ups and downs of romance!',
+    'Family': '⭐⭐⭐⭐⭐ 5/5: Family-friendly, dad jokes 2026, jokes about parents, kids, siblings, and family life. Humor the whole family can enjoy together!',
+    'School': '⭐⭐⭐⭐⭐ 5/5: Student life, teachers, homework, and educational humor. Perfect for anyone who\'s been through the school experience!',
+    'Friends': '⭐⭐⭐⭐⭐ 5/5: Jokes about friendship, social situations, and hanging out with buddies. Share these with your best friends!',
+    'Adult': '⭐⭐⭐⭐⭐ 5/5: Mature humor for adult audiences. Sophisticated jokes and witty humor for grown-ups.',
+    'Sports': '⭐⭐⭐⭐⭐ 5/5: unny jokes about sports, athletes, games, and competition. Score big laughs with these sporting jokes!',
+    'Old People': '⭐⭐⭐⭐⭐ 5/5: Lighthearted humor about aging, retirement, and senior life. Age is just a number, but these jokes are timeless!',
+    'Women': '⭐⭐⭐⭐⭐ 5/5: Jokes celebrating women and female perspectives. Humor from a woman\'s point of view!',
+    'Men': '⭐⭐⭐⭐⭐ 5/5: Jokes about guys and male perspectives. Laugh at the funny side of being a man!',
+    'Kids': '⭐⭐⭐⭐⭐ 5/5: Fun, clean, and family-friendly kids jokes perfect for children, parents, and all ages.'
   };
   
   return descriptions[category.value.label] || 'Browse our collection of funny jokes in this category.';
@@ -113,14 +113,14 @@ const getCategoryDescription = () => {
 
 // SEO optimization helpers
 const generateCategorySEOTitle = () => {
-  const name = categoryName.value;
-  return `${name} Jokes - Funny ${name} Humor | Best ${name} Jokes 2026`;
+  const name = categoryTitle.value;
+  return `${name}`;
 };
 
 const generateCategorySEODescription = () => {
   const name = categoryName.value.toLowerCase();
   const count = jokes.value.length;
-  return `Discover ${count > 0 ? count + '+' : ''} funny ${name} jokes! Read the best ${name} humor in English, French, and Arabic. Short ${name} jokes, one-liners, and hilarious ${name} stories. Updated daily!`;
+  return `Discover ${count > 0 ? count + '+' : ''} funny ${name} jokes! Read the best ${name} humor in English, French, spanish and Arabic. Short ${name} jokes, one-liners, and hilarious ${name} stories. Updated daily!`;
 };
 
 const generateCategorySEOKeywords = () => {

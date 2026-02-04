@@ -9,139 +9,140 @@ export const CATEGORIES = [
   {
     value: 'General',
     label: 'General',
-    slug: 'general',
+    slug: 'general-jokes',
     icon: 'bi-chat-square-text',
     color: 'info',
-    title: '+100 Hilarious All-Purpose Jokes That Work for Any Occasion',    
-    description: 'Discover the funniest jokes of all time! Our collection features trending jokes, classic humor, and popular one-liners that everyone loves to share. Perfect for any occasion.'
+    title: '100+ General Jokes to Make Anyone Laugh Out Loud',    
+    description: 'Discover the funniest general jokes, trending one-liners, and classic humor that everyone loves. Perfect for any occasion, these jokes are great for sharing laughs with friends and family.'
   },
   {
     value: 'Relationships',
     label: 'Relationships',
-    slug: 'relationships',
+    slug: 'relationship-jokes',
     icon: 'bi-heart',
     color: 'danger',
-    title: 'The best 10 Funny Relationship Jokes That Will Make Your Partner Laugh',
-    description: 'Hilarious dating jokes, funny couple humor, and romantic comedy one-liners. Perfect for sharing with your partner, friends, or on date nights. Love jokes that make everyone smile!'
+    title: 'Top 20 Funny Relationship Jokes That Will Make Your Partner Laugh',
+    description: 'Hilarious dating jokes, couple humor, romantic one-liners, and love comedy. Perfect for sharing with your partner, friends, or on date nights to spark laughter and joy.'
   },
   {
     value: 'Family',
     label: 'Family',
-    slug: 'family',
+    slug: 'family-jokes',
     icon: 'bi-people',
     color: 'success',
-    title: '100 Relatable Family Jokes Perfect for Dinner Table Laughs',
-    description: 'Relatable family jokes about parents, kids, marriage, siblings, and home life. Clean family-friendly humor perfect for sharing at dinner tables and family gatherings.'
+    title: '100 Family Jokes Everyone Will Relate To',
+    description: 'Relatable jokes about parents, kids, siblings, marriage, and home life. Clean, family-friendly humor that brings laughter to dinner tables, family gatherings, and everyday moments.'
   },
   {
     value: 'Work',
     label: 'Work',
-    slug: 'work',
+    slug: 'work-jokes',
     icon: 'bi-briefcase',
     color: 'primary',
-    title: 'Top 10 Office Jokes to Survive Your 9-to-5 with Laughter',
-    description: 'Office jokes, funny work stories, boss humor, and coworker comedy. Perfect for Monday motivation, team meetings, or surviving the 9-to-5 grind with laughter.'
+    title: 'Top 20 Office Jokes to Survive Your 9-to-5 with Laughter',
+    description: 'Office humor, funny work stories, coworker jokes, and boss comedy. Ideal for Monday motivation, team meetings, or sharing laughs during the workday.'
   },
   {
     value: 'School',
     label: 'School',
-    slug: 'school',
+    slug: 'school-jokes',
     icon: 'bi-mortarboard',
     color: 'warning',
-    title: '100 Classroom Jokes Every Student and Teacher Will Love',
-    description: 'Funny classroom jokes, student humor, teacher comedy, and exam jokes. Great for students, educators, and anyone who remembers their school days with a smile.'
+    title: '100 School Jokes Every Student and Teacher Will Love',
+    description: 'Classroom humor, student jokes, teacher comedy, and exam laughs. Perfect for students, educators, and anyone who wants to relive school days with a smile.'
   },
   {
     value: 'Friends',
     label: 'Friends',
-    slug: 'friends',
+    slug: 'friend-jokes',
     icon: 'bi-person-hearts',
     color: 'info',
     title: '100 Friend Jokes Perfect for Sharing with Your Squad',
-    description: 'Best friend jokes, social life humor, friend group comedy, and hilarious memories. Perfect for sharing with your squad or posting on social media.'
+    description: 'Best friend jokes, social life humor, friend group comedy, and funny memories. Share with your squad or post on social media for guaranteed laughs.'
   },
   {
     value: 'Adult',
     label: 'Adult',
-    slug: 'adult',
+    slug: 'adult-jokes',
     icon: 'bi-shield-exclamation',
     color: 'dark',
-    title: 'More than 100 Adult Jokes for Mature Audiences and Grown-Up Laughs',
-    description: 'Mature jokes, edgy humor, and uncensored comedy for adults only. Bold jokes perfect for parties, nights out, and grown-up laughter sessions.'
+    title: '100+ Adult Jokes for Mature Audiences and Grown-Up Laughs',
+    description: 'Mature humor, edgy jokes, uncensored comedy, and risqué stories. Perfect for adult parties, nights out, or sharing laughs with friends who enjoy bold humor.'
   },
   {
     value: 'Animals',
     label: 'Animals',
-    slug: 'animals',
+    slug: 'animal-jokes',
     icon: 'bi-bug',
     color: 'warning',
-    title: '+20 Animal Jokes That Every Pet Owner Will Find Hilarious',
-    description: 'Funny pet jokes, hilarious animal stories, dog and cat humor, and wildlife comedy. Perfect for animal lovers, pet owners, and anyone who enjoys creature comedy.'
+    title: '20+ Hilarious Animal Jokes Every Pet Owner Will Love',
+    description: 'Funny pet jokes, dog and cat humor, wildlife comedy, and hilarious animal stories. Perfect for animal lovers and anyone who enjoys creature comedy.'
   },
   {
     value: 'Food',
     label: 'Food',
-    slug: 'food',
+    slug: 'food-jokes',
     icon: 'bi-cup-hot',
     color: 'danger',
     title: '100 Food Jokes to Spice Up Your Meal Times with Laughter',
-    description: 'Delicious food jokes, cooking humor, restaurant comedy, and foodie laughs. From kitchen disasters to restaurant fails, we serve up the best food comedy.'
+    description: 'Delicious food jokes, kitchen humor, restaurant fails, and foodie comedy. From cooking disasters to restaurant stories, enjoy tasty laughs for all food lovers.'
   },
   {
     value: 'Tech',
     label: 'Tech',
-    slug: 'tech',
+    slug: 'tech-jokes',
     icon: 'bi-code-slash',
     color: 'primary',
-    title: '100 Tech Jokes That Only Programmers Will Truly Understand',
-    description: 'Programming jokes, developer humor, computer comedy, and tech meme laughs. Perfect for coders, IT professionals, and anyone who speaks geek.'
+    title: '100 Tech Jokes Only Programmers and Geek Fans Will Get',
+    description: 'Programming jokes, developer humor, tech memes, and computer comedy. Perfect for coders, IT professionals, and anyone fluent in geek culture.'
   },
   {
     value: 'Sports',
     label: 'Sports',
-    slug: 'sports',
+    slug: 'sports-jokes',
     icon: 'bi-trophy',
     color: 'success',
-    title: 'Top 100 Sports Jokes That Score Big with Fans and Athletes',
-    description: 'Football jokes, fitness humor, athlete comedy, and sports fan laughs. Whether you play or watch, these jokes score big on the humor field.'
+    title: '100 Sports Jokes That Score Big with Fans and Athletes',
+    description: 'Football, basketball, fitness humor, athlete jokes, and sports fan comedy. Whether you play or watch, enjoy hilarious sports-themed laughs.'
   },
   {
     value: 'Old People',
     label: 'Old People',
-    slug: 'old-people',
+    slug: 'senior-jokes',
     icon: 'bi-clock-history',
     color: 'secondary',
     title: '100 Senior Jokes About Aging with Humor and Grace',
-    description: 'Funny aging jokes, senior citizen humor, retirement comedy, and golden years laughs. Lighthearted jokes about getting older with grace and humor.'
+    description: 'Funny aging jokes, senior humor, retirement comedy, and golden years laughs. Lighthearted jokes about getting older while keeping a sense of humor.'
   },
   {
     value: 'Women',
     label: 'Women',
-    slug: 'women',
+    slug: 'women-jokes',
     icon: 'bi-person-standing-dress',
     color: 'danger',
-    title: 'The best 10 Women Jokes About Modern Life and Everyday Situations',
-    description: 'Women\'s lifestyle jokes, female humor, daily life comedy, and girl power laughs. Relatable jokes about modern womanhood, friendships, and life.'
+    title: 'Top 20 Women Jokes About Modern Life and Everyday Situations',
+    description: 'Women lifestyle jokes, female humor, daily life comedy, and girl power laughs. Relatable jokes about friendships, work, and life as a modern woman.'
   },
   {
     value: 'Men',
     label: 'Men',
-    slug: 'men',
+    slug: 'men-jokes',
     icon: 'bi-person-standing',
     color: 'primary',
-    title: '100+ Men Jokes About Guy Stuff and Everyday Man Life',
-    description: 'Men\'s lifestyle jokes, guy humor, male bonding comedy, and everyday man laughs. From relationships to hobbies, jokes that speak to the modern man.'
+    title: '100+ Men Jokes About Guy Stuff and Everyday Life',
+    description: 'Men lifestyle jokes, guy humor, male bonding comedy, and everyday life laughs. From relationships to hobbies, enjoy jokes that resonate with modern men.'
   },
   {
     value: 'Kids',
     label: 'Kids',
-    slug: 'kids',
+    slug: 'kids-jokes',
     icon: 'bi-emoji-smile',
     color: 'success',
-    title: '18 Clean Kids Jokes Perfect for Children and Parents',
-    description: 'Clean kids jokes, children\'s humor, family-friendly comedy, and school-appropriate laughs. Perfect for parents, teachers, and children of all ages.'
+    title: '20+ Clean Kids Jokes Perfect for Children and Parents',
+    description: 'Clean jokes for kids, children humor, family-friendly comedy, and school-appropriate laughs. Perfect for parents, teachers, and kids of all ages.'
   }
 ];
+
 
 
 /**

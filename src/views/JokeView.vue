@@ -72,9 +72,17 @@
               />
             </div>
 
-            <!-- Related Jokes Section -->
-            <section v-if="currentJoke && !loading" class="related-jokes-section">
-              <div class="section-header">
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Jokes Section - FULL WIDTH with TWO COLUMNS -->
+      <section v-if="currentJoke && !loading" class="related-jokes-section-fullwidth">
+        <div class="container-fluid px-3 px-lg-5">
+          <div class="row g-4">
+            <!-- Left Column: Section Header & Info -->
+            <div class="col-lg-4">
+              <div class="section-header-sidebar">
                 <div class="header-line"></div>
                 <h2 class="section-title">
                   <i class="bi bi-stars"></i>
@@ -83,28 +91,42 @@
                 <p class="section-subtitle">
                   Discover more hilarious {{ getCategoryDisplayName(currentJoke).toLowerCase() }} jokes loved by our community
                 </p>
+                
+                <!-- View All Link -->
+                <div v-if="relatedJokes.length > 0" class="view-all-section-sidebar">
+                  <router-link 
+                    :to="`/category/${getCategorySlug(currentJoke)}`"
+                    class="btn-view-all"
+                  >
+                    <span>View All {{ getCategoryDisplayName(currentJoke) }} Jokes</span>
+                    <i class="bi bi-arrow-right"></i>
+                  </router-link>
+                </div>
               </div>
+            </div>
 
+            <!-- Right Column: Related Jokes Grid -->
+            <div class="col-lg-8">
               <!-- Loading State -->
               <div v-if="relatedJokesLoading" class="related-loading">
                 <div class="spinner-small"></div>
                 <span>Loading related jokes...</span>
               </div>
 
-              <!-- Related Jokes Grid -->
+              <!-- Related Jokes Grid - FULL CONTENT (NO TRUNCATION) -->
               <transition-group 
                 v-else-if="relatedJokes.length > 0" 
                 name="stagger"
                 tag="div"
-                class="related-jokes-grid"
+                class="related-jokes-grid-fullcontent"
               >
                 <article 
                   v-for="(joke, index) in relatedJokes" 
                   :key="joke.id"
-                  class="related-joke-card"
+                  class="related-joke-card-full"
                   :style="{ '--delay': index * 0.05 + 's' }"
                   @click="navigateToJoke(joke)"
-                  :aria-label="`Read joke: ${getJokePreview(joke, 50)}`"
+                  :aria-label="`Read joke: ${joke.title || joke.text.substring(0, 50)}`"
                 >
                   <div class="card-shine"></div>
                   
@@ -119,14 +141,24 @@
                     </span>
                   </div>
 
-                  <!-- Joke Preview -->
-                  <p 
-                    class="joke-preview"
+                  <!-- Joke Title (if exists) -->
+                  <h3 
+                    v-if="joke.title" 
+                    class="joke-title-full"
+                    :dir="getTextDirection(joke.title)"
+                    :class="getDirectionClass(joke.title)"
+                  >
+                    {{ joke.title }}
+                  </h3>
+
+                  <!-- Joke FULL Content - NO TRUNCATION for SEO -->
+                  <div 
+                    class="joke-content-full preserve-whitespace"
                     :dir="getTextDirection(joke.text)"
                     :class="getDirectionClass(joke.text)"
                   >
-                    {{ getJokePreview(joke, 120) }}
-                  </p>
+                    {{ joke.text }}
+                  </div>
 
                   <!-- Card Footer -->
                   <div class="card-footer">
@@ -153,20 +185,15 @@
                   Browse Other Categories
                 </router-link>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <!-- View All Link -->
-              <div v-if="relatedJokes.length > 0" class="view-all-section">
-                <router-link 
-                  :to="`/category/${getCategorySlug(currentJoke)}`"
-                  class="btn-view-all"
-                >
-                  <span>View All {{ getCategoryDisplayName(currentJoke) }} Jokes</span>
-                  <i class="bi bi-arrow-right"></i>
-                </router-link>
-              </div>
-            </section>
-
-            <!-- CTA Section -->
+      <!-- CTA Section - back inside container -->
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
             <div v-if="currentJoke" class="cta-section-modern">
               <div class="cta-background">
                 <div class="cta-pattern"></div>
@@ -186,10 +213,10 @@
                 <p class="cta-hint">It only takes a minute ✨</p>
               </div>
             </div>
-
           </div>
         </div>
       </div>
+
     </div>
   </DefaultLayout>
 </template>
@@ -253,21 +280,6 @@ const getJokeCategories = (joke) => {
   if (Array.isArray(joke.categories)) return joke.categories;
   if (joke.category) return [joke.category];
   return ['General'];
-};
-
-const getJokePreview = (joke, maxLength) => {
-  if (!joke || !joke.text) return '';
-  
-  if (joke.text.length <= maxLength) return joke.text;
-  
-  const truncated = joke.text.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  
-  if (lastSpace > maxLength * 0.8) {
-    return truncated.substring(0, lastSpace) + '...';
-  }
-  
-  return truncated + '...';
 };
 
 const formatCount = (count) => {
@@ -365,6 +377,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Existing styles remain the same ... */
 /* ============================================
    VIEW CONTAINER & BACKGROUND
    ============================================ */
@@ -632,29 +645,44 @@ onMounted(() => {
 }
 
 /* ============================================
-   RELATED JOKES SECTION
+   RELATED JOKES SECTION - FULL WIDTH TWO COLUMNS
    ============================================ */
-.related-jokes-section {
+.related-jokes-section-fullwidth {
   margin-top: 4rem;
-  padding-top: 3rem;
+  padding: 4rem 0;
+  background: rgba(102, 126, 234, 0.02);
   border-top: 2px solid rgba(0, 0, 0, 0.06);
   animation: fadeInUp 1s ease;
 }
 
-.dark-mode .related-jokes-section {
+.dark-mode .related-jokes-section-fullwidth {
+  background: rgba(102, 126, 234, 0.05);
   border-top-color: rgba(255, 255, 255, 0.06);
 }
 
-.section-header {
-  text-align: center;
-  margin-bottom: 3rem;
+/* Left Sidebar Header */
+.section-header-sidebar {
+  position: sticky;
+  top: 100px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.dark-mode .section-header-sidebar {
+  background: rgba(28, 32, 36, 0.9);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .header-line {
   width: 80px;
   height: 4px;
   background: linear-gradient(90deg, #667eea, #764ba2);
-  margin: 0 auto 1.5rem;
+  margin-bottom: 1.5rem;
   border-radius: 2px;
 }
 
@@ -664,9 +692,9 @@ onMounted(() => {
   color: var(--text-color, #0f1419);
   margin: 0 0 1rem 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
   gap: 0.75rem;
+  flex-direction: column;
 }
 
 .section-title i {
@@ -675,11 +703,10 @@ onMounted(() => {
 }
 
 .section-subtitle {
-  font-size: 1.0625rem;
+  font-size: 1rem;
   color: #6c757d;
-  margin: 0;
-  max-width: 600px;
-  margin: 0 auto;
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
 }
 
 .dark-mode .section-title {
@@ -688,6 +715,10 @@ onMounted(() => {
 
 .dark-mode .section-subtitle {
   color: #adb5bd;
+}
+
+.view-all-section-sidebar {
+  margin-top: 2rem;
 }
 
 /* Related Loading */
@@ -709,21 +740,20 @@ onMounted(() => {
   animation: spin 0.8s linear infinite;
 }
 
-/* Related Jokes Grid */
-.related-jokes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+/* Related Jokes Grid - FULL CONTENT */
+.related-jokes-grid-fullcontent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.related-joke-card {
+.related-joke-card-full {
   position: relative;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 20px;
-  padding: 1.75rem;
+  padding: 2rem;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -732,9 +762,9 @@ onMounted(() => {
   animation-delay: var(--delay, 0s);
 }
 
-.related-joke-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+.related-joke-card-full:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border-color: rgba(102, 126, 234, 0.2);
 }
 
@@ -754,18 +784,18 @@ onMounted(() => {
   transition: transform 0.6s ease;
 }
 
-.related-joke-card:hover .card-shine {
+.related-joke-card-full:hover .card-shine {
   transform: translateX(100%) translateY(100%) rotate(45deg);
 }
 
-.dark-mode .related-joke-card {
+.dark-mode .related-joke-card-full {
   background: rgba(28, 32, 36, 0.9);
   border-color: rgba(255, 255, 255, 0.06);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
-.dark-mode .related-joke-card:hover {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+.dark-mode .related-joke-card-full:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   border-color: rgba(102, 126, 234, 0.3);
 }
 
@@ -786,7 +816,7 @@ onMounted(() => {
   transition: transform 0.3s ease;
 }
 
-.related-joke-card:hover .category-badge {
+.related-joke-card-full:hover .category-badge {
   transform: scale(1.1) rotate(5deg);
 }
 
@@ -806,30 +836,55 @@ onMounted(() => {
 .dark-mode .badge-secondary { background: rgba(108, 117, 125, 0.2); color: #adb5bd; }
 .dark-mode .badge-dark { background: rgba(255, 255, 255, 0.2); color: #f8f9fa; }
 
-.joke-preview {
-  font-size: 1rem;
-  line-height: 1.6;
+/* Joke Title (if exists) */
+.joke-title-full {
+  font-size: 1.375rem;
+  font-weight: 700;
   color: var(--text-color, #0f1419);
-  margin: 0 0 1.5rem 0;
-  flex-grow: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: pre-wrap;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
 }
 
-.dark-mode .joke-preview {
+.dark-mode .joke-title-full {
   color: var(--text-color, #e7e9ea);
 }
 
-.rtl-text.joke-preview {
+.rtl-text.joke-title-full {
   text-align: right !important;
   direction: rtl !important;
 }
 
-.ltr-text.joke-preview {
+.ltr-text.joke-title-full {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+/* Joke FULL Content - NO TRUNCATION for SEO */
+.joke-content-full {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text-color, #0f1419);
+  margin: 0 0 1.5rem 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  /* NO line-clamp - display full content */
+}
+
+.dark-mode .joke-content-full {
+  color: var(--text-color, #e7e9ea);
+}
+
+.preserve-whitespace {
+  white-space: pre-wrap;
+}
+
+.rtl-text.joke-content-full {
+  line-height: 1.8 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.ltr-text.joke-content-full {
   text-align: left !important;
   direction: ltr !important;
 }
@@ -874,7 +929,7 @@ onMounted(() => {
   transition: gap 0.3s ease;
 }
 
-.related-joke-card:hover .read-more {
+.related-joke-card-full:hover .read-more {
   gap: 0.625rem;
 }
 
@@ -882,7 +937,7 @@ onMounted(() => {
   transition: transform 0.3s ease;
 }
 
-.related-joke-card:hover .read-more i {
+.related-joke-card-full:hover .read-more i {
   transform: translateX(3px);
 }
 
@@ -905,12 +960,7 @@ onMounted(() => {
   margin-bottom: 1.5rem;
 }
 
-/* View All Section */
-.view-all-section {
-  text-align: center;
-  margin-top: 2.5rem;
-}
-
+/* View All Button */
 .btn-view-all {
   display: inline-flex;
   align-items: center;
@@ -924,6 +974,8 @@ onMounted(() => {
   font-weight: 600;
   font-size: 1.0625rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  justify-content: center;
 }
 
 .btn-view-all:hover {
@@ -1127,6 +1179,18 @@ onMounted(() => {
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
+@media (max-width: 991px) {
+  .section-header-sidebar {
+    position: relative;
+    top: 0;
+    margin-bottom: 2rem;
+  }
+  
+  .related-jokes-grid-fullcontent {
+    gap: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .joke-view-modern {
     padding: 1.5rem 0 3rem;
@@ -1143,13 +1207,10 @@ onMounted(() => {
 
   .section-title {
     font-size: 1.75rem;
-    flex-direction: column;
-    gap: 0.5rem;
   }
 
-  .related-jokes-grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+  .related-joke-card-full {
+    padding: 1.5rem;
   }
 
   .cta-section-modern {
@@ -1188,8 +1249,8 @@ onMounted(() => {
     font-size: 1rem;
   }
 
-  .related-joke-card {
-    padding: 1.5rem;
+  .related-joke-card-full {
+    padding: 1.25rem;
   }
 
   .cta-icon {

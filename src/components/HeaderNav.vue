@@ -24,7 +24,7 @@
 
         <!-- Actions Section -->
         <div class="navbar-actions">
-          <!-- Language Selector with Bootstrap Dropdown -->
+          <!-- Language Selector with RADIO BUTTONS (Single Selection) -->
           <div class="dropdown language-dropdown">
             <button 
               class="btn-language dropdown-toggle" 
@@ -35,22 +35,23 @@
             >
               <i class="bi bi-translate"></i>
               <span class="language-text">{{ languageButtonText }}</span>
-              <span class="badge-count">{{ selectedLanguages.length }}</span>
             </button>
             
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-              <li class="dropdown-header">Select Languages</li>
+              <li class="dropdown-header">Select Language</li>
               
               <li v-for="lang in availableLanguages" :key="lang.code">
-                <label class="dropdown-item checkbox-item">
+                <label class="dropdown-item radio-item">
                   <input 
-                    type="checkbox" 
+                    type="radio" 
                     :id="`lang-${lang.code}`"
+                    :value="lang.code"
                     :checked="isLanguageSelected(lang.code)"
-                    @change="toggleLanguage(lang.code)"
-                    class="checkbox-input"
+                    @change="selectLanguage(lang.code)"
+                    name="language-selector"
+                    class="radio-input"
                   />
-                  <span class="checkbox-label">
+                  <span class="radio-label">
                     <span class="lang-name">{{ lang.name }}</span>
                   </span>
                   <i v-if="isLanguageSelected(lang.code)" class="bi bi-check-circle-fill check-icon"></i>
@@ -61,7 +62,7 @@
               
               <li class="dropdown-footer">
                 <small class="text-muted">
-                  <strong>Selected:</strong> {{ selectedLanguagesText }}
+                  <strong>Current:</strong> {{ selectedLanguageName }}
                 </small>
               </li>
             </ul>
@@ -118,31 +119,31 @@ const availableLanguages = [
   { code: 'ar', name: 'العربية' }
 ];
 
-// Computed
-const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
+// Computed - SINGLE LANGUAGE SELECTION
+const selectedLanguage = computed(() => {
+  const languages = store.getters['preferences/selectedLanguages'];
+  // Return first language from array (or 'en' as fallback)
+  return languages && languages.length > 0 ? languages[0] : 'en';
+});
 
 const languageButtonText = computed(() => {
-  const langs = selectedLanguages.value;
-  if (langs.length === 4) return 'All';
-  if (langs.length === 1) {
-    const names = { en: 'EN', fr: 'FR', es : 'ES', ar: 'AR' };
-    return names[langs[0]] || 'Lang';
-  }
-  return langs.map(l => l.toUpperCase()).join(', ');
+  const names = { en: 'EN', fr: 'FR', es: 'ES', ar: 'AR' };
+  return names[selectedLanguage.value] || 'Lang';
 });
 
-const selectedLanguagesText = computed(() => {
-  const names = { en: 'English', fr: 'Français',es: 'Español' , ar: 'العربية' };
-  return selectedLanguages.value.map(l => names[l]).join(', ');
+const selectedLanguageName = computed(() => {
+  const lang = availableLanguages.find(l => l.code === selectedLanguage.value);
+  return lang ? lang.name : 'English';
 });
 
-// Methods
+// Methods - RADIO BUTTON BEHAVIOR (Single Selection)
 const isLanguageSelected = (lang) => {
-  return store.getters['preferences/isLanguageSelected'](lang);
+  return selectedLanguage.value === lang;
 };
 
-const toggleLanguage = (lang) => {
-  store.dispatch('preferences/toggleLanguage', lang);
+const selectLanguage = (lang) => {
+  // Set languages array with single selected language
+  store.dispatch('preferences/setLanguages', [lang]);
 };
 
 const toggleMobileMenu = () => {
@@ -334,7 +335,7 @@ onUnmounted(() => {
 }
 
 /* ============================================
-   LANGUAGE DROPDOWN
+   LANGUAGE DROPDOWN - RADIO BUTTON STYLE
    ============================================ */
 .language-dropdown {
   position: relative;
@@ -386,20 +387,6 @@ onUnmounted(() => {
   .language-text {
     display: inline;
   }
-}
-
-.badge-count {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 0.375rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  border-radius: 10px;
 }
 
 .dropdown-menu {
@@ -460,41 +447,62 @@ onUnmounted(() => {
   background: rgba(102, 126, 234, 0.12);
 }
 
-.checkbox-item {
+/* RADIO BUTTON STYLING */
+.radio-item {
   padding: 0.75rem;
 }
 
-.checkbox-input {
+.radio-input {
   width: 18px;
   height: 18px;
   margin: 0;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 50%;
   border: 2px solid #dee2e6;
   cursor: pointer;
   transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
 }
 
-.checkbox-input:checked {
+.radio-input::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s ease;
+}
+
+.radio-input:checked {
   background-color: #667eea;
   border-color: #667eea;
 }
 
-.checkbox-input:hover {
+.radio-input:checked::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.radio-input:hover {
   border-color: #667eea;
 }
 
-.dark-mode .checkbox-input {
+.dark-mode .radio-input {
   background-color: #495057;
   border-color: #6c757d;
 }
 
-.dark-mode .checkbox-input:checked {
+.dark-mode .radio-input:checked {
   background-color: #667eea;
   border-color: #667eea;
 }
 
-.checkbox-label {
+.radio-label {
   display: flex;
   align-items: center;
   flex: 1;
@@ -654,18 +662,6 @@ onUnmounted(() => {
     min-width: 280px;
     max-width: calc(100vw - 2rem);
   }
-  
-  /* Alternative: If you want it centered */
-  /* .dropdown-menu {
-    position: fixed !important;
-    top: 70px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
-    min-width: calc(100vw - 2rem);
-    max-width: calc(100vw - 2rem);
-  } */
 }
 
 @media (max-width: 576px) {
@@ -680,12 +676,6 @@ onUnmounted(() => {
 
   .btn-language i {
     font-size: 1rem;
-  }
-
-  .badge-count {
-    min-width: 18px;
-    height: 18px;
-    font-size: 0.625rem;
   }
 
   /* Ensure dropdown doesn't overflow on small screens */
@@ -720,13 +710,6 @@ onUnmounted(() => {
 
   .btn-language i {
     font-size: 0.95rem;
-  }
-
-  .badge-count {
-    min-width: 16px;
-    height: 16px;
-    font-size: 0.5625rem;
-    padding: 0 0.25rem;
   }
 }
 
