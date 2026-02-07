@@ -271,8 +271,8 @@
 
   onMounted(async () => {
     updateSEO({
-      title: 'Jokes Feed - Humoraq',
-      description: 'Browse the latest and most popular jokes from the Humoraq community.'
+      title: 'Funny Jokes Feed, Best Short & Viral Jokes Updated Daily',
+      description: 'Scroll through the funniest jokes online. Short jokes, viral humor, dark comedy, couple jokes, and daily funny content curated by the Humor community.'
     });
 
     await loadInitialJokes();

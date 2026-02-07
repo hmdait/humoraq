@@ -248,7 +248,7 @@ onMounted(() => {
   
   // Initial SEO update
   updateSEO({
-    title: `${categoryName.value || 'Category'} Jokes - Humoraq | Best Jokes 2026`,
+    title: `${categoryName.value || 'Category'} Jokes - Humor | Best Jokes 2026`,
     description: `Browse all ${(categoryName.value || props.slug || 'category').toLowerCase()} jokes. Funny and entertaining content in multiple languages.`,
     keywords: `${(categoryName.value || props.slug).toLowerCase()} jokes, funny jokes, humor`
   });

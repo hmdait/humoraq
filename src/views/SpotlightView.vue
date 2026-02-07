@@ -5,7 +5,7 @@
         <div class="col-lg-8">
           <!-- Page Header -->
           <div class="text-center mb-4">
-            <h1 class="display-5 mb-2">Joke of the Day</h1>
+            <h1 class="display-5 mb-2">Jokes of the Day – Today’s Funniest Jokes</h1>
           </div>
 
           <!-- NO CATEGORY FILTER - removed completely -->
@@ -64,7 +64,7 @@
   // FIXED: Use LOCAL state for Spotlight instead of shared Vuex store
   const spotlightJoke = ref(null);
   const loading = ref(false);
-  
+
   // Local state (NO category filter)
   const isAutoRotationActive = ref(true);
   const isPaused = ref(false);
@@ -111,23 +111,23 @@
           language: language,
           category: undefined // No category filter in Spotlight
         };
-        
+
         console.log('Spotlight: Fetching with filters:', filters);
-        
+
         const joke = await getRandomJoke(filters);
         if (joke) {
           allJokes.push(joke);
         }
       }
-      
+
       console.log('Spotlight: Total jokes fetched:', allJokes.length);
-      
+
       // Pick a random joke from all fetched jokes
       if (allJokes.length > 0) {
         const randomJoke = allJokes[Math.floor(Math.random() * allJokes.length)];
         // FIXED: Update LOCAL state only - doesn't affect JokeView!
         spotlightJoke.value = randomJoke;
-        
+
         if (randomJoke) {
           trackSpotlightAction('next', randomJoke.id);
         }
@@ -225,11 +225,9 @@
   });
 
   onMounted(() => {
-    console.log('=== Spotlight: Component mounted ===');
-
     updateSEO({
-      title: 'Spotlight - Humoraq',
-      description: 'Watch jokes rotate automatically with our spotlight feature!'
+      title: 'Jokes of the Day: Today’s Funniest Jokes',
+      description: 'Discover today’s funniest jokes, trending humor, and laugh-out-loud one-liners. Updated daily with fresh jokes to brighten your day.'
     });
 
     document.addEventListener('visibilitychange', handleVisibilityChange);

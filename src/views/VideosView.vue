@@ -6,10 +6,10 @@
         <div class="page-header text-center mb-4">
           <h1 class="page-title">
             <i class="bi bi-play-circle me-2"></i>
-            Funny Videos
+            Funny Videos – Watch Today’s Funniest Clips
           </h1>
           <p class="page-subtitle text-muted">
-            Watch hilarious video content
+            Discover the funniest videos, viral comedy clips, and short funny moments. Humoraq updates this page regularly with trending videos to make you laugh.
           </p>
         </div>
 
@@ -90,169 +90,169 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import VideoGrid from '@/components/VideoGrid.vue';
-import VideoCategoryFilter from '@/components/VideoCategoryFilter.vue';
-import { getCategoryLabel } from '@/config/categories'; // UPDATED: Use unified config
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import { updateSEO } from '@/utils/seo';
+  import { computed, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import VideoGrid from '@/components/VideoGrid.vue';
+  import VideoCategoryFilter from '@/components/VideoCategoryFilter.vue';
+  import { getCategoryLabel } from '@/config/categories'; // UPDATED: Use unified config
+  import DefaultLayout from '@/layouts/DefaultLayout.vue';
+  import { updateSEO } from '@/utils/seo';
 
-const store = useStore();
+  const store = useStore();
 
-// Vuex state
-const videos = computed(() => store.getters['videos/filteredVideos']);
-const loading = computed(() => store.getters['videos/isLoading']);
-const hasError = computed(() => store.getters['videos/hasError']);
-const errorMessage = computed(() => store.getters['videos/errorMessage']);
-const selectedCategories = computed(() => store.getters['videos/selectedCategories']);
-const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
+  // Vuex state
+  const videos = computed(() => store.getters['videos/filteredVideos']);
+  const loading = computed(() => store.getters['videos/isLoading']);
+  const hasError = computed(() => store.getters['videos/hasError']);
+  const errorMessage = computed(() => store.getters['videos/errorMessage']);
+  const selectedCategories = computed(() => store.getters['videos/selectedCategories']);
+  const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-// Display helpers
-const hasActiveFilters = computed(() => 
-  selectedLanguages.value.length > 0 || selectedCategories.value.length > 0
-);
+  // Display helpers
+  const hasActiveFilters = computed(() =>
+    selectedLanguages.value.length > 0 || selectedCategories.value.length > 0
+  );
 
-const languageNames = computed(() => {
-  const names = { en: 'English', fr: 'Français', ar: 'العربية' };
-  return selectedLanguages.value.map(l => names[l] || l).join(', ');
-});
-
-// UPDATED: Use unified category config
-const categoryNames = computed(() => {
-  return selectedCategories.value
-    .map(slug => getCategoryLabel(slug))
-    .join(', ');
-});
-
-// Fetch videos on mount
-onMounted(async () => {
-  updateSEO({
-    title: 'Funny Videos | Humoraq',
-    description: 'Watch hilarious videos filtered by language and category.'
+  const languageNames = computed(() => {
+    const names = { en: 'English', fr: 'Français',es: 'Espagneol' , ar: 'العربية' };
+    return selectedLanguages.value.map(l => names[l] || l).join(', ');
   });
 
-  await store.dispatch('videos/fetchVideos');
-});
+  // UPDATED: Use unified category config
+  const categoryNames = computed(() => {
+    return selectedCategories.value
+      .map(slug => getCategoryLabel(slug))
+      .join(', ');
+  });
 
-// Watch for language changes (refetch)
-watch(selectedLanguages, async (newLanguages, oldLanguages) => {
-  if (JSON.stringify(newLanguages) !== JSON.stringify(oldLanguages)) {
-    console.log('Languages changed, refetching videos:', newLanguages);
+  // Fetch videos on mount
+  onMounted(async () => {
+    updateSEO({
+      title: 'These Funny Videos Will Make You Laugh 😂',
+      description: 'Looking for a good laugh? Watch viral funny videos, short comedy clips, and hilarious moments people can’t stop sharing.'
+    });
+
     await store.dispatch('videos/fetchVideos');
-  }
-}, { deep: true });
+  });
+
+  // Watch for language changes (refetch)
+  watch(selectedLanguages, async (newLanguages, oldLanguages) => {
+    if (JSON.stringify(newLanguages) !== JSON.stringify(oldLanguages)) {
+      console.log('Languages changed, refetching videos:', newLanguages);
+      await store.dispatch('videos/fetchVideos');
+    }
+  }, { deep: true });
 </script>
 
 <style scoped>
-.videos-view {
-  min-height: calc(100vh - 200px);
-}
+  .videos-view {
+    min-height: calc(100vh - 200px);
+  }
 
-.page-header {
-  margin-bottom: 2rem;
-}
+  .page-header {
+    margin-bottom: 2rem;
+  }
 
-.page-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--text-color, #333);
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.page-title i {
-  color: var(--primary-color, #0d6efd);
-}
-
-.page-subtitle {
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.alert-info {
-  border-radius: 8px;
-  border-left: 4px solid #0d6efd;
-}
-
-.filter-summary {
-  line-height: 1.6;
-}
-
-.filter-summary div {
-  margin-bottom: 0.25rem;
-}
-
-.filter-summary div:last-child {
-  margin-bottom: 0;
-}
-
-.results-count {
-  text-align: center;
-}
-
-.loading-container {
-  padding: 3rem 0;
-}
-
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
-
-.empty-state {
-  padding: 4rem 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.empty-state i {
-  font-size: 5rem;
-  opacity: 0.3;
-}
-
-.empty-state h4 {
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.empty-state ul {
-  text-align: left;
-  display: inline-block;
-  margin-top: 1rem;
-}
-
-/* Dark mode */
-.dark-mode .page-title {
-  color: var(--text-color);
-}
-
-.dark-mode .alert-danger {
-  background-color: rgba(220, 53, 69, 0.1);
-  border-color: rgba(220, 53, 69, 0.3);
-  color: #ff6b6b;
-}
-
-.dark-mode .alert-info {
-  background-color: rgba(13, 110, 253, 0.1);
-  border-color: rgba(13, 110, 253, 0.3);
-  color: #6ea8fe;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
   .page-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text-color, #333);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-title i {
+    color: var(--primary-color, #0d6efd);
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .alert-info {
+    border-radius: 8px;
+    border-left: 4px solid #0d6efd;
+  }
+
+  .filter-summary {
+    line-height: 1.6;
+  }
+
+  .filter-summary div {
+    margin-bottom: 0.25rem;
+  }
+
+  .filter-summary div:last-child {
+    margin-bottom: 0;
+  }
+
+  .results-count {
+    text-align: center;
+  }
+
+  .loading-container {
+    padding: 3rem 0;
+  }
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
   }
 
   .empty-state {
-    padding: 3rem 1rem;
+    padding: 4rem 2rem;
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .empty-state i {
-    font-size: 4rem;
+    font-size: 5rem;
+    opacity: 0.3;
   }
-}
+
+  .empty-state h4 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state ul {
+    text-align: left;
+    display: inline-block;
+    margin-top: 1rem;
+  }
+
+  /* Dark mode */
+  .dark-mode .page-title {
+    color: var(--text-color);
+  }
+
+  .dark-mode .alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #ff6b6b;
+  }
+
+  .dark-mode .alert-info {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+    color: #6ea8fe;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .empty-state {
+      padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+    }
+  }
 </style>
