@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-12">
           <router-link to="/categories" class="btn btn-outline-secondary mb-4">
-            ← Back to Categories
+            {{ t('category.backButton') }}
           </router-link>
 
           <!-- Enhanced Header with SEO-optimized content -->
@@ -18,13 +18,13 @@
             <div class="category-meta text-muted">
               <small>
                 <i class="bi bi-collection me-1"></i>
-                {{ jokes.length }} {{ jokes.length === 1 ? 'joke' : 'jokes' }} available
+                {{ jokes.length }} {{ jokes.length === 1 ? t('category.jokeCount.singular') : t('category.jokeCount.plural') }}
                 <span class="mx-2">•</span>
                 <i class="bi bi-translate me-1"></i>
-                Multiple languages
+                {{ t('category.meta.multipleLanguages') }}
                 <span class="mx-2">•</span>
                 <i class="bi bi-clock-history me-1"></i>
-                Updated regularly
+                {{ t('category.meta.updatedRegularly') }}
               </small>
             </div>
           </div>
@@ -32,7 +32,7 @@
           <!-- Loading State -->
           <div v-if="loading" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
+              <span class="visually-hidden">{{ t('category.loading') }}</span>
             </div>
           </div>
 
@@ -41,11 +41,11 @@
 
           <!-- Empty State -->
           <div v-else class="alert alert-info">
-            <h5 class="alert-heading">No {{ categoryName.toLowerCase() }} jokes found</h5>
-            <p class="mb-0">Try selecting more languages from the header or be the first to submit a {{ categoryName.toLowerCase() }} joke!</p>
+            <h5 class="alert-heading">{{ t('category.empty.title', { category: categoryName.toLowerCase() }) }}</h5>
+            <p class="mb-0">{{ t('category.empty.description', { category: categoryName.toLowerCase() }) }}</p>
             <hr>
             <router-link to="/submit" class="btn btn-primary btn-sm mt-2">
-              Submit a {{ categoryName }} Joke
+              {{ t('category.empty.submitButton', { category: categoryName }) }}
             </router-link>
           </div>
         </div>
@@ -61,6 +61,7 @@ import { getCategoryBySlug, slugToValue } from '@/config/categories';
 import JokeGrid from '../components/JokeGrid.vue';
 import { updateSEO } from '../utils/seo';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import { t, currentLanguage } from '@/i18n';
 
 const props = defineProps({
   slug: {
@@ -76,51 +77,34 @@ const loading = computed(() => store.getters['jokes/loading']);
 const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
 const category = computed(() => getCategoryBySlug(props.slug));
-const categoryName = computed(() => category.value ? category.value.label : props.slug);
-const categoryTitle = computed(() => category.value ? category.value.title : props.slug);
+const categoryName = computed(() => category.value ? t(`categoryNames.${category.value.value}`) : props.slug);
+const categoryTitle = computed(() => category.value ? t(`categories.titles.${category.value.value}`) : props.slug);
 const categoryValue = computed(() => slugToValue(props.slug));
 
-// Enhanced category descriptions for SEO
+// Get category description (translated)
 const getCategoryDescription = () => {
   if (!category.value) return '';
   
-  // If category already has description, use it
-  if (category.value.description) {
-    return category.value.description;
-  }
-  
-  // Otherwise provide SEO-friendly descriptions
-  const descriptions = {
-    'General': '⭐⭐⭐⭐⭐ 5/5 knock knock jokes: Explore our collection of general humor for everyone. From everyday situations to universal experiences that make us laugh.',
-    'Tech': '⭐⭐⭐⭐⭐ 5/5: Hilarious jokes about technology, programming, coding, and the digital world. Perfect for developers, engineers, and tech enthusiasts!',
-    'Work': '⭐⭐⭐⭐⭐ 5/5: Office humor and workplace jokes that every professional can relate to. Lighten up your work day with these funny work stories!',
-    'Animals': '⭐⭐⭐⭐⭐ 5/5: Funny jokes about our furry, feathered, and finned friends. Perfect for pet lovers and animal enthusiasts!',
-    'Food': '⭐⭐⭐⭐⭐ 5/5: Delicious humor about cooking, eating, restaurants, and all things culinary. Food jokes that will make you hungry for more laughs!',
-    'Relationships': '⭐⭐⭐⭐⭐ 5/5: Humorous takes on dating, love, marriage, and relationships. Laugh about the ups and downs of romance!',
-    'Family': '⭐⭐⭐⭐⭐ 5/5: Family-friendly, dad jokes 2026, jokes about parents, kids, siblings, and family life. Humor the whole family can enjoy together!',
-    'School': '⭐⭐⭐⭐⭐ 5/5: Student life, teachers, homework, and educational humor. Perfect for anyone who\'s been through the school experience!',
-    'Friends': '⭐⭐⭐⭐⭐ 5/5: Jokes about friendship, social situations, and hanging out with buddies. Share these with your best friends!',
-    'Adult': '⭐⭐⭐⭐⭐ 5/5: Mature humor for adult audiences. Sophisticated jokes and witty humor for grown-ups.',
-    'Sports': '⭐⭐⭐⭐⭐ 5/5: unny jokes about sports, athletes, games, and competition. Score big laughs with these sporting jokes!',
-    'Old People': '⭐⭐⭐⭐⭐ 5/5: Lighthearted humor about aging, retirement, and senior life. Age is just a number, but these jokes are timeless!',
-    'Women': '⭐⭐⭐⭐⭐ 5/5: Jokes celebrating women and female perspectives. Humor from a woman\'s point of view!',
-    'Men': '⭐⭐⭐⭐⭐ 5/5: Jokes about guys and male perspectives. Laugh at the funny side of being a man!',
-    'Kids': '⭐⭐⭐⭐⭐ 5/5: Fun, clean, and family-friendly kids jokes perfect for children, parents, and all ages.'
-  };
-  
-  return descriptions[category.value.label] || 'Browse our collection of funny jokes in this category.';
+  return t(`categories.descriptions.${category.value.value}`);
 };
 
-// SEO optimization helpers
+// SEO optimization helpers (using seo.js translations)
 const generateCategorySEOTitle = () => {
-  const name = categoryTitle.value;
-  return `${name}`;
+  if (!category.value) return 'Category Jokes';
+  
+  const lang = currentLanguage.value;
+  const categoryKey = category.value.value.replace(/\s+/g, ''); // Remove spaces: "Old People" -> "OldPeople"
+  
+  return t(`seo.categories.title.${categoryKey}`, lang);
 };
 
 const generateCategorySEODescription = () => {
-  const name = categoryName.value.toLowerCase();
-  const count = jokes.value.length;
-  return `Discover ${count > 0 ? count + '+' : ''} funny ${name} jokes! Read the best ${name} humor in English, French, spanish and Arabic. Short ${name} jokes, one-liners, and hilarious ${name} stories. Updated daily!`;
+  if (!category.value) return '';
+  
+  const lang = currentLanguage.value;
+  const categoryKey = category.value.value.replace(/\s+/g, ''); // Remove spaces
+  
+  return t(`seo.categories.description.${categoryKey}`, lang);
 };
 
 const generateCategorySEOKeywords = () => {
@@ -178,7 +162,7 @@ const addCategoryStructuredData = () => {
         'name': `${categoryName.value} Jokes Collection`,
         'description': getCategoryDescription(),
         'url': `https://humoraq.com/category/${props.slug}`,
-        'inLanguage': ['en', 'fr', 'ar'],
+        'inLanguage': ['en', 'fr', 'es', 'ar'],
         'isPartOf': {
           '@type': 'WebSite',
           'name': 'Humoraq',
@@ -232,6 +216,12 @@ watch(selectedLanguages, () => {
   loadJokes();
 }, { deep: true });
 
+// Watch for language UI changes
+watch(currentLanguage, () => {
+  console.log('=== UI Language changed, updating SEO ===');
+  updateCategorySEO();
+});
+
 // Watch for route changes
 watch(() => props.slug, () => {
   loadJokes();
@@ -245,13 +235,7 @@ watch(jokes, () => {
 
 onMounted(() => {
   loadJokes();
-  
-  // Initial SEO update
-  updateSEO({
-    title: `${categoryName.value || 'Category'} Jokes - Humor | Best Jokes 2026`,
-    description: `Browse all ${(categoryName.value || props.slug || 'category').toLowerCase()} jokes. Funny and entertaining content in multiple languages.`,
-    keywords: `${(categoryName.value || props.slug).toLowerCase()} jokes, funny jokes, humor`
-  });
+  updateCategorySEO();
 });
 </script>
 

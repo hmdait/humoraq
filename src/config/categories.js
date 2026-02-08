@@ -9,7 +9,7 @@ export const CATEGORIES = [
   {
     value: 'General',
     label: 'General',
-    slug: 'general-jokes',
+    slug: 'general',  
     icon: 'bi-chat-square-text',
     color: 'info',
     title: '100+ General Jokes to Make Anyone Laugh Out Loud',    
@@ -18,7 +18,7 @@ export const CATEGORIES = [
   {
     value: 'Relationships',
     label: 'Relationships',
-    slug: 'relationship-jokes',
+    slug: 'relationships',  
     icon: 'bi-heart',
     color: 'danger',
     title: 'Top 20 Funny Relationship Jokes That Will Make Your Partner Laugh',
@@ -27,7 +27,7 @@ export const CATEGORIES = [
   {
     value: 'Family',
     label: 'Family',
-    slug: 'family-jokes',
+    slug: 'family',  
     icon: 'bi-people',
     color: 'success',
     title: '100 Family Jokes Everyone Will Relate To',
@@ -36,7 +36,7 @@ export const CATEGORIES = [
   {
     value: 'Work',
     label: 'Work',
-    slug: 'work-jokes',
+    slug: 'work',  
     icon: 'bi-briefcase',
     color: 'primary',
     title: 'Top 20 Office Jokes to Survive Your 9-to-5 with Laughter',
@@ -45,7 +45,7 @@ export const CATEGORIES = [
   {
     value: 'School',
     label: 'School',
-    slug: 'school-jokes',
+    slug: 'school',  
     icon: 'bi-mortarboard',
     color: 'warning',
     title: '100 School Jokes Every Student and Teacher Will Love',
@@ -54,7 +54,7 @@ export const CATEGORIES = [
   {
     value: 'Friends',
     label: 'Friends',
-    slug: 'friend-jokes',
+    slug: 'friends',  
     icon: 'bi-person-hearts',
     color: 'info',
     title: '100 Friend Jokes Perfect for Sharing with Your Squad',
@@ -63,7 +63,7 @@ export const CATEGORIES = [
   {
     value: 'Adult',
     label: 'Adult',
-    slug: 'adult-jokes',
+    slug: 'adult',  
     icon: 'bi-shield-exclamation',
     color: 'dark',
     title: '100+ Adult Jokes for Mature Audiences and Grown-Up Laughs',
@@ -72,7 +72,7 @@ export const CATEGORIES = [
   {
     value: 'Animals',
     label: 'Animals',
-    slug: 'animal-jokes',
+    slug: 'animals',  
     icon: 'bi-bug',
     color: 'warning',
     title: '20+ Hilarious Animal Jokes Every Pet Owner Will Love',
@@ -81,7 +81,7 @@ export const CATEGORIES = [
   {
     value: 'Food',
     label: 'Food',
-    slug: 'food-jokes',
+    slug: 'food',  
     icon: 'bi-cup-hot',
     color: 'danger',
     title: '100 Food Jokes to Spice Up Your Meal Times with Laughter',
@@ -90,7 +90,7 @@ export const CATEGORIES = [
   {
     value: 'Tech',
     label: 'Tech',
-    slug: 'tech-jokes',
+    slug: 'tech',  
     icon: 'bi-code-slash',
     color: 'primary',
     title: '100 Tech Jokes Only Programmers and Geek Fans Will Get',
@@ -99,7 +99,7 @@ export const CATEGORIES = [
   {
     value: 'Sports',
     label: 'Sports',
-    slug: 'sports-jokes',
+    slug: 'sports',  
     icon: 'bi-trophy',
     color: 'success',
     title: '100 Sports Jokes That Score Big with Fans and Athletes',
@@ -108,7 +108,7 @@ export const CATEGORIES = [
   {
     value: 'Old People',
     label: 'Old People',
-    slug: 'senior-jokes',
+    slug: 'senior',  
     icon: 'bi-clock-history',
     color: 'secondary',
     title: '100 Senior Jokes About Aging with Humor and Grace',
@@ -117,7 +117,7 @@ export const CATEGORIES = [
   {
     value: 'Women',
     label: 'Women',
-    slug: 'women-jokes',
+    slug: 'women',  
     icon: 'bi-person-standing-dress',
     color: 'danger',
     title: 'Top 20 Women Jokes About Modern Life and Everyday Situations',
@@ -126,7 +126,7 @@ export const CATEGORIES = [
   {
     value: 'Men',
     label: 'Men',
-    slug: 'men-jokes',
+    slug: 'men', 
     icon: 'bi-person-standing',
     color: 'primary',
     title: '100+ Men Jokes About Guy Stuff and Everyday Life',
@@ -135,7 +135,7 @@ export const CATEGORIES = [
   {
     value: 'Kids',
     label: 'Kids',
-    slug: 'kids-jokes',
+    slug: 'kids', 
     icon: 'bi-emoji-smile',
     color: 'success',
     title: '20+ Clean Kids Jokes Perfect for Children and Parents',

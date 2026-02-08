@@ -18,13 +18,13 @@
             @click="closeMobileMenu"
           >
             <i :class="link.icon"></i>
-            <span>{{ link.label }}</span>
+            <span>{{ t(`nav.${link.key}`) }}</span>
           </router-link>
         </div>
 
         <!-- Actions Section -->
         <div class="navbar-actions">
-          <!-- Language Selector with RADIO BUTTONS (Single Selection) -->
+          <!-- Language Selector (Controls BOTH UI and Content Language) -->
           <div class="dropdown language-dropdown">
             <button 
               class="btn-language dropdown-toggle" 
@@ -38,7 +38,7 @@
             </button>
             
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-              <li class="dropdown-header">Select Language</li>
+              <li class="dropdown-header">Language / Langue / Idioma</li>
               
               <li v-for="lang in availableLanguages" :key="lang.code">
                 <label class="dropdown-item radio-item">
@@ -47,12 +47,12 @@
                     :id="`lang-${lang.code}`"
                     :value="lang.code"
                     :checked="isLanguageSelected(lang.code)"
-                    @change="selectLanguage(lang.code)"
+                    @change="changeLanguage(lang.code)"
                     name="language-selector"
                     class="radio-input"
                   />
                   <span class="radio-label">
-                    <span class="lang-name">{{ lang.name }}</span>
+                    <span class="lang-name">{{ lang.nativeName }}</span>
                   </span>
                   <i v-if="isLanguageSelected(lang.code)" class="bi bi-check-circle-fill check-icon"></i>
                 </label>
@@ -62,7 +62,8 @@
               
               <li class="dropdown-footer">
                 <small class="text-muted">
-                  <strong>Current:</strong> {{ selectedLanguageName }}
+                  <i class="bi bi-info-circle me-1"></i>
+                  Changes UI and joke content language
                 </small>
               </li>
             </ul>
@@ -93,6 +94,7 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import ThemeToggle from './ThemeToggle.vue';
+import { AVAILABLE_LANGUAGES, currentLanguage, t } from '@/i18n';
 
 const store = useStore();
 
@@ -100,29 +102,23 @@ const store = useStore();
 const isScrolled = ref(false);
 const showMobileMenu = ref(false);
 
-// Navigation links
+// Navigation links (with translation keys)
 const navLinks = [
-  { to: '/', label: 'Feed', icon: 'bi bi-grid' },
-  { to: '/spotlight', label: 'Spotlight', icon: 'bi bi-star' },
-  { to: '/videos', label: 'Videos', icon: 'bi bi-play-circle' },
-  { to: '/blogs', label: 'Blog', icon: 'bi bi-journal-text' },
-  { to: '/categories', label: 'Categories', icon: 'bi bi-folder' },
-  { to: '/submit', label: 'Submit', icon: 'bi bi-plus-circle' },
-  { to: '/about', label: 'About', icon: 'bi bi-info-circle' }
+  { to: '/', key: 'feed', icon: 'bi bi-grid' },
+  { to: '/spotlight', key: 'spotlight', icon: 'bi bi-star' },
+  { to: '/videos', key: 'videos', icon: 'bi bi-play-circle' },
+  { to: '/blogs', key: 'blog', icon: 'bi bi-journal-text' },
+  { to: '/categories', key: 'categories', icon: 'bi bi-folder' },
+  { to: '/submit', key: 'submit', icon: 'bi bi-plus-circle' },
+  { to: '/about', key: 'about', icon: 'bi bi-info-circle' }
 ];
 
-// Available languages
-const availableLanguages = [
-  { code: 'en', name: 'English' },
-  { code: 'fr', name: 'Français' },
-  { code: 'es', name: 'Español' },
-  { code: 'ar', name: 'العربية' }
-];
+// Language Management (Single dropdown controls both UI and content)
+const availableLanguages = AVAILABLE_LANGUAGES;
 
-// Computed - SINGLE LANGUAGE SELECTION
+// Get selected language from Vuex store
 const selectedLanguage = computed(() => {
   const languages = store.getters['preferences/selectedLanguages'];
-  // Return first language from array (or 'en' as fallback)
   return languages && languages.length > 0 ? languages[0] : 'en';
 });
 
@@ -131,19 +127,20 @@ const languageButtonText = computed(() => {
   return names[selectedLanguage.value] || 'Lang';
 });
 
-const selectedLanguageName = computed(() => {
-  const lang = availableLanguages.find(l => l.code === selectedLanguage.value);
-  return lang ? lang.name : 'English';
-});
-
-// Methods - RADIO BUTTON BEHAVIOR (Single Selection)
+// Methods
 const isLanguageSelected = (lang) => {
   return selectedLanguage.value === lang;
 };
 
-const selectLanguage = (lang) => {
-  // Set languages array with single selected language
-  store.dispatch('preferences/setLanguages', [lang]);
+/**
+ * Change language - updates BOTH UI translations AND joke content
+ */
+const changeLanguage = (langCode) => {
+  // Update Vuex store (for joke content language)
+  store.dispatch('preferences/setLanguages', [langCode]);
+  
+  // The i18n system will automatically sync currentLanguage via store.watch
+  // This ensures UI translations update automatically
 };
 
 const toggleMobileMenu = () => {
@@ -160,12 +157,10 @@ const closeMobileMenu = () => {
   document.body.style.overflow = '';
 };
 
-// Scroll handler
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20;
 };
 
-// Lifecycle
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
 });

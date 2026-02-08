@@ -1,3 +1,6 @@
+// generateSitemap.js
+// Enhanced sitemap generator with multilingual hreflang support
+
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
@@ -13,25 +16,24 @@ const OUTPUT_PATH = path.join(__dirname, 'public', 'sitemap.xml');
 
 // Categories configuration (matching src/config/categories.js)
 const CATEGORIES = [
-  { slug: 'general', value: 'General' },
-  { slug: 'relationships', value: 'Relationships' },
-  { slug: 'family', value: 'Family' },
-  { slug: 'work', value: 'Work' },
-  { slug: 'school', value: 'School' },
-  { slug: 'friends', value: 'Friends' },
-  { slug: 'adult', value: 'Adult' },
-  { slug: 'animals', value: 'Animals' },
-  { slug: 'food', value: 'Food' },
-  { slug: 'tech', value: 'Tech' },
-  { slug: 'sports', value: 'Sports' },
-  { slug: 'old-people', value: 'Old People' },
-  { slug: 'women', value: 'Women' },
-  { slug: 'men', value: 'Men' },
-  { slug: 'kids', value: 'Kids' },
+  { slug: 'general-jokes', value: 'General' },
+  { slug: 'relationships-jokes', value: 'Relationships' },
+  { slug: 'family-jokes', value: 'Family' },
+  { slug: 'work-jokes', value: 'Work' },
+  { slug: 'school-jokes', value: 'School' },
+  { slug: 'friends-jokes', value: 'Friends' },
+  { slug: 'adult-jokes', value: 'Adult' },
+  { slug: 'animals-jokes', value: 'Animals' },
+  { slug: 'food-jokes', value: 'Food' },
+  { slug: 'tech-jokes', value: 'Tech' },
+  { slug: 'sports-jokes', value: 'Sports' },
+  { slug: 'senior-jokes', value: 'Old People' },
+  { slug: 'women-jokes', value: 'Women' },
+  { slug: 'men-jokes', value: 'Men' },
+  { slug: 'kids-jokes', value: 'Kids' }
 ];
 
 // Comedians configuration (matching src/data/comedians.js)
-// UPDATED: Complete list including classic, modern, and international comedians
 const COMEDIANS = [
   // Classic Comedians
   { slug: 'eddie-murphy', name: 'Eddie Murphy' },
@@ -45,7 +47,7 @@ const COMEDIANS = [
   { slug: 'steve-martin', name: 'Steve Martin' },
   { slug: 'chris-rock', name: 'Chris Rock' },
   
-  // Modern Comedians (2000s-present)
+  // Modern Comedians
   { slug: 'dave-chappelle', name: 'Dave Chappelle' },
   { slug: 'kevin-hart', name: 'Kevin Hart' },
   { slug: 'ricky-gervais', name: 'Ricky Gervais' },
@@ -57,14 +59,12 @@ const COMEDIANS = [
   { slug: 'john-mulaney', name: 'John Mulaney' },
   { slug: 'bo-burnham', name: 'Bo Burnham' },
   
-  // International Comedian
+  // International Comedians
   { slug: 'adel-imam', name: 'Adel Imam' },
   { slug: 'gad-elmaleh', name: 'Gad Elmaleh' },
   { slug: 'jamel-debbouze', name: 'Jamel Debbouze' },
   { slug: 'paul-mirabel', name: 'Paul Mirabel' },
   { slug: 'florence-foresti', name: 'Florence Foresti' }
-  
-
 ];
 
 // Static routes configuration
@@ -80,6 +80,9 @@ const staticRoutes = [
   { path: '/legal', changefreq: 'monthly', priority: '0.3' }
 ];
 
+// Supported languages for hreflang
+const LANGUAGES = ['en', 'fr', 'es', 'ar'];
+
 /**
  * Get category slug from category value
  */
@@ -87,7 +90,7 @@ function getCategorySlug(categoryValue) {
   const category = CATEGORIES.find(function(cat) {
     return cat.value === categoryValue;
   });
-  return category ? category.slug : 'general';
+  return category ? category.slug : 'general-jokes';
 }
 
 /**
@@ -102,7 +105,7 @@ function slugify(text, maxLength) {
     .toLowerCase()
     .trim();
 
-  // Replace French accented characters
+  // Replace accented characters
   const replacements = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a',
     'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -133,7 +136,6 @@ function slugify(text, maxLength) {
   }
 
   slug = slug.replace(/-+$/g, '');
-
   return slug || 'untitled';
 }
 
@@ -168,15 +170,26 @@ function formatDate(timestamp) {
 }
 
 /**
- * Generate XML for a single URL entry
+ * Generate XML for a single URL entry with hreflang tags
+ * ✅ ENHANCED: Now includes multilingual hreflang annotations
  */
 function generateUrlEntry(loc, lastmod, changefreq, priority) {
-  return `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-  </url>`;
+  let entry = '  <url>\n';
+  entry += `    <loc>${loc}</loc>\n`;
+  entry += `    <lastmod>${lastmod}</lastmod>\n`;
+  entry += `    <changefreq>${changefreq}</changefreq>\n`;
+  entry += `    <priority>${priority}</priority>\n`;
+  
+  // ✅ ADD HREFLANG FOR ALL LANGUAGES
+  LANGUAGES.forEach(function(lang) {
+    entry += `    <xhtml:link rel="alternate" hreflang="${lang}" href="${loc}"/>\n`;
+  });
+  
+  // ✅ ADD X-DEFAULT FALLBACK
+  entry += `    <xhtml:link rel="alternate" hreflang="x-default" href="${loc}"/>\n`;
+  
+  entry += '  </url>';
+  return entry;
 }
 
 /**
@@ -231,7 +244,7 @@ async function fetchAllVideos() {
     console.log('✅ Fetched ' + videos.length + ' videos from Firestore');
     return videos;
   } catch (error) {
-    console.error('Warning: Error fetching videos (collection may not exist):', error.message);
+    console.error('⚠️  Warning: Error fetching videos (collection may not exist):', error.message);
     return [];
   }
 }
@@ -255,26 +268,29 @@ async function getCategoryLastmod(categoryValue) {
     
     return formatDate(new Date());
   } catch (error) {
-    console.error('Warning: Error fetching lastmod for category ' + categoryValue + ':', error.message);
+    console.error('⚠️  Warning: Error fetching lastmod for category ' + categoryValue + ':', error.message);
     return formatDate(new Date());
   }
 }
 
 /**
  * Generate sitemap XML content
+ * ✅ ENHANCED: Now includes hreflang annotations for all URLs
  */
 async function generateSitemap() {
-  console.log('🚀 Starting sitemap generation...\n');
+  console.log('🚀 Starting sitemap generation with multilingual support...\n');
+  console.log('🌍 Supported languages: ' + LANGUAGES.join(', '));
   console.log('🎯 SEO-friendly URL formats:');
   console.log('   • Jokes: /{category}-jokes/{title-slug}-{id}');
   console.log('   • Blogs: /blogs/{comedian-slug}\n');
   
-  // Start XML
+  // ✅ START XML WITH XHTML NAMESPACE FOR HREFLANG
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
+  xml += '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
   
   // Add static routes
-  console.log('📄 Adding static routes...');
+  console.log('📄 Adding static routes with hreflang...');
   staticRoutes.forEach(function(route) {
     xml += generateUrlEntry(
       BASE_URL + route.path,
@@ -287,7 +303,7 @@ async function generateSitemap() {
   console.log('   ✓ Added ' + staticRoutes.length + ' static routes\n');
   
   // Add category routes
-  console.log('📚 Adding category routes...');
+  console.log('📚 Adding category routes with hreflang...');
   let categoryCount = 0;
   for (let i = 0; i < CATEGORIES.length; i++) {
     const category = CATEGORIES[i];
@@ -303,8 +319,8 @@ async function generateSitemap() {
   }
   console.log('   ✓ Added ' + categoryCount + ' category routes\n');
   
-  // Add blog routes (ALL COMEDIANS)
-  console.log('📝 Adding blog comedian routes...');
+  // Add blog routes
+  console.log('📝 Adding blog comedian routes with hreflang...');
   let blogCount = 0;
   COMEDIANS.forEach(function(comedian) {
     xml += generateUrlEntry(
@@ -328,8 +344,8 @@ async function generateSitemap() {
   }
   console.log('');
   
-  // Fetch and add dynamic joke routes with TITLE SLUGS
-  console.log('🎭 Adding joke routes with title slugs...');
+  // Fetch and add dynamic joke routes
+  console.log('🎭 Adding joke routes with title slugs and hreflang...');
   const jokes = await fetchAllJokes();
   const categoryStats = {};
   const exampleUrls = [];
@@ -353,7 +369,7 @@ async function generateSitemap() {
     categoryStats[categorySlug]++;
     
     // Generate SEO-friendly URL: /{category}-jokes/{title-slug}-{id}
-    const jokeUrl = BASE_URL + '/' + categorySlug + '-jokes/' + titleSlug + '-' + joke.id;
+    const jokeUrl = BASE_URL + '/' + categorySlug + '/' + titleSlug + '-' + joke.id;
     
     xml += generateUrlEntry(
       jokeUrl,
@@ -393,12 +409,12 @@ async function generateSitemap() {
   sortedCategories.forEach(function(entry) {
     const category = entry[0];
     const count = entry[1];
-    console.log('   • ' + category.padEnd(15) + ': ' + String(count).padStart(4) + ' jokes');
+    console.log('   • ' + category.padEnd(20) + ': ' + String(count).padStart(4) + ' jokes');
   });
   console.log('');
   
   // Fetch and add video routes (if any)
-  console.log('📹 Adding video routes...');
+  console.log('📹 Adding video routes with hreflang...');
   const videos = await fetchAllVideos();
   if (videos.length > 0) {
     videos.forEach(function(video) {
@@ -457,9 +473,18 @@ function validateSitemap(xml) {
   const urlCount = (xml.match(/<url>/g) || []).length;
   const locCount = (xml.match(/<loc>/g) || []).length;
   const lastmodCount = (xml.match(/<lastmod>/g) || []).length;
+  const hreflangCount = (xml.match(/hreflang="/g) || []).length;
   
   if (urlCount !== locCount || urlCount !== lastmodCount) {
     throw new Error('Sitemap structure validation failed: mismatched tags');
+  }
+  
+  // Each URL should have 5 hreflang tags (en, fr, es, ar, x-default)
+  const expectedHreflang = urlCount * 5;
+  if (hreflangCount !== expectedHreflang) {
+    console.warn(`⚠️  Warning: Expected ${expectedHreflang} hreflang tags, found ${hreflangCount}`);
+  } else {
+    console.log(`✅ Hreflang validation: ${hreflangCount} tags found (${urlCount} URLs × 5 languages)`);
   }
   
   if (urlCount > 50000) {
@@ -486,16 +511,15 @@ async function main() {
     console.log('📊 Final Statistics:');
     console.log('   • Static routes:    ' + staticRoutes.length);
     console.log('   • Category routes:  ' + stats.categories);
-    console.log('   • Blog routes:      ' + stats.blogs + ' (Classic + Modern + International)');
+    console.log('   • Blog routes:      ' + stats.blogs);
     console.log('   • Joke routes:      ' + stats.jokes);
     console.log('   • Video routes:     ' + stats.videos);
     console.log('   • Total URLs:       ' + (xml.match(/<url>/g) || []).length);
     console.log('');
-    console.log('👥 Blog Coverage:');
-    console.log('   • Classic Comedians:       10');
-    console.log('   • Modern Comedians:        10');
-    console.log('   • International:           1 (Adel Imam)');
-    console.log('   • Total Biographies:       ' + COMEDIANS.length);
+    console.log('🌍 Multilingual SEO:');
+    console.log('   • Languages:        ' + LANGUAGES.join(', '));
+    console.log('   • Hreflang tags:    ' + (xml.match(/hreflang="/g) || []).length);
+    console.log('   • Per URL:          5 tags (4 languages + x-default)');
     console.log('');
     console.log('💡 SEO-optimized URL formats:');
     console.log('   ✅ Jokes:  https://humoraq.com/{category}-jokes/{title-slug}-{id}');
@@ -504,8 +528,9 @@ async function main() {
     console.log('📝 Next steps:');
     console.log('   1. Deploy the sitemap to production');
     console.log('   2. Submit to Google Search Console: https://search.google.com/search-console');
-    console.log('   3. Verify robots.txt references sitemap: https://humoraq.com/robots.txt');
-    console.log('   4. Monitor indexing progress in Search Console');
+    console.log('   3. Verify robots.txt references sitemap');
+    console.log('   4. Monitor indexing progress and hreflang validation');
+    console.log('   5. Check for hreflang errors in Search Console (2-4 weeks)');
     console.log('');
     
     process.exit(0);

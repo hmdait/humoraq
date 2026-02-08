@@ -1,0 +1,7 @@
+// src/i18n/locales/common.js
+export default {
+  en: { loading: 'Loading...', error: 'Error', retry: 'Try Again', back: 'Back', next: 'Next', previous: 'Previous', close: 'Close', save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit', share: 'Share', copy: 'Copy', copied: 'Copied!', readMore: 'Read More', showLess: 'Show Less' },
+  fr: { loading: 'Chargement...', error: 'Erreur', retry: 'Réessayer', back: 'Retour', next: 'Suivant', previous: 'Précédent', close: 'Fermer', save: 'Enregistrer', cancel: 'Annuler', delete: 'Supprimer', edit: 'Modifier', share: 'Partager', copy: 'Copier', copied: 'Copié !', readMore: 'Lire Plus', showLess: 'Afficher Moins' },
+  es: { loading: 'Cargando...', error: 'Error', retry: 'Intentar', back: 'Atrás', next: 'Siguiente', previous: 'Anterior', close: 'Cerrar', save: 'Guardar', cancel: 'Cancelar', delete: 'Eliminar', edit: 'Editar', share: 'Compartir', copy: 'Copiar', copied: '¡Copiado!', readMore: 'Leer Más', showLess: 'Mostrar Menos' },
+  ar: { loading: 'جاري التحميل...', error: 'خطأ', retry: 'حاول', back: 'رجوع', next: 'التالي', previous: 'السابق', close: 'إغلاق', save: 'حفظ', cancel: 'إلغاء', delete: 'حذف', edit: 'تعديل', share: 'مشاركة', copy: 'نسخ', copied: 'تم النسخ!', readMore: 'اقرأ المزيد', showLess: 'عرض أقل' }
+};

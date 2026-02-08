@@ -11,52 +11,60 @@
                 <div class="col-lg-9 mx-auto text-center">
 
                   <h1 class="display-5 fw-bold mb-3">
-                    Browse Funny Jokes by Category
+                    {{ t('categories.hero.title') }}
                   </h1>
 
-                  <p class="lead text-muted mb-0">
-                    Looking for <strong>dad jokes</strong>, <strong>jokes for kids</strong>,
-                    or classic <strong>knock knock jokes</strong>?
-                    Explore thousands of jokes organized into easy-to-browse categories —
-                    from family-friendly <strong>kids jokes</strong> to bold
-                    <strong>dark humor jokes</strong>.
-                  </p>
+                  <p class="lead text-muted mb-0" v-html="t('categories.hero.description')"></p>
+                  
                   <p class="small text-muted mt-3">
-                    Updated daily with new jokes across all categories.
+                    {{ t('categories.hero.updated') }}
                   </p>
-                  <p class="visually-hidden">
-                    Funny jokes categories including dad jokes, kids jokes, clean jokes,
-                    dark humor jokes, knock knock jokes, holiday jokes, and joke of the day.
-                  </p>
-
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Categories Grid -->
+          <div v-if="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">{{ t('categories.loading') }}</span>
+            </div>
+          </div>
 
+          <div v-else-if="categories.length === 0" class="text-center py-5">
+            <p class="text-muted">{{ t('categories.empty') }}</p>
+          </div>
 
-
-
-          <div class="row g-4">
-            <div v-for="category in categories" :key="category.slug" class="col-md-6 col-lg-4">
-              <div class="card category-card h-100" @click="navigateToCategory(category.slug)">
-                <div class="card-body text-center">
-                  <!-- Bootstrap Icon with gradient background -->
-                  <div class="category-icon-wrapper mb-3">
-                    <i :class="['bi', category.icon, 'category-icon']"></i>
+          <div v-else class="row g-4">
+            <div 
+              v-for="category in categories" 
+              :key="category.slug"
+              class="col-md-6 col-lg-4"
+            >
+              <router-link 
+                :to="`/category/${category.slug}`"
+                class="text-decoration-none"
+              >
+                <div class="card category-card h-100 border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="category-icon me-3">
+                        <i :class="category.icon"></i>
+                      </div>
+                      <h3 class="card-title h5 mb-0">{{ t(`categoryNames.${category.value}`) }}</h3>
+                    </div>
+                    <p class="card-text text-muted">{{ t(`categories.descriptions.${category.value}`) }}</p>
+                    <div class="mt-3">
+                      <span class="badge bg-primary">
+                        {{ categoryCounts[category.value] || 0 }} {{ t('categories.jokesCount') }}
+                      </span>
+                    </div>
                   </div>
-                  <h5 class="card-title">{{ category.label }}</h5>
-                  <p class="card-text text-muted mb-2">
-                    <strong>{{ categoryCounts[category.value] || 0 }}</strong> jokes
-                  </p>
-                  <small class="text-muted" v-if="category.description">
-                    {{ category.description }}
-                  </small>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -64,67 +72,74 @@
 </template>
 
 <script setup>
-  import { ref, reactive, computed, onMounted, watch } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useStore } from 'vuex';
-  import { getAllCategories, getAllCategoryValues } from '@/config/categories';
-  import { getBatchCategoryCounts } from '../services/jokeService';
-  import { updateSEO } from '../utils/seo';
-  import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import { ref, onMounted, watch, computed } from 'vue';
+import { getAllCategories, getAllCategoryValues } from '@/config/categories';
+import { getBatchCategoryCounts } from '@/services/jokeService';
+import { useStore } from 'vuex';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import { t, currentLanguage } from '@/i18n';
+import { updateDynamicSEO } from '@/utils/dynamicSEO';
 
-  const router = useRouter();
-  const store = useStore();
+const store = useStore();
+const categories = ref([]);
+const categoryCounts = ref({});
+const loading = ref(true);
 
-  const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
+// Get selected languages from Vuex
+const selectedLanguages = computed(() => store.getters['preferences/selectedLanguages']);
 
-  const categories = ref(getAllCategories());
-  const categoryCounts = reactive({});
+const loadCounts = async () => {
+  loading.value = true;
+  
+  console.log('🚀 Loading category counts for languages:', selectedLanguages.value);
+  console.time('⏱️ Category counts load time');
+  
+  try {
+    categories.value = getAllCategories();
+    const categoryValues = getAllCategoryValues();
+    
+    // ✅ OPTIMIZED: Single batch call - executes all queries in parallel
+    const counts = await getBatchCategoryCounts(categoryValues, selectedLanguages.value);
+    categoryCounts.value = counts;
+    
+    console.log('✅ Category counts loaded:', counts);
+  } catch (error) {
+    console.error('❌ Error loading category counts:', error);
+  } finally {
+    loading.value = false;
+    console.timeEnd('⏱️ Category counts load time');
+  }
+};
 
-  const loadCounts = async () => {
-    console.log('=== Loading counts for languages:', selectedLanguages.value);
-    console.time('⏱️ Category counts load time');
-
-    try {
-      const categoryValues = getAllCategoryValues();
-      console.log('Querying for categories:', categoryValues);
-
-      const counts = await getBatchCategoryCounts(categoryValues, selectedLanguages.value);
-      Object.assign(categoryCounts, counts);
-
-      console.log('✅ Category counts loaded:', counts);
-    } catch (error) {
-      console.error('❌ Error loading category counts:', error);
-    } finally {
-      console.timeEnd('⏱️ Category counts load time');
-    }
-  };
-
-  const navigateToCategory = (slug) => {
-    console.log('=== Navigating to category slug:', slug);
-    router.push(`/category/${slug}`);
-  };
-
-  watch(selectedLanguages, () => {
-    console.log('=== Languages changed, reloading counts ===');
-    loadCounts();
-  }, { deep: true });
-
-  onMounted(async () => {
-    updateSEO({
-      title: 'Browse Funny Jokes by Category | Dad Jokes, Kids Jokes & More',
-      description: 'Explore our joke categories! Find dad jokes, jokes for kids, knock knock jokes, work humor, tech jokes, and dark humor. Thousands of jokes organized for easy browsing.',
-      keywords: 'funny jokes categories, dad jokes, kids jokes, knock knock jokes, work jokes, tech humor, dark jokes, joke categories'
-    });
-
-    await loadCounts();
+// SEO update function
+const updateCategoriesSEO = () => {
+  const lang = currentLanguage.value;
+  
+  updateDynamicSEO({
+    title: t('seo.categoriesTitle', lang),
+    description: t('seo.categoriesDescription', lang),
+    keywords: t('seo.categoriesKeywords', lang),
+    lang: lang,
+    ogLocale: lang === 'en' ? 'en_US' : lang === 'fr' ? 'fr_FR' : lang === 'es' ? 'es_ES' : 'ar_AR'
   });
+};
+
+// Watch for language changes
+watch(currentLanguage, updateCategoriesSEO);
+
+// Watch for selected languages changes to reload counts
+watch(selectedLanguages, () => {
+  loadCounts();
+}, { deep: true });
+
+onMounted(async () => {
+  updateCategoriesSEO();
+  await loadCounts();
+});
 </script>
 
 <style scoped>
-  
-  /* ============================================
-   CATEGORIES HERO SECTION (SEO OPTIMIZED)
-   ============================================ */
+/* Categories Hero Section */
 .categories-hero {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
   border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
@@ -202,58 +217,7 @@
   color: #adb5bd;
 }
 
-/* Animated gradient on hover (subtle effect) */
-@media (hover: hover) {
-  .categories-hero .lead strong {
-    transition: all 0.3s ease;
-  }
-  
-  .categories-hero .lead strong:hover {
-    color: #764ba2;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
-  }
-  
-  .dark-mode .categories-hero .lead strong:hover {
-    color: #6ea8fe;
-  }
-}
-
-/* Responsive typography */
-@media (max-width: 768px) {
-  .categories-hero .display-5 {
-    font-size: 2rem;
-  }
-  
-  .categories-hero .lead {
-    font-size: 1rem;
-  }
-  
-  .categories-hero .display-5::after {
-    width: 60px;
-    height: 3px;
-  }
-}
-
-@media (max-width: 576px) {
-  .categories-hero .display-5 {
-    font-size: 1.75rem;
-  }
-  
-  .categories-hero .lead {
-    font-size: 0.9375rem;
-  }
-  
-  .categories-hero .py-4 {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
-  }
-}
-
-/* ============================================
-   CATEGORY CARDS
-   ============================================ */
+/* Category Cards */
 .category-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
@@ -271,89 +235,36 @@
   border-color: rgba(13, 110, 253, 0.5);
 }
 
-/* Modern Icon Wrapper */
-.category-icon-wrapper {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto;
+.category-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.05));
-  border-radius: 20px;
-  transition: all 0.3s ease;
-}
-
-.category-card:hover .category-icon-wrapper {
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(13, 110, 253, 0.1));
-  transform: scale(1.1);
-}
-
-.category-icon {
-  font-size: 2.5rem;
-  color: #0d6efd;
-  transition: all 0.3s ease;
-}
-
-.category-card:hover .category-icon {
-  color: #0a58ca;
-  transform: scale(1.05);
-}
-
-/* Dark Mode Icon Styling */
-.dark-mode .category-icon-wrapper {
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), rgba(13, 110, 253, 0.08));
-}
-
-.dark-mode .category-card:hover .category-icon-wrapper {
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.25), rgba(13, 110, 253, 0.15));
-}
-
-.dark-mode .category-icon {
-  color: #6ea8fe;
-}
-
-.dark-mode .category-card:hover .category-icon {
-  color: #9ec5fe;
-}
-
-.card-title {
-  font-weight: 600;
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-}
-
-.card-text {
-  font-weight: 500;
-}
-
-.card-text strong {
-  color: #0d6efd;
-  font-size: 1.1rem;
-}
-
-.dark-mode .card-text strong {
-  color: #6ea8fe;
-}
-
-small.text-muted {
-  font-size: 0.85rem;
-  line-height: 1.4;
-  display: block;
-  margin-top: 0.5rem;
+  color: white;
+  font-size: 1.5rem;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .category-icon-wrapper {
-    width: 70px;
-    height: 70px;
+  .categories-hero .display-5 {
+    font-size: 2rem;
   }
   
-  .category-icon {
-    font-size: 2rem;
+  .categories-hero .lead {
+    font-size: 1rem;
   }
 }
 
+@media (max-width: 576px) {
+  .categories-hero .display-5 {
+    font-size: 1.75rem;
+  }
+  
+  .categories-hero .lead {
+    font-size: 0.9375rem;
+  }
+}
 </style>

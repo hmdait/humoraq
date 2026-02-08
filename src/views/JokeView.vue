@@ -359,8 +359,8 @@ watch(
       
       if (currentJoke.value) {
         updateSEO({
-          title: `${currentJoke.value.title || 'Joke'}`,
-          description: currentJoke.value.text.substring(0, 160)
+          title: `${currentJoke.value.title.substring(0, 60) || 'Funny Joke - Laugh Out Loud!'}`,
+          description: currentJoke.value.text.substring(0, 150)
         });
       }
     }

@@ -5,12 +5,8 @@
         <!-- Page Header -->
         <div class="page-header text-center mb-4">
           <h1 class="page-title">
-            <i class="bi bi-play-circle me-2"></i>
-            Funny Videos – Watch Today’s Funniest Clips
-          </h1>
-          <p class="page-subtitle text-muted">
-            Discover the funniest videos, viral comedy clips, and short funny moments. Humoraq updates this page regularly with trending videos to make you laugh.
-          </p>
+            <i class="bi bi-play-circle me-2"></i>{{ t('videos.hero.title') }}</h1>
+          <p class="page-subtitle text-muted">{{ t('videos.hero.description') }}</p>
         </div>
 
         <!-- Category Filter (UPDATED: Using unified categories) -->
@@ -20,9 +16,6 @@
         <div v-if="hasActiveFilters" class="alert alert-info d-flex align-items-center mb-4">
           <i class="bi bi-info-circle me-2"></i>
           <div class="filter-summary">
-            <div v-if="selectedLanguages.length > 0">
-              <strong>Languages:</strong> {{ languageNames }}
-            </div>
             <div v-if="selectedCategories.length > 0">
               <strong>Categories:</strong> {{ categoryNames }}
             </div>
@@ -60,11 +53,10 @@
         <!-- Empty State -->
         <div v-else class="empty-state text-center py-5">
           <i class="bi bi-camera-video-off display-1 text-muted mb-3"></i>
-          <h4 class="text-muted">No videos found</h4>
+          <h4 class="text-muted">{{ t('videos.empty.title') }}</h4>
           <div class="text-muted">
             <p v-if="selectedCategories.length > 0">
-              No videos available in <strong>{{ categoryNames }}</strong>
-              for your selected languages.
+              {{ t('videos.empty.description') }}  <strong>{{ categoryNames }}</strong>
             </p>
             <p v-else>
               No videos available for your selected languages.
@@ -97,6 +89,7 @@
   import { getCategoryLabel } from '@/config/categories'; // UPDATED: Use unified config
   import DefaultLayout from '@/layouts/DefaultLayout.vue';
   import { updateSEO } from '@/utils/seo';
+  import { t, currentLanguage } from '@/i18n';
 
   const store = useStore();
 

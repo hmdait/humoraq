@@ -45,7 +45,7 @@ const updatePageSEO = () => {
   } else {
     // Default SEO for blog home
     updateSEO({
-      title: 'Famous Comedians Biographies | Humoraq Blog',
+      title: 'Famous Comedians – Stand-Up Legends & Comedy Stars',
       description: 'Explore biographies of legendary comedians including Eddie Murphy, Charlie Chaplin, Jim Carrey, and more. Learn about their lives, careers, and impact on comedy.',
       keywords: 'famous comedians, comedian biographies, stand-up comedy history, comedy legends, humor blog',
       canonical: 'https://humoraq.com/blogs'

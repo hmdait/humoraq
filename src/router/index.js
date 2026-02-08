@@ -1,6 +1,8 @@
+// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '@/store';  // ✅ ADDED: Import store to fix "store is not defined" error
 import { isValidCategorySlug, getCategoryBySlug } from '@/config/categories';
-import { getAllComedianSlugs } from '@/data/comedians'; // NEW IMPORT
+import { getAllComedianSlugs } from '@/data/comedians';
 import JokesFeedView from '../views/JokesFeedView.vue';
 import SpotlightView from '../views/SpotlightView.vue';
 import JokeView from '../views/JokeView.vue';
@@ -9,10 +11,11 @@ import CategoryView from '../views/CategoryView.vue';
 import SubmitView from '../views/SubmitView.vue';
 import AboutView from '../views/AboutView.vue';
 import VideosView from '../views/VideosView.vue';
-import BlogView from '../views/BlogView.vue'; // NEW IMPORT
+import BlogView from '../views/BlogView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
-import { trackPageView } from '../services/analyticsService';
 import LegalView from '../views/LegalView.vue';
+import { trackPageView } from '../services/analyticsService';
+import { addHreflangTags, updateHtmlLang } from '@/utils/hreflang';
 
 const routes = [
   {
@@ -32,7 +35,7 @@ const routes = [
     meta: { title: 'Humoraq - Spotlight' }
   },
   
-  // NEW BLOG ROUTES
+  // BLOG ROUTES
   {
     path: '/blogs',
     name: 'blogs',
@@ -60,7 +63,6 @@ const routes = [
     },
     meta: { title: 'Comedian Biography - Humoraq Blog' }
   },
-  // END NEW BLOG ROUTES
   
   // SEO-friendly joke URL - /{category}-jokes/{title-slug}-{id}
   {
@@ -177,14 +179,20 @@ const router = createRouter({
   }
 });
 
-// Update document title and track page views
+// Update document title
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || 'Humoraq';
   next();
 });
 
-router.afterEach((to, from) => {
+// Track page views
+router.afterEach((to) => {
   trackPageView(to.name, to.meta.title || 'Humoraq');
+  
+  // ✅ Optional: Add hreflang tags for multilingual SEO
+  addHreflangTags(to.path);
+  const currentLang = store.getters['preferences/selectedLanguage'] || 'en';
+  updateHtmlLang(currentLang);
 });
 
 export default router;

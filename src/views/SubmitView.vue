@@ -3,135 +3,42 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <h1 class="display-5 mb-4">Submit Your Joke</h1>
-
-          <div class="card">
-            <div class="card-body">
+          <div class="card shadow-sm">
+            <div class="card-body p-4">
+              <h1 class="h2 mb-4">Submit Your Joke</h1>
+              
               <form @submit.prevent="handleSubmit">
-                
-                <!-- Author Name -->
+                <!-- Joke Text -->
                 <div class="mb-3">
-                  <label for="authorName" class="form-label">
-                    Your Pseudonym
+                  <label for="jokeText" class="form-label">
+                    Your Joke <span class="text-danger">*</span>
                   </label>
-                  <input 
-                    id="authorName" 
-                    v-model="formData.authorName" 
-                    type="text" 
-                    class="form-control"
-                    placeholder="Enter your username (or leave empty for Anonymous)" 
-                    maxlength="50" 
-                  />
-                  <small class="form-text text-muted">
-                    Leave empty to post as "Anonymous"
-                  </small>
-                </div>
-
-                <!-- Email -->
-                <div class="mb-3">
-                  <label for="email" class="form-label">
-                    Email <span class="text-muted">(optional)</span>
-                  </label>
-                  <input 
-                    id="email" 
-                    v-model="formData.email" 
-                    type="email" 
-                    class="form-control"
-                    :class="{ 'is-invalid': emailError }" 
-                    placeholder="your@email.com" 
-                    @input="validateEmail" 
-                  />
-
-                  <!-- Monetization Message -->
-                  <div class="email-info-box mt-2">
-                    <div class="d-flex align-items-start">
-                      <i class="bi bi-cash-coin text-success me-2" style="font-size: 1.2rem;"></i>
-                      <div>
-                        <small class="text-muted">
-                          <strong>Earn money from your jokes!</strong>
-                          If your joke performs well, you can receive:
-                        </small>
-                        <ul class="reward-list mb-1">
-                          <li><strong>$5</strong> when your joke reaches <strong>5,000 views</strong></li>
-                          <li><strong>$5</strong> when your joke reaches <strong>1,000 likes</strong></li>
-                        </ul>
-                        <small class="text-muted">
-                          We'll contact you via email to send your reward.
-                          <span class="text-primary">Your email stays private</span> and won't be used for spam.
-                        </small>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="emailError" class="invalid-feedback d-block">
-                    {{ emailError }}
+                  <textarea
+                    id="jokeText"
+                    v-model="formData.text"
+                    class="form-control joke-textarea"
+                    :class="{ 'is-invalid': showJokeError }"
+                    rows="5"
+                    placeholder="Enter your hilarious joke here..."
+                    required
+                  ></textarea>
+                  <div v-if="showJokeError" class="invalid-feedback">
+                    ⚠️ Please enter your joke (minimum 10 characters)
                   </div>
                 </div>
 
                 <!-- Joke Title (Optional) -->
                 <div class="mb-3">
-                  <label for="title" class="form-label">
-                    Joke Title <span class="text-muted">(optional)</span>
+                  <label for="jokeTitle" class="form-label">
+                    Joke Title <small class="text-muted">(Optional)</small>
                   </label>
-                  <input 
-                    id="title" 
-                    v-model="formData.title" 
-                    type="text" 
+                  <input
+                    id="jokeTitle"
+                    v-model="formData.title"
+                    type="text"
                     class="form-control"
-                    placeholder="Give your joke a catchy title" 
-                    maxlength="100" 
+                    placeholder="Give your joke a catchy title"
                   />
-                </div>
-
-                <!-- Joke Text -->
-                <div class="mb-3">
-                  <label for="jokeText" class="form-label">
-                    Joke Text <span class="text-danger">*</span>
-                  </label>
-                  <textarea 
-                    id="jokeText" 
-                    ref="jokeTextarea" 
-                    v-model="formData.text" 
-                    class="form-control joke-textarea"
-                    :class="{ 
-                      'is-invalid': showValidationError,
-                      'is-valid': isTextValid && formData.text.length > 0
-                    }" 
-                    rows="6" 
-                    placeholder="Write your joke here…"
-                    @input="handleTextInput" 
-                    required
-                  ></textarea>
-
-                  <div class="d-flex justify-content-between align-items-center mt-2">
-                    <small 
-                      class="form-text" 
-                      :class="{
-                        'text-danger': characterCount < minLength || characterCount > maxLength,
-                        'text-warning': characterCount >= maxLength - 100 && characterCount <= maxLength,
-                        'text-success': isTextValid,
-                        'text-muted': characterCount === 0
-                      }"
-                    >
-                      {{ characterCount }} / {{ maxLength }} characters
-                      <span v-if="characterCount < minLength">
-                        (minimum {{ minLength }})
-                      </span>
-                    </small>
-
-                    <button 
-                      v-if="formData.text.length > 0"
-                      type="button" 
-                      class="btn btn-sm btn-outline-secondary" 
-                      @click="clearText"
-                    >
-                      Clear
-                    </button>
-                  </div>
-
-                  <div v-if="showValidationError" class="invalid-feedback d-block">
-                    ⚠️ Your joke must be between {{ minLength }} and {{ maxLength }} characters.
-                  </div>
                 </div>
 
                 <!-- Categories -->
@@ -162,7 +69,7 @@
                         :class="{ selected: formData.categories.includes(category.value) }"
                       >
                         <i :class="['bi', category.icon, 'category-icon']"></i>
-                        <span class="category-name">{{ category.label }}</span>
+                        <span class="category-name">{{ t(`categoryNames.${category.value}`) }}</span>
                       </label>
                     </div>
                   </div>
@@ -197,70 +104,118 @@
                   </select>
                 </div>
 
+                <!-- Display Name (Optional) -->
+                <div class="mb-3">
+                  <label for="displayName" class="form-label">
+                    Display Name <small class="text-muted">(Optional)</small>
+                  </label>
+                  <input
+                    id="displayName"
+                    v-model="formData.displayName"
+                    type="text"
+                    class="form-control"
+                    placeholder="Your name or pseudonym"
+                  />
+                  <small class="form-text text-muted">
+                    This will be shown as the author of your joke
+                  </small>
+                </div>
+
+                <!-- Email (Optional) -->
+                <div class="mb-3">
+                  <label for="email" class="form-label">
+                    Email <small class="text-muted">(Optional)</small>
+                  </label>
+                  <input
+                    id="email"
+                    v-model="formData.email"
+                    type="email"
+                    class="form-control"
+                    placeholder="your@email.com"
+                  />
+                  <div class="email-info-box mt-2">
+                    <small class="text-muted">
+                      <strong>💰 Why provide email?</strong>
+                      <ul class="reward-list mt-1 mb-0">
+                        <li>Get notified if your joke goes viral</li>
+                        <li>Receive updates on community engagement</li>
+                        <li>Optional rewards for top contributors</li>
+                      </ul>
+                      We'll never spam or share your email. You can also submit anonymously by leaving this blank.
+                    </small>
+                  </div>
+                </div>
+
                 <!-- Privacy & Terms Agreement -->
                 <div class="mb-3">
                   <div class="form-check">
                     <input 
                       type="checkbox" 
-                      class="form-check-input" 
-                      id="agreeTerms"
-                      v-model="formData.agreeTerms"
+                      id="agreeToTerms" 
+                      v-model="formData.agreeToTerms" 
+                      class="form-check-input"
                       :class="{ 'is-invalid': showTermsError }"
+                      required
                     />
-                    <label class="form-check-label" for="agreeTerms">
+                    <label class="form-check-label" for="agreeToTerms">
                       I agree to the 
-                      <a href="/legal" target="_blank" class="privacy-link">Privacy Policy</a>
-                      and 
-                      <a href="/legal" target="_blank" class="privacy-link">Terms of Service</a>
-                      <span class="text-danger">*</span>
+                      <router-link to="/legal" class="privacy-link" target="_blank">
+                        Privacy Policy & Terms of Service
+                      </router-link>
                     </label>
+                    <div v-if="showTermsError" class="invalid-feedback">
+                      ⚠️ Please agree to the terms to continue
+                    </div>
                   </div>
-                  <div v-if="showTermsError" class="invalid-feedback d-block">
-                    ⚠️ You must agree to the Privacy Policy and Terms of Service to submit
-                  </div>
+                </div>
+
+                <!-- Success Message -->
+                <div v-if="successMessage" class="alert alert-success" role="alert">
+                  <i class="bi bi-check-circle-fill me-2"></i>
+                  {{ successMessage }}
+                </div>
+
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="alert alert-danger" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  {{ errorMessage }}
                 </div>
 
                 <!-- Submit Button -->
-                <div class="d-grid gap-2">
+                <div class="d-grid">
                   <button 
                     type="submit" 
                     class="btn btn-primary btn-lg"
-                    :disabled="submitting || submitted || !isFormValid"
+                    :disabled="submitting"
                   >
                     <span v-if="submitting">
-                      <span class="spinner-border spinner-border-sm me-2"></span>
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                       Submitting...
                     </span>
-                    <span v-else-if="submitted">
-                      ✓ Submitted!
-                    </span>
                     <span v-else>
-                      <i class="bi bi-send me-1"></i> Submit Joke
+                      <i class="bi bi-send-fill me-2"></i>
+                      Submit Joke
                     </span>
                   </button>
                 </div>
-
-                <!-- Submission Guidelines -->
-                <div class="mt-3">
-                  <small class="text-muted">
-                    <strong>Guidelines:</strong>
-                    <ul class="mb-0 mt-2">
-                      <li>Keep it funny and appropriate for all audiences</li>
-                      <li>Original jokes are preferred</li>
-                      <li>Multi-line jokes and stories are welcome</li>
-                      <li>Use emojis to enhance your joke 😄</li>
-                    </ul>
-                  </small>
-                </div>
               </form>
+            </div>
+          </div>
 
-              <div v-if="submitted" class="alert alert-success mt-4">
-                <strong>🎉 Thank you!</strong> Your joke has been published successfully.
-              </div>
-
-              <div v-if="errorMessage" class="alert alert-danger mt-4">
-                <strong>❌ Error:</strong> {{ errorMessage }}
-              </div>
+          <!-- Guidelines Card -->
+          <div class="card shadow-sm mt-4">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="bi bi-info-circle-fill text-info me-2"></i>
+                Submission Guidelines
+              </h5>
+              <ul class="mb-0">
+                <li>Keep jokes family-friendly (except in Adult category)</li>
+                <li>No hate speech, discrimination, or offensive content</li>
+                <li>Original jokes or proper attribution required</li>
+                <li>Jokes are reviewed before publishing</li>
+                <li>All submissions must comply with our community standards</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -270,146 +225,140 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
-import { createJoke } from '../services/jokeService';
-import { updateSEO } from '../utils/seo';
-import { trackJokeSubmit } from '../services/analyticsService';
-import { getCategoriesForSelect } from '../config/categories';
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import { t } from '@/i18n';
+import { getAllCategories } from '@/config/categories';
+import { submitJoke } from '@/services/jokeService';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import { updateSEO } from '@/utils/seo';
 
-const minLength = 20;
-const maxLength = 2000;
+const store = useStore();
+const router = useRouter();
 
-const availableCategories = getCategoriesForSelect();
+// Get available categories
+const availableCategories = getAllCategories();
 
-const formData = reactive({
-  authorName: '',
-  email: '',
-  title: '',
+// Form data
+const formData = ref({
   text: '',
+  title: '',
   categories: [],
   language: 'en',
-  agreeTerms: false
+  displayName: '',
+  email: '',
+  agreeToTerms: false
 });
 
+// UI state
 const submitting = ref(false);
-const submitted = ref(false);
+const successMessage = ref('');
 const errorMessage = ref('');
-const emailError = ref('');
-const jokeTextarea = ref(null);
-const showValidationError = ref(false);
+const showJokeError = ref(false);
 const showCategoriesError = ref(false);
 const showTermsError = ref(false);
 
-const characterCount = computed(() => formData.text.length);
-const isTextValid = computed(() => 
-  characterCount.value >= minLength && characterCount.value <= maxLength
-);
-const isFormValid = computed(() => 
-  isTextValid.value && 
-  formData.categories.length > 0 && 
-  formData.language !== '' && 
-  formData.agreeTerms && 
-  !emailError.value
-);
-const selectedCategoriesText = computed(() => formData.categories.join(', '));
+// Computed
+const selectedCategoriesText = computed(() => {
+  return formData.value.categories
+    .map(value => {
+      const category = availableCategories.find(cat => cat.value === value);
+      return category ? t(`categoryNames.${category.value}`) : value;
+    })
+    .join(', ');
+});
 
-const validateEmail = () => {
-  emailError.value = '';
-  if (formData.email.trim()) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      emailError.value = 'Please enter a valid email address';
-    }
-  }
-};
-
-const handleTextInput = () => {
-  showValidationError.value = false;
-  if (jokeTextarea.value) {
-    jokeTextarea.value.style.height = 'auto';
-    jokeTextarea.value.style.height = jokeTextarea.value.scrollHeight + 'px';
-  }
-};
-
-const clearText = () => {
-  formData.text = '';
-  showValidationError.value = false;
-  if (jokeTextarea.value) {
-    jokeTextarea.value.style.height = 'auto';
-  }
-};
-
-const resetForm = () => {
-  formData.authorName = '';
-  formData.email = '';
-  formData.title = '';
-  formData.text = '';
-  formData.categories = [];
-  formData.language = 'en';
-  formData.agreeTerms = false;
-  showValidationError.value = false;
+// Validate form
+const validateForm = () => {
+  let isValid = true;
+  
+  // Reset errors
+  showJokeError.value = false;
   showCategoriesError.value = false;
   showTermsError.value = false;
-  emailError.value = '';
-  if (jokeTextarea.value) {
-    jokeTextarea.value.style.height = 'auto';
-  }
-};
-
-const handleSubmit = async () => {
   errorMessage.value = '';
-  showValidationError.value = false;
-  showCategoriesError.value = false;
-  showTermsError.value = false;
 
-  if (!isTextValid.value) {
-    showValidationError.value = true;
-    jokeTextarea.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
+  // Validate joke text
+  if (!formData.value.text || formData.value.text.trim().length < 10) {
+    showJokeError.value = true;
+    isValid = false;
   }
 
-  if (formData.categories.length === 0) {
+  // Validate categories
+  if (formData.value.categories.length === 0) {
     showCategoriesError.value = true;
-    errorMessage.value = 'Please select at least one category';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
+    isValid = false;
   }
 
-  if (!formData.agreeTerms) {
+  // Validate terms agreement
+  if (!formData.value.agreeToTerms) {
     showTermsError.value = true;
-    errorMessage.value = 'You must agree to the Privacy Policy and Terms of Service';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
+    isValid = false;
   }
 
-  if (formData.email.trim()) {
-    validateEmail();
-    if (emailError.value) return;
+  return isValid;
+};
+
+// Handle form submission
+const handleSubmit = async () => {
+  console.log('=== Submit form submitted ===');
+  
+  // Validate
+  if (!validateForm()) {
+    errorMessage.value = 'Please fix the errors above before submitting.';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
   }
 
   submitting.value = true;
+  successMessage.value = '';
+  errorMessage.value = '';
 
   try {
-    await createJoke({
-      authorName: formData.authorName.trim() || 'Anonymous',
-      email: formData.email.trim() || null,
-      title: formData.title.trim(),
-      text: formData.text.trim(),
-      categories: formData.categories,
-      language: formData.language
-    });
+    // Prepare joke data
+    const jokeData = {
+      text: formData.value.text.trim(),
+      title: formData.value.title.trim() || null,
+      categories: formData.value.categories,
+      language: formData.value.language,
+      displayName: formData.value.displayName.trim() || 'Anonymous',
+      email: formData.value.email.trim() || null,
+      status: 'pending' // Will be reviewed before publishing
+    };
 
-    trackJokeSubmit(formData.categories[0], formData.language, 'user');
-    submitted.value = true;
+    console.log('Submitting joke:', jokeData);
 
+    // Submit to Firestore
+    const jokeId = await submitJoke(jokeData);
+
+    console.log('✅ Joke submitted successfully:', jokeId);
+
+    // Show success message
+    successMessage.value = '🎉 Thank you! Your joke has been submitted and is pending review. You\'ll see it published soon!';
+    
+    // Reset form
+    formData.value = {
+      text: '',
+      title: '',
+      categories: [],
+      language: 'en',
+      displayName: '',
+      email: '',
+      agreeToTerms: false
+    };
+
+    // Scroll to top to show success message
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Redirect after 3 seconds
     setTimeout(() => {
-      submitted.value = false;
-      resetForm();
+      router.push('/');
     }, 3000);
+
   } catch (error) {
-    console.error('Error submitting joke:', error);
-    errorMessage.value = error.message || 'Failed to submit joke. Please try again.';
+    console.error('❌ Error submitting joke:', error);
+    errorMessage.value = 'Sorry, there was an error submitting your joke. Please try again.';
   } finally {
     submitting.value = false;
   }

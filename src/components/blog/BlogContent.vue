@@ -101,15 +101,6 @@
           <div class="share-section">
             <h3>Share this article</h3>
             <div class="share-buttons">
-              <button @click="share('twitter')" class="share-btn twitter">
-                <i class="bi bi-twitter-x"></i>
-              </button>
-              <button @click="share('facebook')" class="share-btn facebook">
-                <i class="bi bi-facebook"></i>
-              </button>
-              <button @click="share('linkedin')" class="share-btn linkedin">
-                <i class="bi bi-linkedin"></i>
-              </button>
               <button @click="copyLink" class="share-btn copy">
                 <i class="bi bi-link-45deg"></i>
               </button>
